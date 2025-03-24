@@ -7,17 +7,18 @@
     <title>Random Movie Suggester</title>
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh; /* Allow scrolling */
-            overflow-x: hidden;
-        }
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh; /* Allow scrolling */
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
 
         .container {
             text-align: center;
@@ -33,6 +34,7 @@
         object-fit: cover;
         border-radius: 8px;
         cursor: pointer;
+        overflow: hidden; /* Ensure poster stays within the viewport */
     }
 
         .movie-poster:hover {
