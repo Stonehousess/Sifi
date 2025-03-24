@@ -115,6 +115,7 @@
 
 
 
+
 <script>
 const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
 
@@ -129,11 +130,10 @@ function shuffle(array) {
 async function getRandomMovie() {
     console.log('Fetching movie...');
 
-    // 50/50 chance between movie and TV
-    const isMovie = Math.random() > 0.5;
-    const endpoint = isMovie ? 'movie' : 'tv';
+    // Lock to movies only
+    const endpoint = 'movie';
 
-    // Individual genre calls (OR logic)
+    // Genres: Thriller (53), Science Fiction (878), Adventure (12), Comedy (35)
     const genres = ['53', '878', '12', '35'];
     const startDate = '1970-01-01';
     const endDate = '2000-12-31';
@@ -142,7 +142,7 @@ async function getRandomMovie() {
 
     // Fetch data for each genre separately and merge results
     for (const genre of genres) {
-        const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&with_genres=${genre}&sort_by=release_date.desc&with_original_language=en&release_date.gte=${startDate}&release_date.lte=${endDate}&page=1`;
+        const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&with_genres=${genre}&sort_by=release_date.desc&with_original_language=en&region=US&release_date.gte=${startDate}&release_date.lte=${endDate}&page=1`;
 
         try {
             const response = await fetch(url);
@@ -177,7 +177,7 @@ async function getRandomMovie() {
 
         console.log('Fetched details:', details);
 
-        const runtime = details.runtime || details.episode_run_time?.[0] || 'N/A';
+        const runtime = details.runtime || 'N/A';
         const countries = details.production_countries || [];
         const countryCode = countries.length > 0 ? countries[0].iso_3166_1 : null;
 
@@ -189,7 +189,7 @@ async function getRandomMovie() {
             `${randomMovie.title || randomMovie.name} 
             (${randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'N/A'}) 
             - ⭐ ${randomMovie.vote_average.toFixed(1)}<br>
-            ${isMovie ? '🎬 Movie' : '📺 TV Show'} - ⏳ ${runtime} mins`;
+            🎬 Movie - ⏳ ${runtime} mins`;
 
         // Country flag if available
         if (countryCode) {
@@ -250,6 +250,7 @@ async function getRandomMovie() {
 document.addEventListener('DOMContentLoaded', getRandomMovie);
 setInterval(getRandomMovie, 60000); // Refresh every 60 seconds
 </script>
+
 
 
 
