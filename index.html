@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Random Movie Suggester</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh; /* Allow scrolling */
+            overflow-x: hidden;
+        }
+
+        .container {
+            text-align: center;
+            width: 100vw;
+            max-width: 800px;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .movie-poster {
+            width: auto;
+            height: 100vh; /* Fit full screen height */
+            object-fit: cover;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .movie-poster:hover {
+            transform: scale(1.02);
+        }
+
+        .info-container {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 10px;
+            flex-wrap: wrap;
+        }
+
+        .movie-title {
+            font-size: 24px;
+            color: #fff;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ffcc00;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #ffaa00;
+        }
+
+        .tmdb-logo {
+            width: 60px;
+            height: auto;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .tmdb-logo:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Movie Poster -->
+        <img id="movie-poster" class="movie-poster" src="" alt="Movie Poster" />
+        <div class="info-container">
+            <!-- Movie Title + Rating -->
+            <div id="movie-title" class="movie-title">Loading...</div> <img id="country-flag" src="" alt="Country Flag" style="display: none; width: 40px; height: 28px; margin-left: 5px;" />
+            <!-- Save Picture Button -->
+            <button id="save-poster">Save Picture</button>
+            <!-- Find Trailer Button -->
+            <button id="find-trailer" style="display: none;">Find Trailer</button>
+            <!-- TMDb Logo Button -->
+            
+<!-- TMDb Button -->
+<button id="tmdb-link" style="display: none;">View on TMDb</button>
+
+        </div>
+    </div>
+
+    
+
+
+
+
+
+
+
+
+<script>
+const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
+
+async function getRandomMovie() {
+    console.log('Fetching movie...');
+
+    // 50/50 chance between movie and TV
+    const isMovie = Math.random() > 0.5;
+    const endpoint = isMovie ? 'movie' : 'tv';
+
+    // Genres: Thriller (53), Science Fiction (878), Adventure (12), Comedy (35)
+    const genreFilter = '53,878,12,35';
+    const startDate = '1970-01-01';
+    const endDate = '2000-12-31';
+
+    // Get total pages to properly randomize
+    const initialUrl = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&with_genres=${genreFilter}&sort_by=popularity.desc&region=US&with_original_language=en&release_date.gte=${startDate}&release_date.lte=${endDate}`;
+    const initialResponse = await fetch(initialUrl);
+    const initialData = await initialResponse.json();
+
+    // TMDb caps pagination at 500 pages even if totalPages > 500
+    const totalPages = Math.min(initialData.total_pages, 500);
+    const randomPage = Math.floor(Math.random() * totalPages) + 1;
+
+    const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&sort_by=popularity.desc&with_genres=${genreFilter}&region=US&with_original_language=en&release_date.gte=${startDate}&release_date.lte=${endDate}&page=${randomPage}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        console.log('Fetched data:', data);
+
+        const validResults = data.results.filter(movie => movie.poster_path);
+
+        if (validResults.length > 0) {
+            const randomMovie = validResults[Math.floor(Math.random() * validResults.length)];
+            const posterUrl = `https://image.tmdb.org/t/p/original${randomMovie.poster_path}`;
+
+            console.log('Random movie:', randomMovie);
+
+            // Fetch additional details (runtime, production countries)
+            const detailsUrl = `https://api.themoviedb.org/3/${endpoint}/${randomMovie.id}?api_key=${API_KEY}`;
+            const detailsResponse = await fetch(detailsUrl);
+            const details = await detailsResponse.json();
+
+            console.log('Fetched details:', details);
+
+            const runtime = details.runtime || details.episode_run_time?.[0] || 'N/A';
+            const countries = details.production_countries || [];
+            const countryCode = countries.length > 0 ? countries[0].iso_3166_1 : null;
+
+            // Set movie poster
+            document.getElementById('movie-poster').src = posterUrl;
+
+            // Set movie title + rating + type
+            document.getElementById('movie-title').innerHTML = 
+                `${randomMovie.title || randomMovie.name} 
+                (${randomMovie.release_date ? randomMovie.release_date.split('-')[0] : 'N/A'}) 
+                - ⭐ ${randomMovie.vote_average.toFixed(1)}<br>
+                ${isMovie ? '🎬 Movie' : '📺 TV Show'} - ⏳ ${runtime} mins`;
+
+            // Country flag if available
+            if (countryCode) {
+                document.getElementById('country-flag').src = `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`;
+                document.getElementById('country-flag').style.display = 'inline';
+            } else {
+                document.getElementById('country-flag').style.display = 'none';
+            }
+
+            // TMDb Button Action
+            const tmdbButton = document.getElementById('tmdb-link');
+            tmdbButton.style.display = 'inline';
+            tmdbButton.onclick = () => window.open(`https://www.themoviedb.org/${endpoint}/${randomMovie.id}`, '_blank');
+
+            // Save Picture Button
+            document.getElementById('save-poster').onclick = () => {
+                fetch(posterUrl)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'movie-poster.jpg';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    });
+            };
+
+            // Find Trailer Button (open YouTube directly)
+            const trailerButton = document.getElementById('find-trailer');
+            const videoUrl = `https://api.themoviedb.org/3/${endpoint}/${randomMovie.id}/videos?api_key=${API_KEY}`;
+            const videoResponse = await fetch(videoUrl);
+            const videoData = await videoResponse.json();
+
+            console.log('Fetched trailer data:', videoData);
+
+            const trailer = videoData.results.find(video => video.type === 'Trailer' && video.site === 'YouTube');
+            if (trailer) {
+                trailerButton.style.display = 'inline';
+                trailerButton.onclick = () => window.open(`https://www.youtube.com/watch?v=${trailer.key}&autoplay=1`, '_blank');
+            } else {
+                trailerButton.style.display = 'none';
+            }
+
+            // Make poster clickable to load new movie
+            document.getElementById('movie-poster').onclick = () => {
+                getRandomMovie(); // Load new movie when poster clicked
+            };
+        } else {
+            console.log('No valid results - trying again...');
+            getRandomMovie();
+        }
+    } catch (error) {
+        console.error('Error fetching movie:', error);
+        document.getElementById('movie-title').textContent = 'Failed to load movie.';
+    }
+}
+
+// Load movie on page load + refresh every 60 seconds
+document.addEventListener('DOMContentLoaded', getRandomMovie);
+setInterval(getRandomMovie, 60000); // Refresh every 60 seconds
+</script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>
