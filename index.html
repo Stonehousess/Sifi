@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Random Movie Suggester</title>
@@ -27,13 +28,12 @@
         }
 
         .movie-poster {
-            width: auto;
-            height: 100vh; /* Fit full screen height */
-            object-fit: cover;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
-        }
+        width: 100%; /* Use full width */
+        height: 100vh; /* Stretch to full viewport height */
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+    }
 
         .movie-poster:hover {
             transform: scale(1.02);
