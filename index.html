@@ -117,6 +117,7 @@
 
 
 
+
 <script>
 const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
 
@@ -141,19 +142,21 @@ async function getRandomMovie() {
 
     let allResults = [];
 
-    // Fetch data for each genre separately and merge results
+    // Fetch data for each genre separately and combine across multiple pages
     for (const genre of genres) {
-        const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&with_genres=${genre}&sort_by=release_date.desc&with_original_language=en&region=US&release_date.gte=${startDate}&release_date.lte=${endDate}&page=1`;
+        for (let page = 1; page <= 3; page++) { // Fetch first 3 pages for larger pool
+            const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&with_genres=${genre}&sort_by=popularity.desc&with_original_language=en&region=US&release_date.gte=${startDate}&release_date.lte=${endDate}&page=${page}`;
 
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
 
-            console.log(`Fetched ${data.results.length} results for genre ${genre}:`, data.results);
+                console.log(`Fetched ${data.results.length} results for genre ${genre}, page ${page}:`, data.results);
 
-            allResults = allResults.concat(data.results.filter(movie => movie.poster_path));
-        } catch (error) {
-            console.error(`Failed to fetch genre ${genre}:`, error);
+                allResults = allResults.concat(data.results.filter(movie => movie.poster_path));
+            } catch (error) {
+                console.error(`Failed to fetch genre ${genre}, page ${page}:`, error);
+            }
         }
     }
 
@@ -166,7 +169,8 @@ async function getRandomMovie() {
         // Strong shuffle using Fisher-Yates
         shuffle(uniqueResults);
 
-        const randomMovie = uniqueResults[0]; // First movie after shuffle
+        // Pick a random movie from the shuffled list
+        const randomMovie = uniqueResults[0];
         const posterUrl = `https://image.tmdb.org/t/p/original${randomMovie.poster_path}`;
 
         console.log('Random movie:', randomMovie);
@@ -251,6 +255,7 @@ async function getRandomMovie() {
 document.addEventListener('DOMContentLoaded', getRandomMovie);
 setInterval(getRandomMovie, 60000); // Refresh every 60 seconds
 </script>
+
 
 
 
