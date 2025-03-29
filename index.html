@@ -297,13 +297,20 @@
     }
   };
   document.getElementById("save-button").onclick = () => {
-    const link = document.createElement("a");
-    link.href = "https://image.tmdb.org/t/p/original" + currentPosterPath;
-    link.download = "movie-poster.jpg";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const posterUrl = document.getElementById('movie-poster').src;
+  fetch(posterUrl)
+    .then(response => response.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'movie-poster.jpg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+};
 
   setInterval(() => getRandomTitle(), 60000);
   window.onload = () => {
