@@ -118,6 +118,16 @@ async function getRandomTitle() {
 
     const endpoint = isMovie ? 'movie' : 'tv';
     const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
+    const lockedGenre = currentGenre;
+    const lockedEndpoint = endpoint;
+    const randomPage = Math.floor(Math.random() * 50) + 1;
+
+    if (isFetching) return;
+    isFetching = true;
+    document.getElementById('loading-spinner').style.display = 'block';
+
+    const endpoint = isMovie ? 'movie' : 'tv';
+    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
         if (!genreId) {
             console.warn("Missing genreId for", endpoint, currentGenre);
             currentGenre = genres[Math.floor(Math.random() * genres.length)];
@@ -204,15 +214,22 @@ window.onload = () => {
     getRandomTitle();
     };
 
-    document.getElementById('save-button').onclick = () => {
-        if (!currentPosterPath) return;
-        const link = document.createElement('a');
-        link.href = currentPosterPath;
-        link.download = 'poster.jpg';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
+    
+document.getElementById('save-button').onclick = () => {
+    const posterUrl = document.getElementById('movie-poster').src;
+    fetch(posterUrl)
+        .then(response => response.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'movie-poster.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
+};
 
     document.getElementById('tmdb-button').onclick = () => {
         if (!currentMovieId) return;
@@ -230,6 +247,16 @@ window.onload = () => {
 setInterval(getRandomTitle, 60000);
 
 async function getRandomTitle() {
+    if (isFetching) return;
+    isFetching = true;
+    document.getElementById('loading-spinner').style.display = 'block';
+
+    const endpoint = isMovie ? 'movie' : 'tv';
+    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
+    const lockedGenre = currentGenre;
+    const lockedEndpoint = endpoint;
+    const randomPage = Math.floor(Math.random() * 50) + 1;
+
     if (isFetching) return;
     isFetching = true;
     document.getElementById('loading-spinner').style.display = 'block';
@@ -264,6 +291,7 @@ async function getRandomTitle() {
         const valid = results.filter(item => item.poster_path && (item.title || item.name));
         
         
+        
         if (!valid.length) {
             retryCount++;
             if (retryCount >= MAX_RETRIES) {
@@ -272,6 +300,13 @@ async function getRandomTitle() {
                 isFetching = false;
                 return;
             }
+            console.warn("No valid results for", lockedEndpoint, genreId, "- retry", retryCount);
+            document.getElementById('loading-spinner').style.display = 'none';
+            isFetching = false;
+            setTimeout(getRandomTitle, 500);
+            return;
+        }
+    
             console.warn("No valid results for", endpoint, genreId, "- retry", retryCount);
             document.getElementById('loading-spinner').style.display = 'none';
             currentGenre = genres[Math.floor(Math.random() * genres.length)];
