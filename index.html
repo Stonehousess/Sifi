@@ -260,13 +260,17 @@ async function getRandomTitle() {
         const results = data.results || [];
 
         const valid = results.filter(item => item.poster_path && (item.title || item.name));
+        
         if (!valid.length) {
             console.warn("No valid results for", endpoint, genreId);
+            document.getElementById('loading-spinner').style.display = 'none';
             currentGenre = genres[Math.floor(Math.random() * genres.length)];
             document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
-            setTimeout(getRandomTitle, 200);
+            isFetching = false;
+            setTimeout(getRandomTitle, 500);
             return;
         }
+    
 
         const item = valid[Math.floor(Math.random() * valid.length)];
         const title = item.title || item.name;
