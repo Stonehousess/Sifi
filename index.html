@@ -42,7 +42,7 @@
       position: fixed;
       bottom: 20px;
       width: 100%;
-      opacity: 0.8;
+      opacity: 0.5;
       transition: opacity 2s ease;
       z-index: 1000;
     }
@@ -113,7 +113,7 @@
 
     #info-panel.expanded {
       transform: translateY(0);
-      opacity: 1;
+      opacity: 0.8;
     }
 
     #info-content {
@@ -157,7 +157,7 @@
     <div id="movie-runtime"></div>
   </div>
 
-  <div id="info-panel" class="collapsed">
+  <div id="info-panel" class="collapsed" onclick="togglePanel()">
     <div id="info-content">
       <div id="info-title">Loading...</div>
       <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins</div>
@@ -208,7 +208,10 @@
         const data = await response.json();
         const results = data.results || [];
 
-        if (!results.length) return;
+        if (!results.length) {
+          console.log("No results found.");
+          return;
+        }
 
         const item = results[Math.floor(Math.random() * results.length)];
         const id = item.id;
@@ -246,27 +249,23 @@
       }
     }
 
-    function togglePanel(forceExpand = null) {
+    function togglePanel() {
       const panel = document.getElementById('info-panel');
-      const shouldExpand = forceExpand !== null ? forceExpand : !panel.classList.contains('expanded');
+      panel.classList.toggle('expanded');
 
-      if (shouldExpand) {
-        panel.classList.add('expanded');
+      if (panel.classList.contains('expanded')) {
         clearTimeout(panelTimer);
         panelTimer = setTimeout(() => panel.classList.remove('expanded'), 10000);
-      } else {
-        panel.classList.remove('expanded');
       }
     }
 
+    // Swipe Gesture Support
     let touchStartY = 0;
     let touchEndY = 0;
-
     const panel = document.getElementById('info-panel');
     panel.addEventListener('touchstart', e => {
       touchStartY = e.changedTouches[0].screenY;
     });
-
     panel.addEventListener('touchend', e => {
       touchEndY = e.changedTouches[0].screenY;
       if (touchStartY - touchEndY > 30) togglePanel(true); // swipe up
@@ -292,7 +291,6 @@
     };
 
     setInterval(() => getRandomTitle(), 60000);
-
     window.onload = () => {
       document.getElementById("movie-poster").onclick = () => getRandomTitle();
       getRandomTitle();
