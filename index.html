@@ -1,115 +1,22 @@
 <!DOCTYPE html>
 
-<html lang="en">
-<head>
-<link href="favicon.ico" rel="icon" type="image/x-icon"/>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Random Movie Suggester</title>
-<style>
-        body {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
-        background-color: #000;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-height: 100vh; /* Allow scrolling */
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
-
-        .container {
-            text-align: center;
-            width: 100vw;
-            max-width: 800px;
-            position: relative;
-            padding-bottom: 20px;
-        }
-
-        .movie-poster {
-        width: auto; /* Keep aspect ratio */
-        height: 100vh; /* Fit full screen height */
-        object-fit: cover; /* Ensure no distortion */
-        border-radius: 8px;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-    }
-
-        .movie-poster:hover {
-            transform: scale(1.02);
-        }
-
-        .info-container {
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 0 10px;
-            flex-wrap: wrap;
-        }
-
-        .movie-title {
-            font-size: 24px;
-            color: #fff;
-            flex-grow: 1;
-            text-align: center;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #ffcc00;
-            color: #000;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #ffaa00;
-        }
-
-        .tmdb-logo {
-            width: 60px;
-            height: auto;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .tmdb-logo:hover {
-            opacity: 0.8;
-        }
-    
-.floating-buttons {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    gap: 10px;
-    z-index: 1000;
+<html><head><title>Random Movie Picker</title><style>
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
 }
-.floating-buttons button {
-    width: 120px;
-    height: 40px;
-    background-color: #222;
-    color: #ffcc00;
-    border: 1px solid #ffcc00;
-    border-radius: 5px;
+#movie-poster {
+    max-width: 300px;
+    margin: 20px auto;
     cursor: pointer;
 }
-.floating-buttons button:hover {
-    background-color: #444;
-}
-
-
 .floating-buttons {
+    opacity: 0.5;
     position: fixed;
-    bottom: 20px;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -128,27 +35,21 @@
 .floating-buttons button:hover {
     background-color: #444;
 }
-</style>
-</head>
-<body>
-<div class="container">
-<!-- Movie Poster -->
-<img alt="Movie Poster" class="movie-poster" id="movie-poster" src=""/>
-<div class="info-container">
-<!-- Movie Title + Rating -->
-<div class="movie-title" id="movie-title">Loading...</div> <img alt="Country Flag" id="country-flag" src="" style="display: none; width: 40px; height: 28px; margin-left: 5px;"/>
-<!-- Save Picture Button -->
-<button id="save-poster">Save Picture</button>
-<!-- Find Trailer Button -->
-<button id="find-trailer" style="display: none;">Find Trailer</button>
-<!-- TMDb Logo Button -->
-<!-- TMDb Button -->
-<button id="tmdb-link" style="display: none;">View on TMDb</button>
-</div>
+</style></head><body>
+<h1 id="movie-title">Loading...</h1>
+<img alt="Movie Poster" id="movie-poster" src=""/>
+<p id="rating"></p>
+<div class="floating-buttons">
+<button id="save-button">Poster</button>
+<button id="trailer-button">Trailer</button>
+<button id="tmdb-button">TMDB</button>
+<button id="next-button">Next</button>
+<button id="genre-button">Genre</button>
 </div>
 <script>
-let genres = ['53', '878', '12', '35', '99', '16', '10749', '80']; // Full genre list
-let currentGenre = '16'; // Default to Animation
+let genres = ['53', '878', '12', '35', '99', '16', '10749', '80'];
+let currentGenre = '16';
+let currentPosterPath = '';
 
 async function getRandomMovie() {
     const genre = currentGenre;
@@ -156,12 +57,17 @@ async function getRandomMovie() {
     const apiKey = '0df61cb2a68c352f4171cf60b79327cf';
     const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=en-US&with_genres=${genre}&page=${randomPage}`;
 
+    console.log("Fetching from:", url);
+
     try {
         const response = await fetch(url);
         const data = await response.json();
         const movies = data.results.filter(movie => movie.poster_path);
 
-        if (!movies.length) return;
+        if (!movies.length) {
+            console.warn("No movies found for this genre/page.");
+            return;
+        }
 
         const randomMovie = movies[Math.floor(Math.random() * movies.length)];
         const title = randomMovie.title;
@@ -170,20 +76,17 @@ async function getRandomMovie() {
         const year = (randomMovie.release_date || '').slice(0, 4);
         const rating = randomMovie.vote_average.toFixed(1);
 
+        currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
+
         document.getElementById('movie-title').innerText = title + ' (' + year + ')';
-        document.getElementById('movie-poster').src = 'https://image.tmdb.org/t/p/w500' + posterPath;
+        document.getElementById('movie-poster').src = currentPosterPath;
         document.getElementById('movie-poster').alt = title;
         document.getElementById('rating').innerText = 'IMDb Rating: ' + rating;
+
         document.getElementById('tmdb-button').onclick = () => window.open(`https://www.themoviedb.org/movie/${id}`, '_blank');
         document.getElementById('trailer-button').onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
-        document.getElementById('save-button').onclick = () => {
-            const link = document.createElement('a');
-            link.href = 'https://image.tmdb.org/t/p/w500' + posterPath;
-            link.download = title + '.jpg';
-            link.click();
-        };
     } catch (err) {
-        console.error("Failed to fetch movie data:", err);
+        console.error("Movie fetch failed:", err);
     }
 }
 
@@ -195,14 +98,12 @@ window.onload = () => {
         currentGenre = genres[Math.floor(Math.random() * genres.length)];
         getRandomMovie();
     };
+    document.getElementById('save-button').onclick = () => {
+        if (!currentPosterPath) return;
+        const link = document.createElement('a');
+        link.href = currentPosterPath;
+        link.download = 'poster.jpg';
+        link.click();
+    };
 };
-</script>
-<div class="floating-buttons">
-<button id="save-button">Save Picture</button>
-<button id="trailer-button">Find Trailer</button>
-<button id="tmdb-button">View on TMDb</button>
-<button id="next-button">Next</button>
-<button id="genre-button">Genre</button>
-</div>
-</body>
-</html>
+</script></body></html>
