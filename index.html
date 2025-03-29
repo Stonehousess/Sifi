@@ -168,9 +168,7 @@ async function getRandomTitle() {
                 document.getElementById('loading-spinner').style.display = 'none';
                 isFetching = false;
         isFetching = false;
-    } 
 
-    }
 
 window.onload = () => {
     currentGenre = genres.find(g => g.name === 'Animation');
@@ -275,7 +273,6 @@ async function getRandomTitle() {
             isFetching = false;
             setTimeout(getRandomTitle, 500);
             return;
-        }
     
 
         const item = valid[Math.floor(Math.random() * valid.length)];
@@ -299,10 +296,7 @@ async function getRandomTitle() {
         retryCount = 0;
         retryCount = 0;
 
-    } 
 
     document.getElementById('loading-spinner').style.display = 'none';
     isFetching = false;
-    isMovie = !isMovie;
-}
-</script><div id="movie-rating"></div></body></html>
+    isMovie = !isMovie;</script><div id="movie-rating"></div></body></html>
