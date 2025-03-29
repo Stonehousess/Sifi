@@ -167,6 +167,25 @@ body {
     opacity: 0;
     pointer-events: none;
 }
+
+
+#movie-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    background: #111;
+    padding: 20px;
+}
+#movie-poster {
+    width: 100vw;
+    max-width: 500px;
+    height: auto;
+    display: block;
+    border: 2px solid red;
+    margin-bottom: 20px;
+    background: #333;
+}
 </style></head><body><div id="movie-container"><img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/><h1 id="movie-title">Loading...</h1><div id="movie-year">Placeholder for Movie Year</div><div id="movie-rating">Placeholder for Movie Rating</div><div id="movie-type">Placeholder for Movie Type</div><div id="movie-runtime">Placeholder for Movie Runtime</div><p id="movie-description"></p></div>
 <div id="loading-spinner">Loading...</div>
 <p id="info-line"></p>
