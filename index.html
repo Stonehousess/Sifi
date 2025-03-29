@@ -369,18 +369,6 @@ function showInfo(title, year, rating, mediaType, overview, genreName) {
         infoBox.classList.add("collapsed");
     }, 10000);
 }
-    infoBox.innerHTML = `
-        <div><strong>${title}</strong> (${year})</div>
-        <div>⭐ ${rating} — ${mediaType}</div>
-        <div><em>${genreName}</em></div>
-        <p>${overview}</p>
-    `;
-    infoBox.classList.remove("hidden");
-    clearTimeout(infoTimeout);
-    infoTimeout = setTimeout(() => {
-        infoBox.classList.add("hidden");
-    }, 10000); // hide after 10s
-}
 
 // Trigger info fade-in again on interaction
 document.addEventListener("click", () => {
