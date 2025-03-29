@@ -178,11 +178,33 @@ body {
     background: #222;
     user-select: none;
 }
+
+
+.floating-info {
+    position: fixed;
+    bottom: 100px;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 1s ease, transform 0.5s ease;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.floating-info.hidden {
+    opacity: 0;
+    transform: translateY(100%);
+    pointer-events: none;
+}
 </style></head><body><div id="movie-container"><img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/><h1 id="movie-title">Loading...</h1><div id="movie-year">Placeholder for Movie Year</div><div id="movie-rating">Placeholder for Movie Rating</div><div id="movie-type">Placeholder for Movie Type</div><div id="movie-runtime">Placeholder for Movie Runtime</div><p id="movie-description"></p></div>
 <div id="loading-spinner">Loading...</div>
 <p id="info-line"></p>
 <p id="current-genre">Genre: </p>
-<div class="floating-buttons">
+<div class="floating-info" id="floating-info">{{INFO_PLACEHOLDER}}</div><div class="floating-buttons">
 <button id="tmdb-button">TMDB</button><button id="trailer-button">Trailer</button><button id="save-button">Poster</button><button id="genre-button">Genre</button><button id="next-button">Next</button></div>
 <script>
 const genres = [
@@ -315,4 +337,31 @@ document.getElementById("next-button").onclick = () => {
     getRandomTitle();
 };
 setInterval(getRandomTitle, 60000); // auto-fetch every 60 seconds
+
+
+let infoTimeout;
+const infoBox = document.getElementById("floating-info");
+
+function showInfo(title, year, rating, mediaType, overview, genreName) {
+    infoBox.innerHTML = `
+        <div><strong>${title}</strong> (${year})</div>
+        <div>⭐ ${rating} — ${mediaType}</div>
+        <div><em>${genreName}</em></div>
+        <p>${overview}</p>
+    `;
+    infoBox.classList.remove("hidden");
+    clearTimeout(infoTimeout);
+    infoTimeout = setTimeout(() => {
+        infoBox.classList.add("hidden");
+    }, 10000); // hide after 10s
+}
+
+// Trigger info fade-in again on interaction
+document.addEventListener("click", () => {
+    if (infoBox) infoBox.classList.remove("hidden");
+    clearTimeout(infoTimeout);
+    infoTimeout = setTimeout(() => {
+        infoBox.classList.add("hidden");
+    }, 10000);
+});
 </script></body></html>
