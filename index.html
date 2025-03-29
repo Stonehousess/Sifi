@@ -197,6 +197,7 @@
 
   async function getRandomTitle() {
   isMovie = Math.random() < 0.5;
+  console.log("Picked:", isMovie ? "🎬 Film" : "📺 TV");
     const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
     const type = isMovie ? "movie" : "tv";
     const randomPage = Math.floor(Math.random() * 50) + 1;
