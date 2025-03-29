@@ -76,6 +76,32 @@ body {
 .floating-buttons.hidden {
     display: none !important;
 }
+
+
+.floating-buttons button {
+    width: 60px;
+    height: 60px;
+    margin: 6px;
+    border-radius: 12px;
+    font-size: 12px;
+    text-align: center;
+    padding: 6px;
+}
+.floating-buttons {
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    width: 100%;
+    opacity: 0.5;
+}
+.floating-buttons.hidden {
+    display: none !important;
+}
+#movie-poster:hover {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+}
 </style></head><body><div id="movie-container"><div id="movie-year">Placeholder for Movie Year</div><div id="movie-rating">Placeholder for Movie Rating</div><div id="movie-runtime">Placeholder for Movie Runtime</div><div id="movie-type">Placeholder for Movie Type</div></div>
 <div id="loading-spinner">Loading...</div>
 <img alt="Movie Poster" id="movie-poster" src=""/>
@@ -171,7 +197,9 @@ async function getRandomTitle(retries = 0) {
         document.getElementById("movie-runtime").innerText = runtime + " min";
         document.getElementById("movie-type").innerText = typeEmoji;
 
-        document.getElementById("movie-poster").src = "https://image.tmdb.org/t/p/w500" + posterPath;
+        document.getElementById("movie-poster").src =
+        document.getElementById("movie-poster").style.cursor = "pointer";
+        document.getElementById("movie-poster").onclick = () => window.open(tmdbUrl, "_blank"); "https://image.tmdb.org/t/p/w500" + posterPath;
 
         const tmdbUrl = `https://www.themoviedb.org/${isMovie ? "movie" : "tv"}/${id}`;
         document.getElementById("tmdb-button").onclick = () => window.open(tmdbUrl, "_blank");
