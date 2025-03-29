@@ -156,41 +156,46 @@ async function getRandomMovie() {
     const apiKey = '0df61cb2a68c352f4171cf60b79327cf';
     const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=en-US&with_genres=${genre}&page=${randomPage}`;
 
-    const response = await fetch(url);
-    const data = await response.json();
-    const movies = data.results;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const movies = data.results.filter(movie => movie.poster_path);
 
-    if (!movies.length) return;
+        if (!movies.length) return;
 
-    const randomMovie = movies[Math.floor(Math.random() * movies.length)];
-    const title = randomMovie.title;
-    const posterPath = randomMovie.poster_path;
-    const id = randomMovie.id;
-    const year = (randomMovie.release_date || '').slice(0, 4);
-    const rating = randomMovie.vote_average.toFixed(1);
+        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+        const title = randomMovie.title;
+        const posterPath = randomMovie.poster_path;
+        const id = randomMovie.id;
+        const year = (randomMovie.release_date || '').slice(0, 4);
+        const rating = randomMovie.vote_average.toFixed(1);
 
-    document.getElementById('movie-title').innerText = title + ' (' + year + ')';
-    document.getElementById('movie-poster').src = 'https://image.tmdb.org/t/p/w500' + posterPath;
-    document.getElementById('movie-poster').alt = title;
-    document.getElementById('rating').innerText = 'IMDb Rating: ' + rating;
-    document.getElementById('tmdb-button').onclick = () => window.open(`https://www.themoviedb.org/movie/${id}`, '_blank');
-    document.getElementById('trailer-button').onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
-    document.getElementById('save-button').onclick = () => {
-        const link = document.createElement('a');
-        link.href = 'https://image.tmdb.org/t/p/w500' + posterPath;
-        link.download = title + '.jpg';
-        link.click();
-    };
+        document.getElementById('movie-title').innerText = title + ' (' + year + ')';
+        document.getElementById('movie-poster').src = 'https://image.tmdb.org/t/p/w500' + posterPath;
+        document.getElementById('movie-poster').alt = title;
+        document.getElementById('rating').innerText = 'IMDb Rating: ' + rating;
+        document.getElementById('tmdb-button').onclick = () => window.open(`https://www.themoviedb.org/movie/${id}`, '_blank');
+        document.getElementById('trailer-button').onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
+        document.getElementById('save-button').onclick = () => {
+            const link = document.createElement('a');
+            link.href = 'https://image.tmdb.org/t/p/w500' + posterPath;
+            link.download = title + '.jpg';
+            link.click();
+        };
+    } catch (err) {
+        console.error("Failed to fetch movie data:", err);
+    }
 }
 
-document.getElementById('next-button').onclick = getRandomMovie;
-document.getElementById('genre-button').onclick = () => {
-    currentGenre = genres[Math.floor(Math.random() * genres.length)];
+window.onload = () => {
     getRandomMovie();
+    document.getElementById('movie-poster').onclick = getRandomMovie;
+    document.getElementById('next-button').onclick = getRandomMovie;
+    document.getElementById('genre-button').onclick = () => {
+        currentGenre = genres[Math.floor(Math.random() * genres.length)];
+        getRandomMovie();
+    };
 };
-
-window.onload = getRandomMovie;
-document.getElementById('movie-poster').onclick = getRandomMovie;
 </script>
 <div class="floating-buttons">
 <button id="save-button">Save Picture</button>
