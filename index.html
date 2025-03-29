@@ -171,8 +171,7 @@ async function getRandomTitle() {
         isFetching = false;
     }
 
-    isMovie = !isMovie;
-}
+    }
 
 window.onload = () => {
     currentGenre = genres.find(g => g.name === 'Animation');
@@ -214,6 +213,7 @@ window.onload = () => {
         const title = document.getElementById('movie-title').innerText.split(' (')[0];
         window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
     };
+    isMovie = !isMovie;
 };
 
 
