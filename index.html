@@ -267,6 +267,7 @@ async function getRandomTitle(retries = 0) {
         const runtime = item.runtime || item.episode_run_time?.[0] || "??";
 
         currentPosterPath = posterPath;
+        console.log("Poster path:", posterPath);
 
         document.getElementById("movie-title").innerText = title + (year ? ` (${year})` : "");
         document.getElementById("movie-description").innerText = item.overview || "No description available.";
@@ -274,6 +275,7 @@ async function getRandomTitle(retries = 0) {
         document.getElementById("movie-runtime").innerText = runtime + " min";
         document.getElementById("movie-type").innerText = typeEmoji;
 
+        console.log("Setting poster src", "https://image.tmdb.org/t/p/w500" + posterPath);
         document.getElementById("movie-poster").src =
         document.getElementById("movie-poster").style.cursor = "pointer";
         document.getElementById("movie-poster").onclick = () => getRandomTitle(); "https://image.tmdb.org/t/p/w500" + posterPath;
