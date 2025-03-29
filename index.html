@@ -42,7 +42,7 @@
       position: fixed;
       bottom: 20px;
       width: 100%;
-      opacity: 0.5;
+      opacity: 0.8;
       transition: opacity 2s ease;
       z-index: 1000;
     }
@@ -108,6 +108,7 @@
       transition: transform 0.4s ease, opacity 0.4s ease;
       z-index: 1500;
       opacity: 0.5;
+      touch-action: pan-y;
     }
 
     #info-panel.expanded {
@@ -156,7 +157,7 @@
     <div id="movie-runtime"></div>
   </div>
 
-  <div id="info-panel" class="collapsed" onclick="togglePanel()">
+  <div id="info-panel" class="collapsed">
     <div id="info-content">
       <div id="info-title">Loading...</div>
       <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins</div>
@@ -207,10 +208,7 @@
         const data = await response.json();
         const results = data.results || [];
 
-        if (!results.length) {
-          console.log("No results found.");
-          return;
-        }
+        if (!results.length) return;
 
         const item = results[Math.floor(Math.random() * results.length)];
         const id = item.id;
@@ -248,33 +246,42 @@
       }
     }
 
-    function togglePanel() {
+    function togglePanel(forceExpand = null) {
       const panel = document.getElementById('info-panel');
-      panel.classList.toggle('expanded');
+      const shouldExpand = forceExpand !== null ? forceExpand : !panel.classList.contains('expanded');
 
-      if (panel.classList.contains('expanded')) {
+      if (shouldExpand) {
+        panel.classList.add('expanded');
         clearTimeout(panelTimer);
         panelTimer = setTimeout(() => panel.classList.remove('expanded'), 10000);
+      } else {
+        panel.classList.remove('expanded');
       }
     }
 
-    document.getElementById("next-button").onclick = () => getRandomTitle();
+    let touchStartY = 0;
+    let touchEndY = 0;
 
+    const panel = document.getElementById('info-panel');
+    panel.addEventListener('touchstart', e => {
+      touchStartY = e.changedTouches[0].screenY;
+    });
+
+    panel.addEventListener('touchend', e => {
+      touchEndY = e.changedTouches[0].screenY;
+      if (touchStartY - touchEndY > 30) togglePanel(true); // swipe up
+      if (touchEndY - touchStartY > 30) togglePanel(false); // swipe down
+    });
+
+    document.getElementById("next-button").onclick = () => getRandomTitle();
     document.getElementById("genre-button").onclick = () => {
       const randomIndex = Math.floor(Math.random() * genres.length);
       currentGenre = genres[randomIndex];
       isMovie = Math.random() < 0.5;
       getRandomTitle();
     };
-
-    document.getElementById("tmdb-button").onclick = () => {
-      if (currentTMDBUrl) window.open(currentTMDBUrl, "_blank");
-    };
-
-    document.getElementById("trailer-button").onclick = () => {
-      if (currentTrailerUrl) window.open(currentTrailerUrl, "_blank");
-    };
-
+    document.getElementById("tmdb-button").onclick = () => currentTMDBUrl && window.open(currentTMDBUrl, "_blank");
+    document.getElementById("trailer-button").onclick = () => currentTrailerUrl && window.open(currentTrailerUrl, "_blank");
     document.getElementById("save-button").onclick = () => {
       const link = document.createElement("a");
       link.href = "https://image.tmdb.org/t/p/original" + currentPosterPath;
@@ -287,10 +294,7 @@
     setInterval(() => getRandomTitle(), 60000);
 
     window.onload = () => {
-      const poster = document.getElementById("movie-poster");
-      if (poster) {
-        poster.onclick = () => getRandomTitle();
-      }
+      document.getElementById("movie-poster").onclick = () => getRandomTitle();
       getRandomTitle();
     };
   </script>
