@@ -115,6 +115,8 @@ async function getRandomTitle() {
     if (isFetching) return;
     isFetching = true;
     document.getElementById('loading-spinner').style.display = 'block';    const lockedGenre = currentGenre;
+    const genreId = isMovie ? lockedGenre.movieId : lockedGenre.tvId;
+    const endpoint = isMovie ? 'movie' : 'tv';
     const lockedEndpoint = endpoint;
     const randomPage = Math.floor(Math.random() * 50) + 1;
 
@@ -242,6 +244,8 @@ async function getRandomTitle() {
     if (isFetching) return;
     isFetching = true;
     document.getElementById('loading-spinner').style.display = 'block';    const lockedGenre = currentGenre;
+    const genreId = isMovie ? lockedGenre.movieId : lockedGenre.tvId;
+    const endpoint = isMovie ? 'movie' : 'tv';
     const lockedEndpoint = endpoint;
     const randomPage = Math.floor(Math.random() * 50) + 1;
 
