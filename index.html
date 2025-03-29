@@ -53,7 +53,7 @@ body {
 </style></head><body><div id="loading-spinner">Loading...</div>
 <h1 id="movie-title">Loading...</h1>
 <img alt="Movie Poster" id="movie-poster" src=""/>
-<p id="rating"></p><p id="movie-description"></p>
+<p id="rating"></p><p id="genre-label">Genre: ...</p><p id="movie-description"></p>
 <div class="floating-buttons">
 <button id="save-button">Poster</button>
 <button id="trailer-button">Trailer</button>
@@ -62,39 +62,52 @@ body {
 <button id="genre-button">Genre</button>
 </div>
 <script>
-let genres = ['53', '878', '12', '35', '99', '16', '10749', '80'];
-let currentGenre = '16';
+const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
+
+const genres = [
+    { id: '53', name: 'Thriller' },
+    { id: '878', name: 'Sci-Fi' },
+    { id: '12', name: 'Adventure' },
+    { id: '35', name: 'Comedy' },
+    { id: '99', name: 'Documentary' },
+    { id: '16', name: 'Animation' },
+    { id: '10749', name: 'Romance' },
+    { id: '80', name: 'Crime' }
+];
+
+let currentGenre = genres[5]; // default to Animation
 let currentPosterPath = '';
 let currentMovieId = '';
+let isMovie = true; // will alternate between movie and TV each request
 
-async function getRandomMovie() {
+async function getRandomTitle() {
     document.getElementById('loading-spinner').style.display = 'block';
 
-    const genre = currentGenre;
-    const randomPage = Math.floor(Math.random() * 20) + 1;  // LIMIT PAGE RANGE
-    const apiKey = '0df61cb2a68c352f4171cf60b79327cf';
-    const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=en-US&with_genres=${genre}&page=${randomPage}`;
+    const endpoint = isMovie ? 'movie' : 'tv';
+    const genreId = currentGenre.id;
+    const randomPage = Math.floor(Math.random() * 100) + 1;
+    const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
 
     console.log("Fetching from:", url);
 
     try {
         const response = await fetch(url);
         const data = await response.json();
-        const movies = (data.results || []).filter(movie => movie.poster_path);
+        const results = (data.results || []).filter(r => r.poster_path);
 
-        if (!movies.length) {
-            console.warn("No movies found for this genre/page.");
+        if (!results.length) {
+            console.warn("No titles found for this genre/page.");
             document.getElementById('loading-spinner').style.display = 'none';
             return;
         }
 
-        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
-        const title = randomMovie.title;
-        const posterPath = randomMovie.poster_path;
-        const id = randomMovie.id;
-        const year = (randomMovie.release_date || '').slice(0, 4);
-        const rating = randomMovie.vote_average.toFixed(1);
-        const description = randomMovie.overview || 'No description available.';
+        const item = results[Math.floor(Math.random() * results.length)];
+        const title = item.title || item.name;
+        const posterPath = item.poster_path;
+        const id = item.id;
+        const year = (item.release_date || item.first_air_date || '').slice(0, 4);
+        const rating = item.vote_average.toFixed(1);
+        const description = item.overview || 'No description available.';
 
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
         currentMovieId = id;
@@ -104,23 +117,26 @@ async function getRandomMovie() {
         document.getElementById('movie-poster').alt = title;
         document.getElementById('rating').innerText = 'IMDb Rating: ' + rating;
         document.getElementById('movie-description').innerText = description;
+        document.getElementById('genre-label').innerText = "Genre: " + currentGenre.name;
 
         document.getElementById('loading-spinner').style.display = 'none';
     } catch (err) {
-        console.error("Movie fetch failed:", err);
+        console.error("Fetch failed:", err);
         document.getElementById('loading-spinner').style.display = 'none';
     }
+
+    isMovie = !isMovie; // Flip for next call
 }
 
 window.onload = () => {
-    getRandomMovie();
+    getRandomTitle();
 
-    document.getElementById('movie-poster').onclick = getRandomMovie;
-    document.getElementById('next-button').onclick = getRandomMovie;
+    document.getElementById('movie-poster').onclick = getRandomTitle;
+    document.getElementById('next-button').onclick = getRandomTitle;
 
     document.getElementById('genre-button').onclick = () => {
         currentGenre = genres[Math.floor(Math.random() * genres.length)];
-        getRandomMovie(); // Also fetch a new movie immediately
+        getRandomTitle(); // fetch a new item immediately
     };
 
     document.getElementById('save-button').onclick = () => {
@@ -133,7 +149,8 @@ window.onload = () => {
 
     document.getElementById('tmdb-button').onclick = () => {
         if (!currentMovieId) return;
-        window.open(`https://www.themoviedb.org/movie/${currentMovieId}`, '_blank');
+        const base = isMovie ? 'movie' : 'tv';
+        window.open(`https://www.themoviedb.org/${base}/${currentMovieId}`, '_blank');
     };
 };
 </script></body></html>
