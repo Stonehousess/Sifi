@@ -24,7 +24,7 @@
       width: auto;
       max-height: 100vh;
       display: block;
-      margin: 0 auto 20px;
+      margin: 0;
       border: 2px solid red;
       border-radius: 12px;
       animation: glowing-border 5s infinite ease-in-out;
@@ -88,6 +88,57 @@
       75% { box-shadow: 0 0 20px 4px orange; border-color: orange; }
       100% { box-shadow: 0 0 10px 2px red; border-color: red; }
     }
+
+    #info-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(20, 20, 20, 0.9);
+      color: white;
+      padding: 10px 20px;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.3s ease, max-height 0.3s ease;
+      z-index: 1500;
+      max-height: 60px;
+      overflow: hidden;
+      opacity: 0.5;
+    }
+
+    #info-panel.expanded {
+      max-height: 60vh;
+      cursor: default;
+      opacity: 1;
+    }
+
+    #info-content {
+      pointer-events: none;
+    }
+
+    #info-title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    #info-meta {
+      font-size: 14px;
+      margin-top: 4px;
+      color: #ffcc00;
+    }
+
+    #info-description {
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    #info-genre {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
@@ -95,6 +146,15 @@
     <img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/>
     <div id="movie-type"></div>
     <div id="movie-runtime"></div>
+  </div>
+
+  <div id="info-panel" class="collapsed" onclick="togglePanel()">
+    <div id="info-content">
+      <div id="info-title">Loading...</div>
+      <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins</div>
+      <div id="info-description">Loading description...</div>
+      <div id="info-genre">Genre: Loading...</div>
+    </div>
   </div>
 
   <div id="loading-spinner">Loading...</div>
@@ -127,7 +187,7 @@
     let currentTrailerUrl = "";
 
     async function getRandomTitle() {
-      isMovie = Math.random() < 0.5; // Randomly switch between film and TV
+      isMovie = Math.random() < 0.5;
       const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
       const type = isMovie ? "movie" : "tv";
       const randomPage = Math.floor(Math.random() * 50) + 1;
@@ -144,20 +204,44 @@
         }
 
         const item = results[Math.floor(Math.random() * results.length)];
+        const id = item.id;
         const title = item.title || item.name || "Untitled";
         const year = (item.release_date || item.first_air_date || "????").slice(0, 4);
-        const rating = item.vote_average || "N/A";
+        const rating = item.vote_average || 0;
         const overview = item.overview || "No description available.";
         currentPosterPath = item.poster_path;
-        currentTMDBUrl = `https://www.themoviedb.org/${type}/${item.id}`;
+        currentTMDBUrl = `https://www.themoviedb.org/${type}/${id}`;
         currentTrailerUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + " " + year + " trailer")}`;
+
+        const detailUrl = `https://api.themoviedb.org/3/${type}/${id}?api_key=${apiKey}&language=en-US`;
+        const detailResponse = await fetch(detailUrl);
+        const detailData = await detailResponse.json();
+
+        let runtime;
+        if (isMovie) {
+          runtime = detailData.runtime;
+        } else {
+          const episodes = detailData.number_of_episodes || 1;
+          const avgRuntime = detailData.episode_run_time?.[0] || 0;
+          runtime = episodes > 1 ? `${episodes} eps × ${avgRuntime}` : `${avgRuntime}`;
+        }
 
         document.getElementById("movie-poster").src = "https://image.tmdb.org/t/p/original" + currentPosterPath;
         document.getElementById("movie-poster").alt = title;
 
+        document.getElementById("info-title").innerText = `${title} (${year})`;
+        document.getElementById("info-meta").innerText = `⭐️ ${Math.round(rating * 10)}% • ${isMovie ? '🎬 Film' : '📺 TV'} • ${runtime || "--"} mins`;
+        document.getElementById("info-description").innerText = overview;
+        document.getElementById("info-genre").innerText = `Genre: ${currentGenre.name}`;
+
       } catch (err) {
         console.error("Fetch failed:", err);
       }
+    }
+
+    function togglePanel() {
+      const panel = document.getElementById('info-panel');
+      panel.classList.toggle('expanded');
     }
 
     document.getElementById("next-button").onclick = () => getRandomTitle();
@@ -186,7 +270,7 @@
       document.body.removeChild(link);
     };
 
-    setInterval(() => getRandomTitle(), 60000); // auto-refresh every 60 seconds
+    setInterval(() => getRandomTitle(), 60000);
 
     window.onload = () => {
       const poster = document.getElementById("movie-poster");
