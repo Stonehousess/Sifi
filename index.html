@@ -192,6 +192,28 @@ body {
     margin-bottom: 20px;
     background: #333;
 }
+
+
+#movie-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    background: #111;
+    padding: 20px;
+}
+#movie-poster {
+    width: auto;
+    height: 100vh;
+    max-height: 100vh;
+    display: block;
+    margin: 0 auto 20px;
+    border: 2px solid red;
+    border-radius: 10px;
+    box-shadow: 0 0 20px red;
+    background: #333;
+    user-select: none;
+}
 </style></head><body><div id="movie-container"><img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/><h1 id="movie-title">Loading...</h1><div id="movie-year">Placeholder for Movie Year</div><div id="movie-rating">Placeholder for Movie Rating</div><div id="movie-type">Placeholder for Movie Type</div><div id="movie-runtime">Placeholder for Movie Runtime</div><p id="movie-description"></p></div>
 <div id="loading-spinner">Loading...</div>
 <p id="info-line"></p>
@@ -327,4 +349,6 @@ document.getElementById("genre-button").onclick = () => {
 
 document.getElementById("next-button").onclick = () => {
     getRandomTitle();
-};</script></body></html>
+};
+setInterval(getRandomTitle, 60000); // auto-fetch every 60 seconds
+</script></body></html>
