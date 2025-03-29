@@ -71,7 +71,7 @@ body {
 <img alt="Movie Poster" id="movie-poster" src=""/>
 <h1 id="movie-title">Loading...</h1>
 <p id="info-line"></p>
-<p id="movie-description"></p>
+<p id="current-genre">Genre: </p><p id="movie-description"></p>
 <div class="floating-buttons">
 <button id="save-button">Poster</button>
 <button id="trailer-button">Trailer</button>
@@ -97,8 +97,11 @@ let currentGenre = genres[5];
 let currentPosterPath = '';
 let currentMovieId = '';
 let isMovie = true;
+let isFetching = false;
 
 async function getRandomTitle() {
+    if (isFetching) return;
+    isFetching = true;
     document.getElementById('loading-spinner').style.display = 'block';
 
     const endpoint = isMovie ? 'movie' : 'tv';
@@ -133,15 +136,21 @@ async function getRandomTitle() {
         document.getElementById('movie-description').innerText = description;
 
         document.getElementById('loading-spinner').style.display = 'none';
+        isFetching = false;
+        isFetching = false;
     } catch (err) {
         console.error("Fetch failed:", err);
+        isFetching = false;
         document.getElementById('loading-spinner').style.display = 'none';
+        isFetching = false;
+        isFetching = false;
     }
 
     isMovie = !isMovie;
 }
 
 window.onload = () => {
+    document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
     getRandomTitle();
 
     document.getElementById('movie-poster').onclick = getRandomTitle;
@@ -149,15 +158,20 @@ window.onload = () => {
 
     document.getElementById('genre-button').onclick = () => {
         currentGenre = genres[Math.floor(Math.random() * genres.length)];
-        getRandomTitle();
+        document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
+        document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
+    getRandomTitle();
     };
 
     document.getElementById('save-button').onclick = () => {
         if (!currentPosterPath) return;
         const link = document.createElement('a');
         link.href = currentPosterPath;
+        link.style.display = 'none';
+        document.body.appendChild(link);
         link.download = 'poster.jpg';
         link.click();
+        document.body.removeChild(link);
     };
 
     document.getElementById('tmdb-button').onclick = () => {
