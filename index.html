@@ -10,6 +10,7 @@ body {
     margin: 0;
 }
 #movie-poster {
+    transition: transform 0.3s ease;
     height: 100vh;
     object-fit: cover;
     display: block;
@@ -66,7 +67,11 @@ body {
     z-index: 2000;
     display: none;
 }
-</style></head><body>
+
+
+#movie-poster:hover {
+    transform: scale(1.05);
+}</style></head><body>
 <div id="loading-spinner">Loading...</div>
 <img alt="Movie Poster" id="movie-poster" src=""/>
 <h1 id="movie-title">Loading...</h1>
@@ -165,6 +170,7 @@ window.onload = () => {
 
     document.getElementById('genre-button').onclick = () => {
         currentGenre = genres[Math.floor(Math.random() * genres.length)];
+        isMovie = true;
         document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
         document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
     getRandomTitle();
