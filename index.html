@@ -96,7 +96,6 @@ function hideButtonsAfterDelay() {
     buttonTimeout = setTimeout(() => {
         document.querySelector('.floating-buttons').classList.add('hidden');
     }, 10000);
-}
 ['click', 'scroll', 'touchstart'].forEach(evt => {
     document.addEventListener(evt, () => {
         document.querySelector('.floating-buttons').classList.remove('hidden');
@@ -161,5 +160,4 @@ function hideButtonsAfterDelay() {
         document.querySelector('.floating-buttons').classList.remove('hidden');
         hideButtonsAfterDelay();
     });
-});
-</script></body></html>
+});</script></body></html>
