@@ -85,7 +85,8 @@ body {
 <button id="next-button">Next</button>
 <button id="genre-button">Genre</button>
 </div>
-<script>let retryCount = 0;
+<script>(async () => {
+let retryCount = 0;
 const MAX_RETRIES = 3;
 
 const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
@@ -295,4 +296,5 @@ async function getRandomTitle() {
 
     document.getElementById('loading-spinner').style.display = 'none';
     isFetching = false;
-    isMovie = !isMovie;</script><div id="movie-rating"></div></body></html>
+    isMovie = !isMovie;
+})();</script><div id="movie-rating"></div></body></html>
