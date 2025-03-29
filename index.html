@@ -147,6 +147,9 @@ async function getRandomTitle() {
             console.warn("No TV results, trying movie fallback.");
             isMovie = true;
             getRandomTitle(); return;
+} catch (err) {
+  console.error('Error during fetch:', err);
+}
         }
 
         if (!results.length) throw new Error("No results");
@@ -257,6 +260,9 @@ async function getRandomTitle() {
             isFetching = false;
             setTimeout(getRandomTitle, 100);
             return;
+} catch (err) {
+  console.error('Error during fetch:', err);
+}
         }
         if (!genreId) {
             console.warn("Missing genreId for", endpoint, currentGenre);
