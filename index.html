@@ -295,7 +295,6 @@ if (posterPath && posterPath.startsWith('/')) {
         }
         document.getElementById("movie-poster").style.cursor = "pointer";
 window.onload = () => {
-  document.getElementById("movie-poster").onclick = () => getRandomTitle(); "https://image.tmdb.org/t/p/w780" + posterPath;
 };
 
         const tmdbUrl = `https://www.themoviedb.org/${isMovie ? "movie" : "tv"}/${id}`;
@@ -319,18 +318,15 @@ window.onload = () => {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    getRandomTitle();
     hideButtonsAfterDelay();
 });
 document.getElementById("genre-button").onclick = () => {
     const randomIndex = Math.floor(Math.random() * genres.length);
     currentGenre = genres[randomIndex];
     isMovie = true; // Always start movie first
-    getRandomTitle();
 };
 
 document.getElementById("next-button").onclick = () => {
-    getRandomTitle();
 };
 setInterval(getRandomTitle, 60000); // auto-fetch every 60 seconds
 
@@ -395,4 +391,11 @@ function handleSwipe() {
         infoBox.classList.remove("expanded");
         infoBox.classList.add("collapsed");
     }
-}</script></body></html>
+}
+window.onload = () => {
+  const poster = document.getElementById("movie-poster");
+  if (poster) {
+    poster.onclick = () => getRandomTitle();
+  }
+  getRandomTitle();
+};</script></body></html>
