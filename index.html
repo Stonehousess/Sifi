@@ -1,20 +1,33 @@
 <!DOCTYPE html>
 
 <html><head><title>Random Movie Picker</title><style>
-body {
-    background-color: #000;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 20px;
-}
 #movie-poster {
-    max-width: 300px;
-    margin: 20px auto;
-    cursor: pointer;
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
 }
+
+#movie-title {
+    font-size: 28px;
+    margin-top: 10px;
+}
+
+#rating, #runtime {
+    font-size: 18px;
+    margin: 6px 0;
+}
+
+#movie-description {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
 .floating-buttons {
-    opacity: 0.5;
     position: fixed;
     bottom: 40px;
     left: 50%;
@@ -22,7 +35,9 @@ body {
     display: flex;
     gap: 10px;
     z-index: 1000;
+    opacity: 0.5;
 }
+
 .floating-buttons button {
     width: 120px;
     height: 40px;
@@ -32,23 +47,9 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
+
 .floating-buttons button:hover {
     background-color: #444;
-}
-
-#loading-spinner {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #111;
-    color: #ffcc00;
-    padding: 20px 40px;
-    font-size: 20px;
-    border: 2px solid #ffcc00;
-    border-radius: 10px;
-    z-index: 2000;
-    display: none;
 }
 </style></head><body><div id="loading-spinner">Loading...</div>
 <h1 id="movie-title">Loading...</h1>
@@ -85,7 +86,7 @@ async function getRandomTitle() {
 
     const endpoint = isMovie ? 'movie' : 'tv';
     const genreId = currentGenre.id;
-    const randomPage = Math.floor(Math.random() * 100) + 1;
+    const randomPage = Math.floor(Math.random() * 50) + 1;
     const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
 
     console.log("Fetching from:", url);
@@ -107,6 +108,7 @@ async function getRandomTitle() {
         const id = item.id;
         const year = (item.release_date || item.first_air_date || '').slice(0, 4);
         const rating = item.vote_average.toFixed(1);
+        const runtime = item.runtime || item.episode_run_time?.[0] || '—';
         const description = item.overview || 'No description available.';
 
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
@@ -115,7 +117,7 @@ async function getRandomTitle() {
         document.getElementById('movie-title').innerText = title + ' (' + year + ')';
         document.getElementById('movie-poster').src = currentPosterPath;
         document.getElementById('movie-poster').alt = title;
-        document.getElementById('rating').innerText = 'IMDb Rating: ' + rating;
+        document.getElementById('rating').innerText = 'IMDb Rating: ' + rating + ' | Runtime: ' + runtime + ' min';
         document.getElementById('movie-description').innerText = description;
         document.getElementById('genre-label').innerText = "Genre: " + currentGenre.name;
 
