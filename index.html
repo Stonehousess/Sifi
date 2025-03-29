@@ -87,6 +87,7 @@ body {
 <script>
 const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
 
+
 const genres = [
     { name: 'Sci-Fi', movieId: '878', tvId: '10765' },
     { name: 'Adventure', movieId: '12', tvId: '10759' },
@@ -96,15 +97,8 @@ const genres = [
     { name: 'Romance', movieId: '10749', tvId: '18' },
     { name: 'Crime', movieId: '80', tvId: '80' },
     { name: 'Mystery', movieId: '9648', tvId: '9648' }
-    { id: '53', name: 'Thriller' },
-    { id: '878', name: 'Sci-Fi' },
-    { id: '12', name: 'Adventure' },
-    { id: '35', name: 'Comedy' },
-    { id: '99', name: 'Documentary' },
-    { id: '16', name: 'Animation' },
-    { id: '10749', name: 'Romance' },
-    { id: '80', name: 'Crime' }
 ];
+
 
 let currentGenre = genres.find(g => g.name === 'Animation');
 let currentPosterPath = '';
