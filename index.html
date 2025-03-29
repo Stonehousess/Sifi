@@ -238,6 +238,11 @@ function hideButtonsAfterDelay() {
 async function getRandomTitle(retries = 0) {
     if (isFetching) return;
     isFetching = true;
+    document.getElementById("movie-title").innerText = "Loading...";
+    document.getElementById("movie-description").innerText = "";
+    document.getElementById("movie-year").innerText = "";
+    document.getElementById("movie-rating").innerText = "";
+    document.getElementById("movie-runtime").innerText = "";
     document.getElementById("movie-type").innerText = "";
 
     const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
@@ -254,6 +259,7 @@ async function getRandomTitle(retries = 0) {
                 isMovie = !isMovie;
                 return getRandomTitle(retries + 1);
             } else {
+                document.getElementById("movie-title").innerText = "No suggestions found.";
                 isFetching = false;
                 return;
             }
@@ -271,6 +277,10 @@ async function getRandomTitle(retries = 0) {
         currentPosterPath = posterPath;
         console.log("Poster path:", posterPath);
 
+        document.getElementById("movie-title").innerText = title + (year ? ` (${year})` : "");
+        document.getElementById("movie-description").innerText = item.overview || "No description available.";
+        document.getElementById("movie-rating").innerText = `⭐️ ${rating}`;
+        document.getElementById("movie-runtime").innerText = runtime + " min";
         document.getElementById("movie-type").innerText = typeEmoji;
 
         console.log("Setting poster src", "https://image.tmdb.org/t/p/w780" + posterPath);
@@ -311,7 +321,11 @@ window.addEventListener('DOMContentLoaded', () => {
     hideButtonsAfterDelay();
 });
 document.getElementById("genre-button").onclick = () => {
-    const randomIndex = Math.floor(Math.random() * genres.length);    currentGenre = genres[randomIndex];    isMovie = true;    getRandomTitle();};    const randomIndex = Math.floor(Math.random() * genres.length);
+    const randomIndex = Math.floor(Math.random() * genres.length);
+    currentGenre = genres[randomIndex];
+    isMovie = true; // Always start movie first
+};
+
 document.getElementById("next-button").onclick = () => {
 };
 setInterval(getRandomTitle, 60000); // auto-fetch every 60 seconds
@@ -320,21 +334,19 @@ setInterval(getRandomTitle, 60000); // auto-fetch every 60 seconds
 let infoTimeout;
 const infoBox = document.getElementById("floating-info");
 
-function showInfo(title, year, rating, mediaType, overview, genreName) {
-    const collapsed = `<div><strong>${title}</strong> (${year})</div>`;
-    const expanded = `
-        <div><strong>${title}</strong> (${year})</div>
-        <div>⭐ ${rating} — ${mediaType}</div>
-        <div><em>${genreName}</em></div>
-        <p>${overview}</p>
-    `;
-    infoBox.innerHTML = expanded;
-    infoBox.classList.remove("hidden");
-    infoBox.classList.remove("collapsed");
-    clearTimeout(infoTimeout);
-    infoTimeout = setTimeout(() => {
-        infoBox.classList.add("collapsed");
-    }, 10000);
+function showInfo(title, year, rating, runtime, description, type, genreName, trailer, posterPath) {
+  const infoBox = document.getElementById("floating-info");
+  infoBox.innerHTML = `
+    <div><strong>${title}</strong> (${year})</div>
+    <div>⭐ ${rating} &nbsp;&nbsp; ${type} &nbsp;&nbsp; 🕒 ${runtime} mins</div>
+    <div style='margin-top: 10px;'>${description}</div>
+    <div style='margin-top: 5px; font-size: 0.9em;'>🎭 ${genreName}</div>
+  `;
+  infoBox.classList.remove("hidden");
+  clearTimeout(infoTimeout);
+  infoTimeout = setTimeout(() => {
+    infoBox.classList.add("hidden");
+  }, 10000);
 }
 
 // Trigger info fade-in again on interaction
