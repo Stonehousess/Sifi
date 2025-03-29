@@ -237,7 +237,6 @@ async function getRandomTitle() {
         if (!genreId) {
             console.warn("Missing genreId for", endpoint, currentGenre);
             isFetching = false;
-            return;
         }
 
         const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
@@ -257,13 +256,11 @@ async function getRandomTitle() {
                 console.warn("Max retries reached. No valid results.");
                 document.getElementById('loading-spinner').style.display = 'none';
                 isFetching = false;
-                return;
             }
             console.warn("No valid results for", lockedEndpoint, genreId, "- retry", retryCount);
             document.getElementById('loading-spinner').style.display = 'none';
             isFetching = false;
             setTimeout(getRandomTitle, 500);
-            return;
         }
     
             console.warn("No valid results for", endpoint, genreId, "- retry", retryCount);
@@ -272,7 +269,6 @@ async function getRandomTitle() {
             document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
             isFetching = false;
             setTimeout(getRandomTitle, 500);
-            return;
     
 
         const item = valid[Math.floor(Math.random() * valid.length)];
