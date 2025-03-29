@@ -105,6 +105,24 @@ let currentGenre = genres[0];
 let isFetching = false;
 let currentPosterPath = '';
 let isMovie = true;
+let buttonTimeout;
+
+function hideButtonsAfterDelay() {
+    clearTimeout(buttonTimeout);
+    buttonTimeout = setTimeout(() => {
+        document.querySelector('.floating-buttons').classList.add('hidden');
+    }, 10000);
+}
+
+['click', 'scroll', 'touchstart'].forEach(evt => {
+    document.addEventListener(evt, () => {
+        const btns = document.querySelector('.floating-buttons');
+        if (btns) {
+            btns.classList.remove('hidden');
+            hideButtonsAfterDelay();
+        }
+    });
+});
 
 async function getRandomTitle(retries = 0) {
     if (isFetching) return;
@@ -127,7 +145,7 @@ async function getRandomTitle(retries = 0) {
 
         if (!items || items.length === 0) {
             if (retries < 3) {
-                isMovie = !isMovie; // try the other type
+                isMovie = !isMovie;
                 return getRandomTitle(retries + 1);
             } else {
                 document.getElementById("movie-title").innerText = "No suggestions found.";
@@ -174,74 +192,6 @@ async function getRandomTitle(retries = 0) {
 
     isFetching = false;
 }
-
-
-let buttonTimeout;
-    clearTimeout(buttonTimeout);
-    buttonTimeout = setTimeout(() => {
-        document.querySelector('.floating-buttons').classList.add('hidden');
-    }, 10000);
-    document.addEventListener(evt, () => {
-        document.querySelector('.floating-buttons').classList.remove('hidden');
-    });
-});
-
-
-    document.getElementById('save-button').onclick = () => {
-    if (!currentPosterPath) return;
-const link = document.createElement('a');
-        link.href = currentPosterPath;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.download = 'poster.jpg';
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    document.getElementById('tmdb-button').onclick = () => {
-        if (!currentMovieId) return;
-        const base = isMovie ? 'movie' : 'tv';
-        window.open(`https://www.themoviedb.org/${base}/${currentMovieId}`, '_blank');
-    };
-
-    document.getElementById('trailer-button').onclick = () => {
-        const title = document.getElementById('movie-title').innerText.split(' (')[0];
-        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
-    };
-};
-
-
-setInterval(getRandomTitle, 60000);
-};
-    clearTimeout(buttonTimeout);
-    buttonTimeout = setTimeout(() => {
-        document.querySelector('.floating-buttons').classList.add('hidden');
-    }, 10000);
-    document.addEventListener(evt, () => {
-        document.querySelector('.floating-buttons').classList.remove('hidden');
-    });
-});
-
-    getRandomTitle();
-};
-
-let buttonTimeout;
-function hideButtonsAfterDelay() {
-    clearTimeout(buttonTimeout);
-    buttonTimeout = setTimeout(() => {
-        document.querySelector('.floating-buttons').classList.add('hidden');
-    }, 10000);
-}
-
-['click', 'scroll', 'touchstart'].forEach(evt => {
-    document.addEventListener(evt, () => {
-        const buttons = document.querySelector('.floating-buttons');
-        if (buttons) {
-            buttons.classList.remove('hidden');
-            hideButtonsAfterDelay();
-        }
-    });
-});
 
 window.onload = () => {
     getRandomTitle();
