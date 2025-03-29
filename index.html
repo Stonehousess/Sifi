@@ -1,6 +1,189 @@
 <!DOCTYPE html>
 
 <html><head><title>Random Movie TV Viewer</title><style>
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+}
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+    height: 100vh;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+#movie-title {
+    font-size: 28px;
+    margin-top: 12px;
+}
+#info-line {
+    font-size: 18px;
+    margin: 6px 0;
+}
+#movie-description {
+    max-width: 800px;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+.floating-buttons {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+    opacity: 0.5;
+}
+.floating-buttons button {
+    width: 60px;
+    height: 40px;
+    background-color: #222;
+    color: #ffcc00;
+    border: 1px solid #ffcc00;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.floating-buttons button:hover {
+    background-color: #444;
+}
+#loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #111;
+    color: #ffcc00;
+    padding: 20px 40px;
+    font-size: 20px;
+    border: 2px solid #ffcc00;
+    border-radius: 10px;
+    z-index: 2000;
+    display: none;
+}
+
+
+    transform: scale(1.02);
+}
+.floating-buttons.hidden {
+    display: none !important;
+}
+
+
+.floating-buttons button {
+    width: 60px;
+    height: 60px;
+    margin: 6px;
+    border-radius: 12px;
+    font-size: 12px;
+    text-align: center;
+    padding: 6px;
+}
+.floating-buttons {
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    width: 100%;
+    opacity: 0.5;
+}
+.floating-buttons.hidden {
+    display: none !important;
+}
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+}
+
+
+#movie-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+}
+    width: 100vw;
+    max-width: 500px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    user-select: none;
+}
+
+.floating-buttons {
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    width: 100%;
+    opacity: 0.8;
+    transition: opacity 2s ease;
+}
+.floating-buttons.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+
+
+
+
+@keyframes glowing-border {
+    0% { box-shadow: 0 0 10px 2px red; border-color: red; }
+    25% { box-shadow: 0 0 20px 4px orange; border-color: orange; }
+    50% { box-shadow: 0 0 25px 6px yellow; border-color: yellow; }
+    75% { box-shadow: 0 0 20px 4px orange; border-color: orange; }
+    100% { box-shadow: 0 0 10px 2px red; border-color: red; }
+}
+
+
+@keyframes glowing-border {
+    0% { box-shadow: 0 0 10px 2px red; border-color: red; }
+    25% { box-shadow: 0 0 20px 4px orange; border-color: orange; }
+    50% { box-shadow: 0 0 25px 6px yellow; border-color: yellow; }
+    75% { box-shadow: 0 0 20px 4px orange; border-color: orange; }
+    100% { box-shadow: 0 0 10px 2px red; border-color: red; }
+}
+
+
+
+
+.floating-info {
+    position: fixed;
+    bottom: 100px;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 1s ease, transform 0.5s ease;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.floating-info.hidden {
+    opacity: 0;
+    transform: translateY(100%);
+    pointer-events: none;
+}
+
+.floating-info.collapsed {
+    max-height: 60px;
+    overflow: hidden;
+    cursor: pointer;
+}
+.floating-info.expanded {
+    max-height: 60vh;
+    overflow-y: auto;
+    pointer-events: auto;
+}
 #movie-poster {
     width: auto;
     height: 100vh;
