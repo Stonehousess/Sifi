@@ -193,7 +193,7 @@ async function getRandomTitle(retries = 0) {
     isFetching = false;
 }
 
-window.onload = () => {
+window.addEventListener('DOMContentLoaded', () => {
     getRandomTitle();
     hideButtonsAfterDelay();
 };
