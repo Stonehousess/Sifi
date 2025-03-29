@@ -152,8 +152,7 @@ async function getRandomTitle() {
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
         currentMovieId = id;
         currentType = isMovie ? 'movie' : 'tv';
-        isMovie = !isMovie;
-
+        
         const emoji = isMovie ? "🎬" : "📺";
 
         document.getElementById('movie-title').innerText = title + ' (' + year + ')';
@@ -161,7 +160,8 @@ async function getRandomTitle() {
         document.getElementById('info-line').innerText = `${emoji} IMDb Rating: ${rating} | Runtime: ${runtime} min`;
         document.getElementById('movie-description').innerText = description;
 
-        document.getElementById('loading-spinner').style.display = 'none';
+                isMovie = !isMovie;
+document.getElementById('loading-spinner').style.display = 'none';
         isFetching = false;
         isFetching = false;
     } catch (err) {
