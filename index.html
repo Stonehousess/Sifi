@@ -114,15 +114,13 @@ let isFetching = false;
 async function getRandomTitle() {
     if (isFetching) return;
     isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
-    const lockedGenre = currentGenre;
+    document.getElementById('loading-spinner').style.display = 'block';    const lockedGenre = currentGenre;
     const lockedEndpoint = endpoint;
     const randomPage = Math.floor(Math.random() * 50) + 1;
 
     if (isFetching) return;
     isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
-        if (!genreId) {
+    document.getElementById('loading-spinner').style.display = 'block';        if (!genreId) {
             console.warn("Missing genreId for", endpoint, currentGenre);
             currentGenre = genres[Math.floor(Math.random() * genres.length)];
             document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
@@ -243,8 +241,7 @@ setInterval(getRandomTitle, 60000);
 async function getRandomTitle() {
     if (isFetching) return;
     isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
-    const lockedGenre = currentGenre;
+    document.getElementById('loading-spinner').style.display = 'block';    const lockedGenre = currentGenre;
     const lockedEndpoint = endpoint;
     const randomPage = Math.floor(Math.random() * 50) + 1;
 
@@ -253,9 +250,7 @@ async function getRandomTitle() {
     document.getElementById('loading-spinner').style.display = 'block';
 
     try {
-        const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
-        const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
-        if (!genreId) {
+        const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';        if (!genreId) {
             console.warn("Missing genreId for", endpoint, currentGenre);
             currentGenre = genres[Math.floor(Math.random() * genres.length)];
             document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
