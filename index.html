@@ -9,15 +9,6 @@ body {
     padding: 0;
     margin: 0;
 }
-#movie-poster {
-    min-height: 400px;
-    width: 100vw;
-    max-width: 500px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    user-select: none;
-    display: block;
-}
     border-radius: 8px;
     transition: transform 0.3s ease;
     height: 100vh;
@@ -78,15 +69,6 @@ body {
 }
 
 
-#movie-poster {
-    min-height: 400px;
-    width: 100vw;
-    max-width: 500px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    user-select: none;
-    display: block;
-}
     transform: scale(1.02);
 }
 .floating-buttons.hidden {
@@ -114,15 +96,6 @@ body {
 .floating-buttons.hidden {
     display: none !important;
 }
-#movie-poster {
-    min-height: 400px;
-    width: 100vw;
-    max-width: 500px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    user-select: none;
-    display: block;
-}
     transform: scale(1.02);
     transition: transform 0.3s ease;
 }
@@ -134,15 +107,6 @@ body {
     align-items: center;
     margin-top: 10px;
 }
-#movie-poster {
-    min-height: 400px;
-    width: 100vw;
-    max-width: 500px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    user-select: none;
-    display: block;
-}
     width: 100vw;
     max-width: 500px;
     border-radius: 10px;
@@ -150,15 +114,6 @@ body {
     user-select: none;
 }
 
-#movie-poster {
-    min-height: 400px;
-    width: 100vw;
-    max-width: 500px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    display: block;
-    user-select: none;
-}
 .floating-buttons {
     display: flex;
     justify-content: center;
@@ -182,16 +137,6 @@ body {
     background: #111;
     padding: 20px;
 }
-#movie-poster {
-    min-height: 400px;
-    width: 100vw;
-    max-width: 500px;
-    height: auto;
-    display: block;
-    border: 2px solid red;
-    margin-bottom: 20px;
-    background: #333;
-}
 
 
 #movie-container {
@@ -202,17 +147,14 @@ body {
     background: #111;
     padding: 20px;
 }
-#movie-poster {
-    width: auto;
-    height: 100vh;
-    max-height: 100vh;
-    display: block;
-    margin: 0 auto 20px;
-    border: 2px solid red;
-    border-radius: 10px;
-    box-shadow: 0 0 20px red;
-    background: #333;
-    user-select: none;
+
+
+@keyframes glowing-border {
+    0% { box-shadow: 0 0 10px 2px red; border-color: red; }
+    25% { box-shadow: 0 0 20px 4px orange; border-color: orange; }
+    50% { box-shadow: 0 0 25px 6px yellow; border-color: yellow; }
+    75% { box-shadow: 0 0 20px 4px orange; border-color: orange; }
+    100% { box-shadow: 0 0 10px 2px red; border-color: red; }
 }
 
 
@@ -223,6 +165,7 @@ body {
     75% { box-shadow: 0 0 20px 4px orange; border-color: orange; }
     100% { box-shadow: 0 0 10px 2px red; border-color: red; }
 }
+
 #movie-poster {
     height: 100vh;
     width: auto;
