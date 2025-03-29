@@ -281,7 +281,10 @@
     if (touchEndY - touchStartY > 30) togglePanel(false);
   });
 
-  document.getElementById("next-button").onclick = () => getRandomTitle();
+  document.getElementById("next-button").onclick = () => {
+  isMovie = Math.random() < 0.5;
+  getRandomTitle();
+};
   document.getElementById("genre-button").onclick = () => {
     const randomIndex = Math.floor(Math.random() * genres.length);
     currentGenre = genres[randomIndex];
