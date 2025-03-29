@@ -169,136 +169,147 @@
   <div id="loading-spinner">Loading...</div>
 
   <div class="floating-buttons">
-  <button id="tmdb-button">TMDB</button>
-  <button id="save-button">Poster</button>
-  <button id="trailer-button">Trailer</button>
-  <button id="next-button">Next</button>
-  <button id="genre-button">Genre</button>
-</div>
+    <button id="tmdb-button">TMDB</button>
+    <button id="save-button">Poster</button>
+    <button id="trailer-button" disabled>Trailer</button>
+    <button id="next-button">Next</button>
+    <button id="genre-button">Genre</button>
+  </div>
+<script>
+  let genres = [
+    { name: "Sci-Fi", movie: "878", tv: "10765" },
+    { name: "Adventure", movie: "12", tv: "10759" },
+    { name: "Comedy", movie: "35", tv: "35" },
+    { name: "Documentary", movie: "99", tv: "99" },
+    { name: "Animation", movie: "16", tv: "16" },
+    { name: "Romance", movie: "10749", tv: "18" },
+    { name: "Crime", movie: "80", tv: "80" },
+    { name: "Mystery", movie: "9648", tv: "9648" }
+  ];
 
-  <script>
-    let genres = [
-      { name: "Sci-Fi", movie: "878", tv: "10765" },
-      { name: "Adventure", movie: "12", tv: "10759" },
-      { name: "Comedy", movie: "35", tv: "35" },
-      { name: "Documentary", movie: "99", tv: "99" },
-      { name: "Animation", movie: "16", tv: "16" },
-      { name: "Romance", movie: "10749", tv: "18" },
-      { name: "Crime", movie: "80", tv: "80" },
-      { name: "Mystery", movie: "9648", tv: "9648" }
-    ];
+  let currentGenre = genres[0];
+  let isMovie = true;
+  let apiKey = "e8d804d1f104509d3c1c5b1166485ae6";
+  let currentTMDBUrl = "";
+  let currentPosterPath = "";
+  let currentTrailerUrl = "";
+  let panelTimer;
 
-    let currentGenre = genres[0];
-    let isMovie = true;
-    let apiKey = "e8d804d1f104509d3c1c5b1166485ae6";
-    let currentTMDBUrl = "";
-    let currentPosterPath = "";
-    let currentTrailerUrl = "";
-    let panelTimer;
+  async function getRandomTitle() {
+    isMovie = Math.random() < 0.5;
+    const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
+    const type = isMovie ? "movie" : "tv";
+    const randomPage = Math.floor(Math.random() * 50) + 1;
+    const url = `https://api.themoviedb.org/3/discover/${type}?api_key=${apiKey}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
 
-    async function getRandomTitle() {
-      isMovie = Math.random() < 0.5;
-      const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
-      const type = isMovie ? "movie" : "tv";
-      const randomPage = Math.floor(Math.random() * 50) + 1;
-      const url = `https://api.themoviedb.org/3/discover/${type}?api_key=${apiKey}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      const results = data.results || [];
 
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        const results = data.results || [];
+      if (!results.length) return;
 
-        if (!results.length) {
-          console.log("No results found.");
-          return;
-        }
+      const item = results[Math.floor(Math.random() * results.length)];
+      const id = item.id;
+      const title = item.title || item.name || "Untitled";
+      const year = (item.release_date || item.first_air_date || "????").slice(0, 4);
+      const rating = item.vote_average || 0;
+      const overview = item.overview || "No description available.";
+      currentPosterPath = item.poster_path;
+      currentTMDBUrl = `https://www.themoviedb.org/${type}/${id}`;
 
-        const item = results[Math.floor(Math.random() * results.length)];
-        const id = item.id;
-        const title = item.title || item.name || "Untitled";
-        const year = (item.release_date || item.first_air_date || "????").slice(0, 4);
-        const rating = item.vote_average || 0;
-        const overview = item.overview || "No description available.";
-        currentPosterPath = item.poster_path;
-        currentTMDBUrl = `https://www.themoviedb.org/${type}/${id}`;
-        currentTrailerUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + " " + year + " trailer")}`;
+      const detailUrl = `https://api.themoviedb.org/3/${type}/${id}?api_key=${apiKey}&language=en-US`;
+      const detailResponse = await fetch(detailUrl);
+      const detailData = await detailResponse.json();
 
-        const detailUrl = `https://api.themoviedb.org/3/${type}/${id}?api_key=${apiKey}&language=en-US`;
-        const detailResponse = await fetch(detailUrl);
-        const detailData = await detailResponse.json();
-
-        let runtime;
-        if (isMovie) {
-          runtime = detailData.runtime;
-        } else {
-          const episodes = detailData.number_of_episodes || 1;
-          const avgRuntime = detailData.episode_run_time?.[0] || 0;
-          runtime = episodes > 1 ? `${episodes} eps × ${avgRuntime}` : `${avgRuntime}`;
-        }
-
-        document.getElementById("movie-poster").src = "https://image.tmdb.org/t/p/original" + currentPosterPath;
-        document.getElementById("movie-poster").alt = title;
-
-        document.getElementById("info-title").innerText = `${title} (${year})`;
-        document.getElementById("info-meta").innerText = `⭐️ ${Math.round(rating * 10)}% • ${isMovie ? '🎬 Film' : '📺 TV'} • ${runtime || "--"} mins`;
-        document.getElementById("info-description").innerText = overview;
-        document.getElementById("info-genre").innerText = `Genre: ${currentGenre.name}`;
-
-      } catch (err) {
-        console.error("Fetch failed:", err);
+      let runtime;
+      if (isMovie) {
+        runtime = detailData.runtime;
+      } else {
+        const episodes = detailData.number_of_episodes || 1;
+        const avgRuntime = detailData.episode_run_time?.[0] || 0;
+        runtime = episodes > 1 ? `${episodes} eps × ${avgRuntime}` : `${avgRuntime}`;
       }
+
+      const videoUrl = `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${apiKey}`;
+      const videoResponse = await fetch(videoUrl);
+      const videoData = await videoResponse.json();
+      const trailer = videoData.results.find(video => video.type === 'Trailer' && video.site === 'YouTube');
+      if (trailer) {
+        currentTrailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
+        document.getElementById("trailer-button").disabled = false;
+      } else {
+        currentTrailerUrl = null;
+        document.getElementById("trailer-button").disabled = true;
+      }
+
+      document.getElementById("movie-poster").src = "https://image.tmdb.org/t/p/original" + currentPosterPath;
+      document.getElementById("movie-poster").alt = title;
+
+      document.getElementById("info-title").innerText = `${title} (${year})`;
+      document.getElementById("info-meta").innerText = `⭐️ ${Math.round(rating * 10)}% • ${isMovie ? '🎬 Film' : '📺 TV'} • ${runtime || "--"} mins`;
+      document.getElementById("info-description").innerText = overview;
+      document.getElementById("info-genre").innerText = `Genre: ${currentGenre.name}`;
+
+    } catch (err) {
+      console.error("Fetch failed:", err);
     }
-
-    function togglePanel(forceExpand = null) {
-  const panel = document.getElementById('info-panel');
-  const shouldExpand = forceExpand !== null ? forceExpand : !panel.classList.contains('expanded');
-
-  if (shouldExpand) {
-    panel.classList.add('expanded');
-    clearTimeout(panelTimer);
-    panelTimer = setTimeout(() => panel.classList.remove('expanded'), 10000);
-  } else {
-    panel.classList.remove('expanded');
   }
 
-    }
-
-    // Swipe Gesture Support
-    let touchStartY = 0;
-    let touchEndY = 0;
+  function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
-    panel.addEventListener('touchstart', e => {
-      touchStartY = e.changedTouches[0].screenY;
-    });
-    panel.addEventListener('touchend', e => {
-      touchEndY = e.changedTouches[0].screenY;
-      if (touchStartY - touchEndY > 30) togglePanel(true); // swipe up
-      if (touchEndY - touchStartY > 30) togglePanel(false); // swipe down
-    });
+    const shouldExpand = forceExpand !== null ? forceExpand : !panel.classList.contains('expanded');
 
-    document.getElementById("next-button").onclick = () => getRandomTitle();
-    document.getElementById("genre-button").onclick = () => {
-      const randomIndex = Math.floor(Math.random() * genres.length);
-      currentGenre = genres[randomIndex];
-      isMovie = Math.random() < 0.5;
-      getRandomTitle();
-    };
-    document.getElementById("tmdb-button").onclick = () => currentTMDBUrl && window.open(currentTMDBUrl, "_blank");
-    document.getElementById("trailer-button").onclick = () => currentTrailerUrl && window.open(currentTrailerUrl, "_blank");
-    document.getElementById("save-button").onclick = () => {
-      const link = document.createElement("a");
-      link.href = "https://image.tmdb.org/t/p/original" + currentPosterPath;
-      link.download = "movie-poster.jpg";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    };
+    if (shouldExpand) {
+      panel.classList.add('expanded');
+      clearTimeout(panelTimer);
+      panelTimer = setTimeout(() => panel.classList.remove('expanded'), 10000);
+    } else {
+      panel.classList.remove('expanded');
+    }
+  }
 
-    setInterval(() => getRandomTitle(), 60000);
-    window.onload = () => {
-      document.getElementById("movie-poster").onclick = () => getRandomTitle();
-      getRandomTitle();
-    };
-  </script>
+  let touchStartY = 0;
+  let touchEndY = 0;
+  const panel = document.getElementById('info-panel');
+  panel.addEventListener('touchstart', e => {
+    touchStartY = e.changedTouches[0].screenY;
+  });
+  panel.addEventListener('touchend', e => {
+    touchEndY = e.changedTouches[0].screenY;
+    if (touchStartY - touchEndY > 30) togglePanel(true);
+    if (touchEndY - touchStartY > 30) togglePanel(false);
+  });
+
+  document.getElementById("next-button").onclick = () => getRandomTitle();
+  document.getElementById("genre-button").onclick = () => {
+    const randomIndex = Math.floor(Math.random() * genres.length);
+    currentGenre = genres[randomIndex];
+    isMovie = Math.random() < 0.5;
+    getRandomTitle();
+  };
+  document.getElementById("tmdb-button").onclick = () => currentTMDBUrl && window.open(currentTMDBUrl, "_blank");
+  document.getElementById("trailer-button").onclick = () => {
+    if (currentTrailerUrl) {
+      window.open(currentTrailerUrl, "_blank");
+    } else {
+      alert("No trailer available for this title.");
+    }
+  };
+  document.getElementById("save-button").onclick = () => {
+    const link = document.createElement("a");
+    link.href = "https://image.tmdb.org/t/p/original" + currentPosterPath;
+    link.download = "movie-poster.jpg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  setInterval(() => getRandomTitle(), 60000);
+  window.onload = () => {
+    document.getElementById("movie-poster").onclick = () => getRandomTitle();
+    getRandomTitle();
+  };
+</script>
 </body>
 </html>
