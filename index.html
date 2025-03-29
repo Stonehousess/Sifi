@@ -104,6 +104,8 @@ function hideButtonsAfterDelay() {
     });
 });
 window.onload = () => {
+    hideButtonsAfterDelay();
+
 
     currentGenre = genres.find(g => g.name === 'Animation');
     getRandomTitle();
@@ -145,4 +147,19 @@ const link = document.createElement('a');
 };
 
 
-setInterval(getRandomTitle, 60000);</script></body></html>
+setInterval(getRandomTitle, 60000);
+};
+let buttonTimeout;
+function hideButtonsAfterDelay() {
+    clearTimeout(buttonTimeout);
+    buttonTimeout = setTimeout(() => {
+        document.querySelector('.floating-buttons').classList.add('hidden');
+    }, 10000);
+}
+['click', 'scroll', 'touchstart'].forEach(evt => {
+    document.addEventListener(evt, () => {
+        document.querySelector('.floating-buttons').classList.remove('hidden');
+        hideButtonsAfterDelay();
+    });
+});
+</script></body></html>
