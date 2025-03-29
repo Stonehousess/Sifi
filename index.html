@@ -103,6 +103,7 @@ const genres = [
 
 let currentGenre = genres.find(g => g.name === 'Animation');
 let currentPosterPath = '';
+let currentType = 'movie';
 let currentMovieId = '';
 let isMovie = true;
 let triedTV = false;
@@ -150,6 +151,7 @@ async function getRandomTitle() {
 
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
         currentMovieId = id;
+        currentType = isMovie ? 'movie' : 'tv';
 
         const emoji = isMovie ? "🎬" : "📺";
 
