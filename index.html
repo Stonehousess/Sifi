@@ -121,7 +121,14 @@ async function getRandomTitle() {
     const endpoint = isMovie ? 'movie' : 'tv';
     const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
     const randomPage = Math.floor(Math.random() * 50) + 1;
+    if (!genreId) {
+        console.warn('Missing genreId for', isMovie ? 'Movie' : 'TV', currentGenre);
+        isFetching = false;
+        return;
+    }
+
     const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
+    console.log('Fetching:', url);
 
     try {
         const response = await fetch(url);
