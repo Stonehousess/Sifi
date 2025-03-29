@@ -282,7 +282,15 @@ async function getRandomTitle(retries = 0) {
         document.getElementById("movie-type").innerText = typeEmoji;
 
         console.log("Setting poster src", "https://image.tmdb.org/t/p/w780" + posterPath);
-        document.getElementById("movie-poster").src =
+if (posterPath && posterPath.startsWith('/')) {
+            currentPosterPath = posterPath;
+            const posterUrl = "https://image.tmdb.org/t/p/w780" + posterPath;
+            console.log("Setting poster src", posterUrl);
+            document.getElementById("movie-poster").src = posterUrl;
+        } else {
+            console.warn("Poster path is invalid:", posterPath);
+            document.getElementById("movie-poster").src = "https://via.placeholder.com/500x750?text=No+Image";
+        }
         document.getElementById("movie-poster").style.cursor = "pointer";
         document.getElementById("movie-poster").onclick = () => getRandomTitle(); "https://image.tmdb.org/t/p/w780" + posterPath;
 
@@ -319,5 +327,4 @@ document.getElementById("genre-button").onclick = () => {
 
 document.getElementById("next-button").onclick = () => {
     getRandomTitle();
-};
-</script></body></html>
+};</script></body></html>
