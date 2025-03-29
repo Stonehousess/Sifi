@@ -99,6 +99,7 @@ const genres = [
     { name: 'Crime', movieId: '80', tvId: '80' },
     { name: 'Mystery', movieId: '9648', tvId: '9648' }
 ];
+let currentGenre = genres.find(g => g.name === 'Animation');
 
 
 let currentGenre = genres.find(g => g.name === 'Animation');
@@ -116,6 +117,14 @@ async function getRandomTitle() {
 
     const endpoint = isMovie ? 'movie' : 'tv';
     const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
+        if (!genreId) {
+            console.warn("Missing genreId for", endpoint, currentGenre);
+            currentGenre = genres[Math.floor(Math.random() * genres.length)];
+            document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
+            isFetching = false;
+            setTimeout(getRandomTitle, 100);
+            return;
+        }
     const randomPage = Math.floor(Math.random() * 50) + 1;
     if (!genreId) {
         console.warn('Missing genreId for', isMovie ? 'Movie' : 'TV', currentGenre);
@@ -195,13 +204,11 @@ window.onload = () => {
     };
 
     document.getElementById('save-button').onclick = () => {
-    if (!currentPosterPath) return;
         if (!currentPosterPath) return;
         const link = document.createElement('a');
         link.href = currentPosterPath;
-        link.style.display = 'none';
-        document.body.appendChild(link);
         link.download = 'poster.jpg';
+        document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     };
@@ -229,6 +236,14 @@ async function getRandomTitle() {
     try {
         const API_KEY = '0df61cb2a68c352f4171cf60b79327cf';
         const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
+        if (!genreId) {
+            console.warn("Missing genreId for", endpoint, currentGenre);
+            currentGenre = genres[Math.floor(Math.random() * genres.length)];
+            document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
+            isFetching = false;
+            setTimeout(getRandomTitle, 100);
+            return;
+        }
         const endpoint = isMovie ? 'movie' : 'tv';
         const randomPage = Math.floor(Math.random() * 50) + 1;
 
