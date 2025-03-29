@@ -114,6 +114,13 @@ async function getRandomTitle() {
         const data = await response.json();
         const results = (data.results || []).filter(r => r.poster_path);
 
+        
+        if (!results.length && !isMovie) {
+            console.warn("No TV results, trying movie fallback.");
+            isMovie = true;
+            getRandomTitle(); return;
+        }
+
         if (!results.length) throw new Error("No results");
 
         const item = results[Math.floor(Math.random() * results.length)];
@@ -164,6 +171,7 @@ window.onload = () => {
     };
 
     document.getElementById('save-button').onclick = () => {
+    if (!currentPosterPath) return;
         if (!currentPosterPath) return;
         const link = document.createElement('a');
         link.href = currentPosterPath;
@@ -185,4 +193,6 @@ window.onload = () => {
         window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
     };
 };
-</script></body></html>
+
+
+setInterval(getRandomTitle, 60000);</script></body></html>
