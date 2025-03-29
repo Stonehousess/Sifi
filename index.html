@@ -10,6 +10,7 @@ body {
     margin: 0;
 }
 #movie-poster {
+    min-height: 400px;
     width: 100vw;
     max-width: 500px;
     border-radius: 10px;
@@ -78,6 +79,7 @@ body {
 
 
 #movie-poster {
+    min-height: 400px;
     width: 100vw;
     max-width: 500px;
     border-radius: 10px;
@@ -113,6 +115,7 @@ body {
     display: none !important;
 }
 #movie-poster {
+    min-height: 400px;
     width: 100vw;
     max-width: 500px;
     border-radius: 10px;
@@ -132,6 +135,7 @@ body {
     margin-top: 10px;
 }
 #movie-poster {
+    min-height: 400px;
     width: 100vw;
     max-width: 500px;
     border-radius: 10px;
@@ -147,6 +151,7 @@ body {
 }
 
 #movie-poster {
+    min-height: 400px;
     width: 100vw;
     max-width: 500px;
     border-radius: 10px;
@@ -178,6 +183,7 @@ body {
     padding: 20px;
 }
 #movie-poster {
+    min-height: 400px;
     width: 100vw;
     max-width: 500px;
     height: auto;
@@ -275,10 +281,10 @@ async function getRandomTitle(retries = 0) {
         document.getElementById("movie-runtime").innerText = runtime + " min";
         document.getElementById("movie-type").innerText = typeEmoji;
 
-        console.log("Setting poster src", "https://image.tmdb.org/t/p/original" + posterPath);
+        console.log("Setting poster src", "https://image.tmdb.org/t/p/w780" + posterPath);
         document.getElementById("movie-poster").src =
         document.getElementById("movie-poster").style.cursor = "pointer";
-        document.getElementById("movie-poster").onclick = () => getRandomTitle(); "https://image.tmdb.org/t/p/original" + posterPath;
+        document.getElementById("movie-poster").onclick = () => getRandomTitle(); "https://image.tmdb.org/t/p/w780" + posterPath;
 
         const tmdbUrl = `https://www.themoviedb.org/${isMovie ? "movie" : "tv"}/${id}`;
         document.getElementById("tmdb-button").onclick = () => window.open(tmdbUrl, "_blank");
