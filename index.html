@@ -194,7 +194,15 @@ body {
     max-height: 60vh;
     overflow-y: auto;
     pointer-events: auto;
-}</style></head><body><div id="movie-container"><img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/></div>
+}
+#movie-poster {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+</style></head><body><div id="movie-container"><img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/></div>
 <div id="loading-spinner">Loading...</div>
 <p id="info-line"></p>
 <p id="current-genre">Genre: </p>
