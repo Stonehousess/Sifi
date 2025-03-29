@@ -85,10 +85,7 @@ body {
 <button id="next-button">Next</button>
 <button id="genre-button">Genre</button>
 </div>
-<script>(async () => {
-let retryCount = 0;
-const MAX_RETRIES = 3;
-
+<script>
 const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
 
 
@@ -102,11 +99,10 @@ const genres = [
     { name: 'Crime', movieId: '80', tvId: '80' },
     { name: 'Mystery', movieId: '9648', tvId: '9648' }
 ];
+
+
 let currentGenre = genres.find(g => g.name === 'Animation');
-
-
 let currentPosterPath = '';
-let currentType = 'movie';
 let currentMovieId = '';
 let isMovie = true;
 let triedTV = false;
@@ -115,21 +111,12 @@ let isFetching = false;
 async function getRandomTitle() {
     if (isFetching) return;
     isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';    const lockedGenre = currentGenre;
-    const genreId = isMovie ? lockedGenre.movieId : lockedGenre.tvId;
+    document.getElementById('loading-spinner').style.display = 'block';
+
     const endpoint = isMovie ? 'movie' : 'tv';
-    const lockedEndpoint = endpoint;
+    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
     const randomPage = Math.floor(Math.random() * 50) + 1;
-    if (isFetching) return;
-    isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';        if (!genreId) {
-            console.warn("Missing genreId for", endpoint, currentGenre);
-            currentGenre = genres[Math.floor(Math.random() * genres.length)];
-            document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
-            isFetching = false;
-            setTimeout(getRandomTitle, 100);
-            return;
-        }    if (!genreId) {
+    if (!genreId) {
         console.warn('Missing genreId for', isMovie ? 'Movie' : 'TV', currentGenre);
         isFetching = false;
         return;
@@ -138,7 +125,16 @@ async function getRandomTitle() {
     const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
     console.log('Fetching:', url);
 
-    // removed unmatched try block 
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const results = (data.results || []).filter(r => r.poster_path);
+
+        
+        if (!results.length && !isMovie) {
+            console.warn("No TV results, trying movie fallback.");
+            isMovie = true;
+            getRandomTitle(); return;
         }
 
         if (!results.length) throw new Error("No results");
@@ -152,13 +148,9 @@ async function getRandomTitle() {
         const runtime = item.runtime || (item.episode_run_time ? item.episode_run_time[0] : '—');
         const description = item.overview || 'No description available.';
 
-        
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
         currentMovieId = id;
-        currentType = isMovie ? 'movie' : 'tv';
-        isMovie = !isMovie;
 
-        
         const emoji = isMovie ? "🎬" : "📺";
 
         document.getElementById('movie-title').innerText = title + ' (' + year + ')';
@@ -166,14 +158,20 @@ async function getRandomTitle() {
         document.getElementById('info-line').innerText = `${emoji} IMDb Rating: ${rating} | Runtime: ${runtime} min`;
         document.getElementById('movie-description').innerText = description;
 
-                document.getElementById('loading-spinner').style.display = 'none';
-                isFetching = false;
+        document.getElementById('loading-spinner').style.display = 'none';
         isFetching = false;
+    } catch (err) {
+        console.error("Fetch failed:", err);
+        isFetching = false;
+        document.getElementById('loading-spinner').style.display = 'none';
+        isFetching = false;
+    }
 
+    isMovie = !isMovie;
+}
 
 window.onload = () => {
     currentGenre = genres.find(g => g.name === 'Animation');
-    document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
     getRandomTitle();
 
     document.getElementById('movie-poster').onclick = getRandomTitle;
@@ -181,30 +179,24 @@ window.onload = () => {
 
     document.getElementById('genre-button').onclick = () => {
         currentGenre = genres[Math.floor(Math.random() * genres.length)];
+    document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
         isMovie = true;
         triedTV = false;
-        document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
         document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
         document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
     getRandomTitle();
     };
 
-    
-document.getElementById('save-button').onclick = () => {
-    const posterUrl = document.getElementById('movie-poster').src;
-    fetch(posterUrl)
-        .then(response => response.blob())
-        .then(blob => {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'movie-poster.jpg';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        });
-};
+    document.getElementById('save-button').onclick = () => {
+    if (!currentPosterPath) return;
+const link = document.createElement('a');
+        link.href = currentPosterPath;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.download = 'poster.jpg';
+        link.click();
+        document.body.removeChild(link);
+    };
 
     document.getElementById('tmdb-button').onclick = () => {
         if (!currentMovieId) return;
@@ -213,85 +205,10 @@ document.getElementById('save-button').onclick = () => {
     };
 
     document.getElementById('trailer-button').onclick = () => {
+        const title = document.getElementById('movie-title').innerText.split(' (')[0];
         window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
     };
-    };
+};
 
 
-setInterval(getRandomTitle, 60000);
-
-async function getRandomTitle() {
-    if (isFetching) return;
-    isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';    const lockedGenre = currentGenre;
-    const genreId = isMovie ? lockedGenre.movieId : lockedGenre.tvId;
-    const endpoint = isMovie ? 'movie' : 'tv';
-    const lockedEndpoint = endpoint;
-    const randomPage = Math.floor(Math.random() * 50) + 1;
-    if (isFetching) return;
-    isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';
-
-    // removed unmatched try block 
-        }
-        if (!genreId) {
-            console.warn("Missing genreId for", endpoint, currentGenre);
-            isFetching = false;
-        }
-
-        const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
-        console.log("Fetching:", url);
-
-        const response = await fetch(url);
-        const data = await response.json();
-        const results = data.results || [];
-
-        const valid = results.filter(item => item.poster_path && (item.title || item.name));
-        
-        
-        
-        if (!valid.length) {
-            retryCount++;
-            if (retryCount >= MAX_RETRIES) {
-                console.warn("Max retries reached. No valid results.");
-                document.getElementById('loading-spinner').style.display = 'none';
-                isFetching = false;
-            }
-            console.warn("No valid results for", lockedEndpoint, genreId, "- retry", retryCount);
-            document.getElementById('loading-spinner').style.display = 'none';
-            isFetching = false;
-            setTimeout(getRandomTitle, 500);
-        }
-    
-            console.warn("No valid results for", endpoint, genreId, "- retry", retryCount);
-            document.getElementById('loading-spinner').style.display = 'none';
-            currentGenre = genres[Math.floor(Math.random() * genres.length)];
-            document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
-            isFetching = false;
-            setTimeout(getRandomTitle, 500);
-    
-
-        const year = (item.release_date || item.first_air_date || '').split('-')[0];
-        const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
-        const runtime = '—';
-        const description = item.overview || 'No description available.';
-        const posterPath = item.poster_path;
-        const id = item.id;
-
-        document.getElementById('movie-poster').src = 'https://image.tmdb.org/t/p/w500' + posterPath;
-        document.getElementById('movie-title').innerText = `${title} (${year})`;
-        document.getElementById('movie-rating').innerText = `⭐ ${rating} • ⏱️ ${runtime}`;
-        document.getElementById('movie-description').innerText = description;
-        document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
-
-        currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
-        currentMovieId = id;
-        currentType = isMovie ? 'movie' : 'tv';
-        retryCount = 0;
-        retryCount = 0;
-
-
-    document.getElementById('loading-spinner').style.display = 'none';
-    isFetching = false;
-    isMovie = !isMovie;
-})();</script><div id="movie-rating"></div></body></html>
+setInterval(getRandomTitle, 60000);</script></body></html>
