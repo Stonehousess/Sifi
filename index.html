@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-
-<html><head><title>Random Movie Picker</title><style>
+<html><head><title>Random Movie TV Viewer</title><style>
 body {
     background-color: #000;
     color: #fff;
@@ -9,24 +8,20 @@ body {
     padding: 0;
     margin: 0;
 }
-
 #movie-poster {
     width: 100vw;
     height: 100vh;
     object-fit: cover;
     display: block;
 }
-
 #movie-title {
     font-size: 28px;
     margin-top: 12px;
 }
-
 #info-line {
     font-size: 18px;
     margin: 6px 0;
 }
-
 #movie-description {
     max-width: 800px;
     margin: 10px auto;
@@ -34,7 +29,6 @@ body {
     font-size: 16px;
     line-height: 1.5;
 }
-
 .floating-buttons {
     position: fixed;
     bottom: 40px;
@@ -45,7 +39,6 @@ body {
     z-index: 1000;
     opacity: 0.5;
 }
-
 .floating-buttons button {
     width: 120px;
     height: 40px;
@@ -55,13 +48,29 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
-
 .floating-buttons button:hover {
     background-color: #444;
 }
-</style></head><body><div id="loading-spinner">Loading...</div>
-<img alt="Movie Poster" id="movie-poster" src=""/><h1 id="movie-title">Loading...</h1>
-<p id="info-line"></p><p id="movie-description"></p>
+#loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #111;
+    color: #ffcc00;
+    padding: 20px 40px;
+    font-size: 20px;
+    border: 2px solid #ffcc00;
+    border-radius: 10px;
+    z-index: 2000;
+    display: none;
+}
+</style></head><body>
+<div id="loading-spinner">Loading...</div>
+<img alt="Movie Poster" id="movie-poster" src=""/>
+<h1 id="movie-title">Loading...</h1>
+<p id="info-line"></p>
+<p id="movie-description"></p>
 <div class="floating-buttons">
 <button id="save-button">Poster</button>
 <button id="trailer-button">Trailer</button>
@@ -83,10 +92,10 @@ const genres = [
     { id: '80', name: 'Crime' }
 ];
 
-let currentGenre = genres[5]; // default to Animation
+let currentGenre = genres[5];
 let currentPosterPath = '';
 let currentMovieId = '';
-let isMovie = true; // will alternate between movie and TV each request
+let isMovie = true;
 
 async function getRandomTitle() {
     document.getElementById('loading-spinner').style.display = 'block';
@@ -96,18 +105,12 @@ async function getRandomTitle() {
     const randomPage = Math.floor(Math.random() * 50) + 1;
     const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
 
-    console.log("Fetching from:", url);
-
     try {
         const response = await fetch(url);
         const data = await response.json();
         const results = (data.results || []).filter(r => r.poster_path);
 
-        if (!results.length) {
-            console.warn("No titles found for this genre/page.");
-            document.getElementById('loading-spinner').style.display = 'none';
-            return;
-        }
+        if (!results.length) throw new Error("No results");
 
         const item = results[Math.floor(Math.random() * results.length)];
         const title = item.title || item.name;
@@ -121,14 +124,12 @@ async function getRandomTitle() {
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
         currentMovieId = id;
 
-        document.getElementById('type-label').innerText = 'Type: ' + (isMovie ? 'Movie' : 'TV Show');
+        const emoji = isMovie ? "🎬" : "📺";
+
         document.getElementById('movie-title').innerText = title + ' (' + year + ')';
         document.getElementById('movie-poster').src = currentPosterPath;
-        document.getElementById('movie-poster').alt = title;
-        const emoji = isMovie ? "🎬" : "📺";
-        document.getElementById("info-line").innerText = `${emoji} IMDb Rating: ${rating} | Runtime: ${runtime} min`;
+        document.getElementById('info-line').innerText = `${emoji} IMDb Rating: ${rating} | Runtime: ${runtime} min`;
         document.getElementById('movie-description').innerText = description;
-        document.getElementById('genre-label').innerText = "Genre: " + currentGenre.name;
 
         document.getElementById('loading-spinner').style.display = 'none';
     } catch (err) {
@@ -136,7 +137,7 @@ async function getRandomTitle() {
         document.getElementById('loading-spinner').style.display = 'none';
     }
 
-    isMovie = !isMovie; // Flip for next call
+    isMovie = !isMovie;
 }
 
 window.onload = () => {
@@ -147,7 +148,7 @@ window.onload = () => {
 
     document.getElementById('genre-button').onclick = () => {
         currentGenre = genres[Math.floor(Math.random() * genres.length)];
-        getRandomTitle(); // fetch a new item immediately
+        getRandomTitle();
     };
 
     document.getElementById('save-button').onclick = () => {
@@ -162,6 +163,11 @@ window.onload = () => {
         if (!currentMovieId) return;
         const base = isMovie ? 'movie' : 'tv';
         window.open(`https://www.themoviedb.org/${base}/${currentMovieId}`, '_blank');
+    };
+
+    document.getElementById('trailer-button').onclick = () => {
+        const title = document.getElementById('movie-title').innerText.split(' (')[0];
+        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
     };
 };
 </script></body></html>
