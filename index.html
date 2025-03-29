@@ -85,7 +85,9 @@ body {
 <button id="next-button">Next</button>
 <button id="genre-button">Genre</button>
 </div>
-<script>
+<script>let retryCount = 0;
+const MAX_RETRIES = 3;
+
 const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
 
 
@@ -261,8 +263,16 @@ async function getRandomTitle() {
 
         const valid = results.filter(item => item.poster_path && (item.title || item.name));
         
+        
         if (!valid.length) {
-            console.warn("No valid results for", endpoint, genreId);
+            retryCount++;
+            if (retryCount >= MAX_RETRIES) {
+                console.warn("Max retries reached. No valid results.");
+                document.getElementById('loading-spinner').style.display = 'none';
+                isFetching = false;
+                return;
+            }
+            console.warn("No valid results for", endpoint, genreId, "- retry", retryCount);
             document.getElementById('loading-spinner').style.display = 'none';
             currentGenre = genres[Math.floor(Math.random() * genres.length)];
             document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
@@ -289,7 +299,9 @@ async function getRandomTitle() {
 
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
         currentMovieId = id;
-        currentType = endpoint;
+        currentType = isMovie ? 'movie' : 'tv';
+        retryCount = 0;
+        retryCount = 0;
 
     } catch (err) {
         console.error("Fetch failed:", err);
