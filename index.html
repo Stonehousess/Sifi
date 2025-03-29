@@ -219,4 +219,59 @@ window.onload = () => {
     };
 
 
-setInterval(getRandomTitle, 60000);</script></body></html>
+setInterval(getRandomTitle, 60000);
+
+async function getRandomTitle() {
+    if (isFetching) return;
+    isFetching = true;
+    document.getElementById('loading-spinner').style.display = 'block';
+
+    try {
+        const API_KEY = '0df61cb2a68c352f4171cf60b79327cf';
+        const randomPage = Math.floor(Math.random() * 50) + 1;
+        const query = currentGenre.name;
+
+        const url = `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&language=en-US&query=${query}&page=${randomPage}`;
+        console.log("Fetching:", url);
+
+        const response = await fetch(url);
+        const data = await response.json();
+        const results = data.results || [];
+
+        const valid = results.filter(r => ['movie', 'tv'].includes(r.media_type) && r.poster_path && (r.title || r.name));
+        if (!valid.length) {
+            console.warn("No valid results for query:", query);
+            currentGenre = genres[Math.floor(Math.random() * genres.length)];
+            document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
+            setTimeout(getRandomTitle, 100);
+            return;
+        }
+
+        const item = valid[Math.floor(Math.random() * valid.length)];
+        const title = item.title || item.name;
+        const year = (item.release_date || item.first_air_date || '').split('-')[0];
+        const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+        const runtime = '—';
+        const description = item.overview || 'No description available.';
+        const posterPath = item.poster_path;
+        const id = item.id;
+
+        document.getElementById('movie-poster').src = 'https://image.tmdb.org/t/p/w500' + posterPath;
+        document.getElementById('movie-title').innerText = `${title} (${year})`;
+        document.getElementById('movie-rating').innerText = `⭐ ${rating} • ⏱️ ${runtime}`;
+        document.getElementById('movie-description').innerText = description;
+        document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
+
+        currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
+        currentMovieId = id;
+        currentType = item.media_type;
+
+    } catch (err) {
+        console.error("Fetch failed:", err);
+    }
+
+    document.getElementById('loading-spinner').style.display = 'none';
+    isFetching = false;
+}
+
+</script></body></html>
