@@ -1,27 +1,35 @@
 <!DOCTYPE html>
 
 <html><head><title>Random Movie Picker</title><style>
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 10px;
+}
+
 #movie-poster {
-    width: 100%;
-    max-width: 600px;
+    width: 100vw;
+    max-width: 100%;
     height: auto;
-    margin: 0 auto;
     display: block;
+    margin: 0 auto;
 }
 
 #movie-title {
     font-size: 28px;
-    margin-top: 10px;
+    margin-top: 12px;
 }
 
-#rating, #runtime {
+#type-label, #rating, #runtime {
     font-size: 18px;
     margin: 6px 0;
 }
 
 #movie-description {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 10px auto;
     padding: 10px;
     font-size: 16px;
     line-height: 1.5;
@@ -54,7 +62,7 @@
 </style></head><body><div id="loading-spinner">Loading...</div>
 <h1 id="movie-title">Loading...</h1>
 <img alt="Movie Poster" id="movie-poster" src=""/>
-<p id="rating"></p><p id="genre-label">Genre: ...</p><p id="movie-description"></p>
+<p id="type-label">Type: </p><p id="rating"></p><p id="movie-description"></p>
 <div class="floating-buttons">
 <button id="save-button">Poster</button>
 <button id="trailer-button">Trailer</button>
@@ -114,6 +122,7 @@ async function getRandomTitle() {
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
         currentMovieId = id;
 
+        document.getElementById('type-label').innerText = 'Type: ' + (isMovie ? 'Movie' : 'TV Show');
         document.getElementById('movie-title').innerText = title + ' (' + year + ')';
         document.getElementById('movie-poster').src = currentPosterPath;
         document.getElementById('movie-poster').alt = title;
