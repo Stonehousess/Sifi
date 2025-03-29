@@ -114,20 +114,14 @@ let isFetching = false;
 async function getRandomTitle() {
     if (isFetching) return;
     isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';
-
-    const endpoint = isMovie ? 'movie' : 'tv';
-    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
+    document.getElementById('loading-spinner').style.display = 'block';    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
     const lockedGenre = currentGenre;
     const lockedEndpoint = endpoint;
     const randomPage = Math.floor(Math.random() * 50) + 1;
 
     if (isFetching) return;
     isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';
-
-    const endpoint = isMovie ? 'movie' : 'tv';
-    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
+    document.getElementById('loading-spinner').style.display = 'block';    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
         if (!genreId) {
             console.warn("Missing genreId for", endpoint, currentGenre);
             currentGenre = genres[Math.floor(Math.random() * genres.length)];
@@ -249,10 +243,7 @@ setInterval(getRandomTitle, 60000);
 async function getRandomTitle() {
     if (isFetching) return;
     isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';
-
-    const endpoint = isMovie ? 'movie' : 'tv';
-    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
+    document.getElementById('loading-spinner').style.display = 'block';    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
     const lockedGenre = currentGenre;
     const lockedEndpoint = endpoint;
     const randomPage = Math.floor(Math.random() * 50) + 1;
@@ -271,9 +262,7 @@ async function getRandomTitle() {
             isFetching = false;
             setTimeout(getRandomTitle, 100);
             return;
-        }
-        const endpoint = isMovie ? 'movie' : 'tv';
-        const randomPage = Math.floor(Math.random() * 50) + 1;
+        }        const randomPage = Math.floor(Math.random() * 50) + 1;
 
         if (!genreId) {
             console.warn("Missing genreId for", endpoint, currentGenre);
