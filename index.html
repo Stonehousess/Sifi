@@ -152,6 +152,7 @@ async function getRandomTitle() {
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
         currentMovieId = id;
         currentType = isMovie ? 'movie' : 'tv';
+        isMovie = !isMovie;
 
         const emoji = isMovie ? "🎬" : "📺";
 
@@ -213,8 +214,7 @@ window.onload = () => {
         const title = document.getElementById('movie-title').innerText.split(' (')[0];
         window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
     };
-    isMovie = !isMovie;
-};
+    };
 
 
 setInterval(getRandomTitle, 60000);</script></body></html>
