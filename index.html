@@ -35,7 +35,22 @@ body {
 .floating-buttons button:hover {
     background-color: #444;
 }
-</style></head><body>
+
+#loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #111;
+    color: #ffcc00;
+    padding: 20px 40px;
+    font-size: 20px;
+    border: 2px solid #ffcc00;
+    border-radius: 10px;
+    z-index: 2000;
+    display: none;
+}
+</style></head><body><div id="loading-spinner">Loading...</div>
 <h1 id="movie-title">Loading...</h1>
 <img alt="Movie Poster" id="movie-poster" src=""/>
 <p id="rating"></p><p id="movie-description"></p>
@@ -50,10 +65,13 @@ body {
 let genres = ['53', '878', '12', '35', '99', '16', '10749', '80'];
 let currentGenre = '16';
 let currentPosterPath = '';
+let currentMovieId = '';
 
 async function getRandomMovie() {
+    document.getElementById('loading-spinner').style.display = 'block';
+
     const genre = currentGenre;
-    const randomPage = Math.floor(Math.random() * 300) + 1;
+    const randomPage = Math.floor(Math.random() * 20) + 1;  // LIMIT PAGE RANGE
     const apiKey = '0df61cb2a68c352f4171cf60b79327cf';
     const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=en-US&with_genres=${genre}&page=${randomPage}`;
 
@@ -62,10 +80,11 @@ async function getRandomMovie() {
     try {
         const response = await fetch(url);
         const data = await response.json();
-        const movies = data.results.filter(movie => movie.poster_path);
+        const movies = (data.results || []).filter(movie => movie.poster_path);
 
         if (!movies.length) {
             console.warn("No movies found for this genre/page.");
+            document.getElementById('loading-spinner').style.display = 'none';
             return;
         }
 
@@ -78,6 +97,7 @@ async function getRandomMovie() {
         const description = randomMovie.overview || 'No description available.';
 
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
+        currentMovieId = id;
 
         document.getElementById('movie-title').innerText = title + ' (' + year + ')';
         document.getElementById('movie-poster').src = currentPosterPath;
@@ -85,27 +105,35 @@ async function getRandomMovie() {
         document.getElementById('rating').innerText = 'IMDb Rating: ' + rating;
         document.getElementById('movie-description').innerText = description;
 
-        document.getElementById('tmdb-button').onclick = () => window.open(`https://www.themoviedb.org/movie/${id}`, '_blank');
-        document.getElementById('trailer-button').onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
+        document.getElementById('loading-spinner').style.display = 'none';
     } catch (err) {
         console.error("Movie fetch failed:", err);
+        document.getElementById('loading-spinner').style.display = 'none';
     }
 }
 
 window.onload = () => {
     getRandomMovie();
+
     document.getElementById('movie-poster').onclick = getRandomMovie;
     document.getElementById('next-button').onclick = getRandomMovie;
+
     document.getElementById('genre-button').onclick = () => {
         currentGenre = genres[Math.floor(Math.random() * genres.length)];
-        getRandomMovie();
+        getRandomMovie(); // Also fetch a new movie immediately
     };
+
     document.getElementById('save-button').onclick = () => {
         if (!currentPosterPath) return;
         const link = document.createElement('a');
         link.href = currentPosterPath;
         link.download = 'poster.jpg';
         link.click();
+    };
+
+    document.getElementById('tmdb-button').onclick = () => {
+        if (!currentMovieId) return;
+        window.open(`https://www.themoviedb.org/movie/${currentMovieId}`, '_blank');
     };
 };
 </script></body></html>
