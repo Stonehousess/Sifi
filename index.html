@@ -397,7 +397,16 @@ infoBox.addEventListener("click", () => {
         infoBox.classList.remove("collapsed");
         infoBox.classList.add("expanded");
     } else {
+    }, 10000);
+}
+
+// Tap to expand/collapse
+document.getElementById("floating-info").addEventListener("click", () => {
+    if (infoBox.classList.contains("collapsed")) {
+        infoBox.classList.remove("collapsed");
+        infoBox.classList.add("expanded");
+    } else {
         infoBox.classList.remove("expanded");
         infoBox.classList.add("collapsed");
     }
-// WARNING: Braces were imbalanced. Fixed script may still need review.</script></body></html>
+});</script></body></html>
