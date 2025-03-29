@@ -88,6 +88,14 @@ body {
 const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
 
 const genres = [
+    { name: 'Sci-Fi', movieId: '878', tvId: '10765' },
+    { name: 'Adventure', movieId: '12', tvId: '10759' },
+    { name: 'Comedy', movieId: '35', tvId: '35' },
+    { name: 'Documentary', movieId: '99', tvId: '99' },
+    { name: 'Animation', movieId: '16', tvId: '16' },
+    { name: 'Romance', movieId: '10749', tvId: '18' },
+    { name: 'Crime', movieId: '80', tvId: '80' },
+    { name: 'Mystery', movieId: '9648', tvId: '9648' }
     { id: '53', name: 'Thriller' },
     { id: '878', name: 'Sci-Fi' },
     { id: '12', name: 'Adventure' },
@@ -102,6 +110,7 @@ let currentGenre = genres[5];
 let currentPosterPath = '';
 let currentMovieId = '';
 let isMovie = true;
+let triedTV = false;
 let isFetching = false;
 
 async function getRandomTitle() {
@@ -110,7 +119,7 @@ async function getRandomTitle() {
     document.getElementById('loading-spinner').style.display = 'block';
 
     const endpoint = isMovie ? 'movie' : 'tv';
-    const genreId = currentGenre.id;
+    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
     const randomPage = Math.floor(Math.random() * 50) + 1;
     const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
 
@@ -171,6 +180,8 @@ window.onload = () => {
     document.getElementById('genre-button').onclick = () => {
         currentGenre = genres[Math.floor(Math.random() * genres.length)];
         isMovie = true;
+        triedTV = false;
+        document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
         document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
         document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
     getRandomTitle();
