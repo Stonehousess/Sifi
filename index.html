@@ -144,15 +144,15 @@ body {
     border-radius: 10px;
     margin-bottom: 20px;
     user-select: none;
-}</style></head><body><div id="movie-container"><h1 id="movie-title">Loading...</h1><div id="movie-year">Placeholder for Movie Year</div><div id="movie-rating">Placeholder for Movie Rating</div><div id="movie-type">Placeholder for Movie Type</div><div id="movie-runtime">Placeholder for Movie Runtime</div><p id="movie-description"></p><button id="tmdb-button">TMDB</button><button id="trailer-button">Trailer</button><button id="save-button">Poster</button></div>
+}</style></head><body><div id="movie-container"><h1 id="movie-title">Loading...</h1><div id="movie-year">Placeholder for Movie Year</div><div id="movie-rating">Placeholder for Movie Rating</div><div id="movie-type">Placeholder for Movie Type</div><div id="movie-runtime">Placeholder for Movie Runtime</div><p id="movie-description"></p></div>
 <div id="loading-spinner">Loading...</div>
-<img alt="" draggable="false" id="movie-poster" src=""/>
+<img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/>
 <p id="info-line"></p>
 <p id="current-genre">Genre: </p>
 <div class="floating-buttons">
-<button id="next-button">Next</button>
-<button id="genre-button">Genre</button>
-</div>
+
+
+<button id="tmdb-button">TMDB</button><button id="trailer-button">Trailer</button><button id="save-button">Poster</button><button id="genre-button">Genre</button><button id="next-button">Next</button></div>
 <script>
 const genres = [
     { name: "Animation", movieId: 16, tvId: 16 },
