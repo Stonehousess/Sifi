@@ -331,12 +331,7 @@ document.getElementById("next-button").onclick = () => {
 setInterval(getRandomTitle, 60000); // auto-fetch every 60 seconds
 
 
-let infoTimeout;
 
-  clearTimeout(infoTimeout);
-  infoTimeout = setTimeout(() => {
-  }, 10000);
-}
 
 // Trigger info fade-in again on interaction
 document.addEventListener("click", () => {
