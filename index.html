@@ -43,7 +43,7 @@ body {
     opacity: 0.5;
 }
 .floating-buttons button {
-    width: 120px;
+    width: 60px;
     height: 40px;
     background-color: #222;
     color: #ffcc00;
@@ -72,7 +72,11 @@ body {
 
 #movie-poster:hover {
     transform: scale(1.02);
-}</style></head><body>
+}
+.floating-buttons.hidden {
+    display: none !important;
+}
+</style></head><body>
 <div id="loading-spinner">Loading...</div>
 <img alt="Movie Poster" id="movie-poster" src=""/>
 <h1 id="movie-title">Loading...</h1>
@@ -86,91 +90,21 @@ body {
 <button id="genre-button">Genre</button>
 </div>
 <script>
-const API_KEY = 'e8d804d1f104509d3c1c5b1166485ae6';
-
-
-const genres = [
-    { name: 'Sci-Fi', movieId: '878', tvId: '10765' },
-    { name: 'Adventure', movieId: '12', tvId: '10759' },
-    { name: 'Comedy', movieId: '35', tvId: '35' },
-    { name: 'Documentary', movieId: '99', tvId: '99' },
-    { name: 'Animation', movieId: '16', tvId: '16' },
-    { name: 'Romance', movieId: '10749', tvId: '18' },
-    { name: 'Crime', movieId: '80', tvId: '80' },
-    { name: 'Mystery', movieId: '9648', tvId: '9648' }
-];
-
-
-let currentGenre = genres.find(g => g.name === 'Animation');
-let currentPosterPath = '';
-let currentMovieId = '';
-let isMovie = true;
-let triedTV = false;
-let isFetching = false;
-
-async function getRandomTitle() {
-    if (isFetching) return;
-    isFetching = true;
-    document.getElementById('loading-spinner').style.display = 'block';
-
-    const endpoint = isMovie ? 'movie' : 'tv';
-    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
-    const randomPage = Math.floor(Math.random() * 50) + 1;
-    if (!genreId) {
-        console.warn('Missing genreId for', isMovie ? 'Movie' : 'TV', currentGenre);
-        isFetching = false;
-        return;
-    }
-
-    const url = `https://api.themoviedb.org/3/discover/${endpoint}?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
-    console.log('Fetching:', url);
-
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        const results = (data.results || []).filter(r => r.poster_path);
-
-        
-        if (!results.length && !isMovie) {
-            console.warn("No TV results, trying movie fallback.");
-            isMovie = true;
-            getRandomTitle(); return;
-        }
-
-        if (!results.length) throw new Error("No results");
-
-        const item = results[Math.floor(Math.random() * results.length)];
-        const title = item.title || item.name;
-        const posterPath = item.poster_path;
-        const id = item.id;
-        const year = (item.release_date || item.first_air_date || '').slice(0, 4);
-        const rating = item.vote_average.toFixed(1);
-        const runtime = item.runtime || (item.episode_run_time ? item.episode_run_time[0] : '—');
-        const description = item.overview || 'No description available.';
-
-        currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
-        currentMovieId = id;
-
-        const emoji = isMovie ? "🎬" : "📺";
-
-        document.getElementById('movie-title').innerText = title + ' (' + year + ')';
-        document.getElementById('movie-poster').src = currentPosterPath;
-        document.getElementById('info-line').innerText = `${emoji} IMDb Rating: ${rating} | Runtime: ${runtime} min`;
-        document.getElementById('movie-description').innerText = description;
-
-        document.getElementById('loading-spinner').style.display = 'none';
-        isFetching = false;
-    } catch (err) {
-        console.error("Fetch failed:", err);
-        isFetching = false;
-        document.getElementById('loading-spinner').style.display = 'none';
-        isFetching = false;
-    }
-
-    isMovie = !isMovie;
+let buttonTimeout;
+function hideButtonsAfterDelay() {
+    clearTimeout(buttonTimeout);
+    buttonTimeout = setTimeout(() => {
+        document.querySelector('.floating-buttons').classList.add('hidden');
+    }, 10000);
 }
-
+['click', 'scroll', 'touchstart'].forEach(evt => {
+    document.addEventListener(evt, () => {
+        document.querySelector('.floating-buttons').classList.remove('hidden');
+        hideButtonsAfterDelay();
+    });
+});
 window.onload = () => {
+
     currentGenre = genres.find(g => g.name === 'Animation');
     getRandomTitle();
 
