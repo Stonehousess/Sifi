@@ -275,10 +275,10 @@ async function getRandomTitle(retries = 0) {
         document.getElementById("movie-runtime").innerText = runtime + " min";
         document.getElementById("movie-type").innerText = typeEmoji;
 
-        console.log("Setting poster src", "https://image.tmdb.org/t/p/w500" + posterPath);
+        console.log("Setting poster src", "https://image.tmdb.org/t/p/original" + posterPath);
         document.getElementById("movie-poster").src =
         document.getElementById("movie-poster").style.cursor = "pointer";
-        document.getElementById("movie-poster").onclick = () => getRandomTitle(); "https://image.tmdb.org/t/p/w500" + posterPath;
+        document.getElementById("movie-poster").onclick = () => getRandomTitle(); "https://image.tmdb.org/t/p/original" + posterPath;
 
         const tmdbUrl = `https://www.themoviedb.org/${isMovie ? "movie" : "tv"}/${id}`;
         document.getElementById("tmdb-button").onclick = () => window.open(tmdbUrl, "_blank");
