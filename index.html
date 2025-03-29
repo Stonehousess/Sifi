@@ -149,9 +149,12 @@ async function getRandomTitle() {
         const runtime = item.runtime || (item.episode_run_time ? item.episode_run_time[0] : '—');
         const description = item.overview || 'No description available.';
 
+        
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
         currentMovieId = id;
         currentType = isMovie ? 'movie' : 'tv';
+        isMovie = !isMovie;
+
         
         const emoji = isMovie ? "🎬" : "📺";
 
@@ -161,15 +164,13 @@ async function getRandomTitle() {
         document.getElementById('movie-description').innerText = description;
 
                 document.getElementById('loading-spinner').style.display = 'none';
-        isMovie = !isMovie;
-        isFetching = false;
+                isFetching = false;
         isFetching = false;
     } catch (err) {
         console.error("Fetch failed:", err);
         isFetching = false;
         document.getElementById('loading-spinner').style.display = 'none';
-        isMovie = !isMovie;
-        isFetching = false;
+                isFetching = false;
         isFetching = false;
     }
 
