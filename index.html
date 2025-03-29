@@ -332,62 +332,43 @@ setInterval(getRandomTitle, 60000); // auto-fetch every 60 seconds
 
 
 let infoTimeout;
-const infoBox = document.getElementById("floating-info");
 
 function showInfo(title, year, rating, runtime, description, type, genreName, trailer, posterPath) {
-  const infoBox = document.getElementById("floating-info");
-  infoBox.innerHTML = `
     <div><strong>${title}</strong> (${year})</div>
     <div>⭐ ${rating} &nbsp;&nbsp; ${type} &nbsp;&nbsp; 🕒 ${runtime} mins</div>
     <div style='margin-top: 10px;'>${description}</div>
     <div style='margin-top: 5px; font-size: 0.9em;'>🎭 ${genreName}</div>
   `;
-  infoBox.classList.remove("hidden");
   clearTimeout(infoTimeout);
   infoTimeout = setTimeout(() => {
-    infoBox.classList.add("hidden");
   }, 10000);
 }
 
 // Trigger info fade-in again on interaction
 document.addEventListener("click", () => {
-    if (infoBox) infoBox.classList.remove("hidden");
     clearTimeout(infoTimeout);
     infoTimeout = setTimeout(() => {
-        infoBox.classList.add("hidden");
     }, 10000);
 });
 
 // Tap to expand/collapse
-document.getElementById("floating-info").addEventListener("click", () => {
-    if (infoBox.classList.contains("collapsed")) {
-        infoBox.classList.remove("collapsed");
-        infoBox.classList.add("expanded");
     } else {
-        infoBox.classList.remove("expanded");
-        infoBox.classList.add("collapsed");
     }
 });
 
 let touchStartY = 0;
 let touchEndY = 0;
 
-infoBox.addEventListener("touchstart", (e) => {
     touchStartY = e.changedTouches[0].screenY;
 }, false);
 
-infoBox.addEventListener("touchend", (e) => {
     touchEndY = e.changedTouches[0].screenY;
     handleSwipe();
 }, false);
 
 function handleSwipe() {
     if (touchStartY - touchEndY > 30) {
-        infoBox.classList.remove("collapsed");
-        infoBox.classList.add("expanded");
     } else if (touchEndY - touchStartY > 30) {
-        infoBox.classList.remove("expanded");
-        infoBox.classList.add("collapsed");
     }
 }
 window.onload = () => {
