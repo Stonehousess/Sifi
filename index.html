@@ -200,4 +200,97 @@ body {
 <p id="current-genre">Genre: </p>
 <div class="floating-buttons">
 <button id="tmdb-button">TMDB</button><button id="trailer-button">Trailer</button><button id="save-button">Poster</button><button id="genre-button">Genre</button><button id="next-button">Next</button></div>
-<script>// JavaScript logic placeholder for fresh rebuild</script></body></html>
+<script>
+let currentGenre = { name: "Animation", movie: "16", tv: "16" };
+let genres = [
+  { name: "Animation", movie: "16", tv: "16" },
+  { name: "Documentary", movie: "99", tv: "99" },
+  { name: "Romance", movie: "10749", tv: "18" },
+  { name: "Crime", movie: "80", tv: "80" },
+  { name: "Mystery", movie: "9648", tv: "9648" },
+  { name: "Sci-Fi", movie: "878", tv: "10765" },
+  { name: "Adventure", movie: "12", tv: "10759" },
+  { name: "Drama", movie: "18", tv: "18" }
+];
+
+let isMovie = true;
+let apiKey = "e8d804d1f104509d3c1c5b1166485ae6";
+let currentTMDBUrl = "";
+let currentPosterPath = "";
+let currentTrailerUrl = "";
+
+async function getRandomTitle() {
+  const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
+  const type = isMovie ? "movie" : "tv";
+  const randomPage = Math.floor(Math.random() * 50) + 1;
+  const url = `https://api.themoviedb.org/3/discover/${type}?api_key=${apiKey}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    const results = data.results || [];
+
+    if (!results.length) {
+      if (!isMovie) {
+        isMovie = true;
+        getRandomTitle(); // fallback
+      } else {
+        console.log("No results found.");
+      }
+      return;
+    }
+
+    const item = results[Math.floor(Math.random() * results.length)];
+    const title = item.title || item.name || "Untitled";
+    const year = (item.release_date || item.first_air_date || "????").slice(0, 4);
+    const rating = item.vote_average || "N/A";
+    const runtime = item.runtime || "??";
+    const overview = item.overview || "No description available.";
+    currentPosterPath = item.poster_path;
+    currentTMDBUrl = `https://www.themoviedb.org/${type}/${item.id}`;
+    currentTrailerUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + " " + year + " trailer")}`;
+
+    document.getElementById("movie-poster").src = "https://image.tmdb.org/t/p/original" + currentPosterPath;
+    document.getElementById("movie-poster").alt = title;
+
+  } catch (err) {
+    console.error("Fetch failed:", err);
+  }
+}
+
+document.getElementById("next-button").onclick = () => getRandomTitle();
+
+document.getElementById("genre-button").onclick = () => {
+  const randomIndex = Math.floor(Math.random() * genres.length);
+  currentGenre = genres[randomIndex];
+  isMovie = true;
+  getRandomTitle();
+};
+
+document.getElementById("tmdb-button").onclick = () => {
+  if (currentTMDBUrl) window.open(currentTMDBUrl, "_blank");
+};
+
+document.getElementById("trailer-button").onclick = () => {
+  if (currentTrailerUrl) window.open(currentTrailerUrl, "_blank");
+};
+
+document.getElementById("save-button").onclick = () => {
+  const link = document.createElement("a");
+  link.href = "https://image.tmdb.org/t/p/original" + currentPosterPath;
+  link.download = "movie-poster.jpg";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+setInterval(() => getRandomTitle(), 60000); // auto-refresh every 60 seconds
+
+window.onload = () => {
+  const poster = document.getElementById("movie-poster");
+  if (poster) {
+    poster.onclick = () => getRandomTitle();
+  }
+  getRandomTitle();
+};
+</script></body></html>
