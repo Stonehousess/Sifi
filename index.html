@@ -200,11 +200,22 @@ body {
     transform: translateY(100%);
     pointer-events: none;
 }
+
+.floating-info.collapsed {
+    max-height: 60px;
+    overflow: hidden;
+    cursor: pointer;
+}
+.floating-info.expanded {
+    max-height: 60vh;
+    overflow-y: auto;
+    pointer-events: auto;
+}
 </style></head><body><div id="movie-container"><img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/><h1 id="movie-title">Loading...</h1><div id="movie-year">Placeholder for Movie Year</div><div id="movie-rating">Placeholder for Movie Rating</div><div id="movie-type">Placeholder for Movie Type</div><div id="movie-runtime">Placeholder for Movie Runtime</div><p id="movie-description"></p></div>
 <div id="loading-spinner">Loading...</div>
 <p id="info-line"></p>
 <p id="current-genre">Genre: </p>
-<div class="floating-info" id="floating-info">{{INFO_PLACEHOLDER}}</div><div class="floating-buttons">
+<div class="floating-info collapsed" id="floating-info">{{INFO_PLACEHOLDER}}</div><div class="floating-buttons">
 <button id="tmdb-button">TMDB</button><button id="trailer-button">Trailer</button><button id="save-button">Poster</button><button id="genre-button">Genre</button><button id="next-button">Next</button></div>
 <script>
 const genres = [
@@ -343,6 +354,21 @@ let infoTimeout;
 const infoBox = document.getElementById("floating-info");
 
 function showInfo(title, year, rating, mediaType, overview, genreName) {
+    const collapsed = `<div><strong>${title}</strong> (${year})</div>`;
+    const expanded = `
+        <div><strong>${title}</strong> (${year})</div>
+        <div>⭐ ${rating} — ${mediaType}</div>
+        <div><em>${genreName}</em></div>
+        <p>${overview}</p>
+    `;
+    infoBox.innerHTML = expanded;
+    infoBox.classList.remove("hidden");
+    infoBox.classList.remove("collapsed");
+    clearTimeout(infoTimeout);
+    infoTimeout = setTimeout(() => {
+        infoBox.classList.add("collapsed");
+    }, 10000);
+}
     infoBox.innerHTML = `
         <div><strong>${title}</strong> (${year})</div>
         <div>⭐ ${rating} — ${mediaType}</div>
@@ -363,5 +389,16 @@ document.addEventListener("click", () => {
     infoTimeout = setTimeout(() => {
         infoBox.classList.add("hidden");
     }, 10000);
+});
+
+// Tap to expand/collapse
+infoBox.addEventListener("click", () => {
+    if (infoBox.classList.contains("collapsed")) {
+        infoBox.classList.remove("collapsed");
+        infoBox.classList.add("expanded");
+    } else {
+        infoBox.classList.remove("expanded");
+        infoBox.classList.add("collapsed");
+    }
 });
 </script></body></html>
