@@ -147,9 +147,7 @@ async function getRandomTitle() {
             console.warn("No TV results, trying movie fallback.");
             isMovie = true;
             getRandomTitle(); return;
-} catch (err) {
-  console.error('Error during fetch:', err);
-}
+} 
         }
 
         if (!results.length) throw new Error("No results");
@@ -180,13 +178,7 @@ async function getRandomTitle() {
                 document.getElementById('loading-spinner').style.display = 'none';
                 isFetching = false;
         isFetching = false;
-    } catch (err) {
-        console.error("Fetch failed:", err);
-        isFetching = false;
-        document.getElementById('loading-spinner').style.display = 'none';
-                isFetching = false;
-        isFetching = false;
-    }
+    } 
 
     }
 
@@ -260,9 +252,7 @@ async function getRandomTitle() {
             isFetching = false;
             setTimeout(getRandomTitle, 100);
             return;
-} catch (err) {
-  console.error('Error during fetch:', err);
-}
+} 
         }
         if (!genreId) {
             console.warn("Missing genreId for", endpoint, currentGenre);
@@ -327,9 +317,7 @@ async function getRandomTitle() {
         retryCount = 0;
         retryCount = 0;
 
-    } catch (err) {
-        console.error("Fetch failed:", err);
-    }
+    } 
 
     document.getElementById('loading-spinner').style.display = 'none';
     isFetching = false;
