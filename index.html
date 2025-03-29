@@ -118,8 +118,6 @@ async function getRandomTitle() {
     const genreId = isMovie ? lockedGenre.movieId : lockedGenre.tvId;
     const endpoint = isMovie ? 'movie' : 'tv';
     const lockedEndpoint = endpoint;
-    const randomPage = Math.floor(Math.random() * 50) + 1;
-
     if (isFetching) return;
     isFetching = true;
     document.getElementById('loading-spinner').style.display = 'block';        if (!genreId) {
@@ -129,9 +127,7 @@ async function getRandomTitle() {
             isFetching = false;
             setTimeout(getRandomTitle, 100);
             return;
-        }
-    const randomPage = Math.floor(Math.random() * 50) + 1;
-    if (!genreId) {
+        }    if (!genreId) {
         console.warn('Missing genreId for', isMovie ? 'Movie' : 'TV', currentGenre);
         isFetching = false;
         return;
@@ -247,8 +243,6 @@ async function getRandomTitle() {
     const genreId = isMovie ? lockedGenre.movieId : lockedGenre.tvId;
     const endpoint = isMovie ? 'movie' : 'tv';
     const lockedEndpoint = endpoint;
-    const randomPage = Math.floor(Math.random() * 50) + 1;
-
     if (isFetching) return;
     isFetching = true;
     document.getElementById('loading-spinner').style.display = 'block';
@@ -261,8 +255,7 @@ async function getRandomTitle() {
             isFetching = false;
             setTimeout(getRandomTitle, 100);
             return;
-        }        const randomPage = Math.floor(Math.random() * 50) + 1;
-
+        }
         if (!genreId) {
             console.warn("Missing genreId for", endpoint, currentGenre);
             isFetching = false;
