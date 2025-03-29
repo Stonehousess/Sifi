@@ -144,7 +144,30 @@ body {
     border-radius: 10px;
     margin-bottom: 20px;
     user-select: none;
-}</style></head><body><div id="movie-container"><h1 id="movie-title">Loading...</h1><div id="movie-year">Placeholder for Movie Year</div><div id="movie-rating">Placeholder for Movie Rating</div><div id="movie-type">Placeholder for Movie Type</div><div id="movie-runtime">Placeholder for Movie Runtime</div><p id="movie-description"></p></div>
+}
+
+#movie-poster {
+    width: 100vw;
+    max-width: 500px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: block;
+    user-select: none;
+}
+.floating-buttons {
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    width: 100%;
+    opacity: 0.8;
+    transition: opacity 0.5s ease;
+}
+.floating-buttons.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+</style></head><body><div id="movie-container"><h1 id="movie-title">Loading...</h1><div id="movie-year">Placeholder for Movie Year</div><div id="movie-rating">Placeholder for Movie Rating</div><div id="movie-type">Placeholder for Movie Type</div><div id="movie-runtime">Placeholder for Movie Runtime</div><p id="movie-description"></p></div>
 <div id="loading-spinner">Loading...</div>
 <img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/>
 <p id="info-line"></p>
