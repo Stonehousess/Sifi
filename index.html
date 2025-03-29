@@ -150,8 +150,6 @@ body {
 <p id="info-line"></p>
 <p id="current-genre">Genre: </p>
 <div class="floating-buttons">
-
-
 <button id="tmdb-button">TMDB</button><button id="trailer-button">Trailer</button><button id="save-button">Poster</button><button id="genre-button">Genre</button><button id="next-button">Next</button></div>
 <script>
 const genres = [
@@ -262,4 +260,15 @@ async function getRandomTitle(retries = 0) {
 window.addEventListener('DOMContentLoaded', () => {
     getRandomTitle();
     hideButtonsAfterDelay();
-});</script></body></html>
+});
+document.getElementById("genre-button").onclick = () => {
+    const randomIndex = Math.floor(Math.random() * genres.length);
+    currentGenre = genres[randomIndex];
+    isMovie = true; // Always start movie first
+    getRandomTitle();
+};
+
+document.getElementById("next-button").onclick = () => {
+    getRandomTitle();
+};
+</script></body></html>
