@@ -38,7 +38,7 @@ body {
 </style></head><body>
 <h1 id="movie-title">Loading...</h1>
 <img alt="Movie Poster" id="movie-poster" src=""/>
-<p id="rating"></p>
+<p id="rating"></p><p id="movie-description"></p>
 <div class="floating-buttons">
 <button id="save-button">Poster</button>
 <button id="trailer-button">Trailer</button>
@@ -75,6 +75,7 @@ async function getRandomMovie() {
         const id = randomMovie.id;
         const year = (randomMovie.release_date || '').slice(0, 4);
         const rating = randomMovie.vote_average.toFixed(1);
+        const description = randomMovie.overview || 'No description available.';
 
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
 
@@ -82,6 +83,7 @@ async function getRandomMovie() {
         document.getElementById('movie-poster').src = currentPosterPath;
         document.getElementById('movie-poster').alt = title;
         document.getElementById('rating').innerText = 'IMDb Rating: ' + rating;
+        document.getElementById('movie-description').innerText = description;
 
         document.getElementById('tmdb-button').onclick = () => window.open(`https://www.themoviedb.org/movie/${id}`, '_blank');
         document.getElementById('trailer-button').onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
