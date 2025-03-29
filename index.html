@@ -6,15 +6,15 @@ body {
     color: #fff;
     font-family: Arial, sans-serif;
     text-align: center;
-    padding: 10px;
+    padding: 0;
+    margin: 0;
 }
 
 #movie-poster {
     width: 100vw;
-    max-width: 100%;
-    height: auto;
+    height: 100vh;
+    object-fit: cover;
     display: block;
-    margin: 0 auto;
 }
 
 #movie-title {
@@ -22,7 +22,7 @@ body {
     margin-top: 12px;
 }
 
-#type-label, #rating, #runtime {
+#info-line {
     font-size: 18px;
     margin: 6px 0;
 }
@@ -60,9 +60,9 @@ body {
     background-color: #444;
 }
 </style></head><body><div id="loading-spinner">Loading...</div>
-<h1 id="movie-title">Loading...</h1>
-<img alt="Movie Poster" id="movie-poster" src=""/>
-<p id="type-label">Type: </p><p id="rating"></p><p id="movie-description"></p>
+
+<img alt="Movie Poster" id="movie-poster" src=""/><h1 id="movie-title">Loading...</h1>
+<p id="info-line"></p><p id="movie-description"></p>
 <div class="floating-buttons">
 <button id="save-button">Poster</button>
 <button id="trailer-button">Trailer</button>
@@ -116,7 +116,7 @@ async function getRandomTitle() {
         const id = item.id;
         const year = (item.release_date || item.first_air_date || '').slice(0, 4);
         const rating = item.vote_average.toFixed(1);
-        const runtime = item.runtime || item.episode_run_time?.[0] || '—';
+        const runtime = item.runtime || (item.episode_run_time ? item.episode_run_time[0] : '—');
         const description = item.overview || 'No description available.';
 
         currentPosterPath = 'https://image.tmdb.org/t/p/w500' + posterPath;
@@ -126,7 +126,8 @@ async function getRandomTitle() {
         document.getElementById('movie-title').innerText = title + ' (' + year + ')';
         document.getElementById('movie-poster').src = currentPosterPath;
         document.getElementById('movie-poster').alt = title;
-        document.getElementById('rating').innerText = 'IMDb Rating: ' + rating + ' | Runtime: ' + runtime + ' min';
+        const emoji = isMovie ? "🎬" : "📺";
+        document.getElementById("info-line").innerText = `${emoji} IMDb Rating: ${rating} | Runtime: ${runtime} min`;
         document.getElementById('movie-description').innerText = description;
         document.getElementById('genre-label').innerText = "Genre: " + currentGenre.name;
 
