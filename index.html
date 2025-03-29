@@ -196,6 +196,7 @@
   let panelTimer;
 
   async function getRandomTitle() {
+  isMovie = Math.random() < 0.5;
     isMovie = Math.random() < 0.5;
     const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
     const type = isMovie ? "movie" : "tv";
@@ -286,11 +287,10 @@
   getRandomTitle();
 };
   document.getElementById("genre-button").onclick = () => {
-    const randomIndex = Math.floor(Math.random() * genres.length);
-    currentGenre = genres[randomIndex];
-    isMovie = Math.random() < 0.5;
-    getRandomTitle();
-  };
+  const randomIndex = Math.floor(Math.random() * genres.length);
+  currentGenre = genres[randomIndex];
+  getRandomTitle();
+};
   document.getElementById("tmdb-button").onclick = () => currentTMDBUrl && window.open(currentTMDBUrl, "_blank");
   document.getElementById("trailer-button").onclick = () => {
     if (currentTrailerUrl) {
