@@ -188,25 +188,7 @@ function hideButtonsAfterDelay() {
         hideButtonsAfterDelay();
     });
 });
-window.onload = () => {
-    hideButtonsAfterDelay();
 
-
-    currentGenre = genres.find(g => g.name === 'Animation');
-    getRandomTitle();
-
-    document.getElementById('movie-poster').onclick = getRandomTitle;
-    document.getElementById('next-button').onclick = getRandomTitle;
-
-    document.getElementById('genre-button').onclick = () => {
-        currentGenre = genres[Math.floor(Math.random() * genres.length)];
-    document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
-        isMovie = true;
-        triedTV = false;
-        document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
-        document.getElementById('current-genre').innerText = 'Genre: ' + currentGenre.name;
-    getRandomTitle();
-    };
 
     document.getElementById('save-button').onclick = () => {
     if (!currentPosterPath) return;
@@ -245,4 +227,10 @@ function hideButtonsAfterDelay() {
         document.querySelector('.floating-buttons').classList.remove('hidden');
         hideButtonsAfterDelay();
     });
-});</script></body></html>
+});
+
+window.onload = () => {
+    getRandomTitle();
+    hideButtonsAfterDelay();
+};
+</script></body></html>
