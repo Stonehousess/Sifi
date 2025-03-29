@@ -213,7 +213,6 @@ document.getElementById('save-button').onclick = () => {
     };
 
     document.getElementById('trailer-button').onclick = () => {
-        const title = document.getElementById('movie-title').innerText.split(' (')[0];
         window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)} trailer`, '_blank');
     };
     };
@@ -272,7 +271,6 @@ async function getRandomTitle() {
             setTimeout(getRandomTitle, 500);
     
 
-        const title = item.title || item.name;
         const year = (item.release_date || item.first_air_date || '').split('-')[0];
         const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
         const runtime = '—';
