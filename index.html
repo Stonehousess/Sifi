@@ -311,11 +311,7 @@ window.addEventListener('DOMContentLoaded', () => {
     hideButtonsAfterDelay();
 });
 document.getElementById("genre-button").onclick = () => {
-    const randomIndex = Math.floor(Math.random() * genres.length);
-    currentGenre = genres[randomIndex];
-    isMovie = true; // Always start movie first
-};
-
+    const randomIndex = Math.floor(Math.random() * genres.length);    currentGenre = genres[randomIndex];    isMovie = true;    getRandomTitle();};    const randomIndex = Math.floor(Math.random() * genres.length);
 document.getElementById("next-button").onclick = () => {
 };
 setInterval(getRandomTitle, 60000); // auto-fetch every 60 seconds
