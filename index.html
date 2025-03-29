@@ -30,7 +30,7 @@
       display: block;
       margin: 0;
       border: 2px solid red;
-      border-radius: 2px;
+      border-radius: 12px;
       animation: glowing-border 5s infinite ease-in-out;
       background: #222;
       user-select: none;
@@ -104,21 +104,25 @@
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
       cursor: pointer;
-      transition: transform 0.3s ease, max-height 0.3s ease;
+      transform: translateY(80%);
+      transition: transform 0.4s ease, opacity 0.4s ease;
       z-index: 1500;
-      max-height: 40px;
-      overflow: hidden;
       opacity: 0.5;
     }
 
     #info-panel.expanded {
-      max-height: 60vh;
-      cursor: default;
+      transform: translateY(0);
       opacity: 1;
     }
 
     #info-content {
       pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease 0.2s;
+    }
+
+    #info-panel.expanded #info-content {
+      opacity: 1;
     }
 
     #info-title {
@@ -146,4 +150,149 @@
   </style>
 </head>
 <body>
-<!-- Rest of HTML remains unchanged -->
+  <div id="movie-container">
+    <img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/>
+    <div id="movie-type"></div>
+    <div id="movie-runtime"></div>
+  </div>
+
+  <div id="info-panel" class="collapsed" onclick="togglePanel()">
+    <div id="info-content">
+      <div id="info-title">Loading...</div>
+      <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins</div>
+      <div id="info-description">Loading description...</div>
+      <div id="info-genre">Genre: Loading...</div>
+    </div>
+  </div>
+
+  <div id="loading-spinner">Loading...</div>
+
+  <div class="floating-buttons">
+    <button id="tmdb-button">TMDB</button>
+    <button id="trailer-button">Trailer</button>
+    <button id="save-button">Poster</button>
+    <button id="genre-button">Genre</button>
+    <button id="next-button">Next</button>
+  </div>
+
+  <script>
+    let genres = [
+      { name: "Sci-Fi", movie: "878", tv: "10765" },
+      { name: "Adventure", movie: "12", tv: "10759" },
+      { name: "Comedy", movie: "35", tv: "35" },
+      { name: "Documentary", movie: "99", tv: "99" },
+      { name: "Animation", movie: "16", tv: "16" },
+      { name: "Romance", movie: "10749", tv: "18" },
+      { name: "Crime", movie: "80", tv: "80" },
+      { name: "Mystery", movie: "9648", tv: "9648" }
+    ];
+
+    let currentGenre = genres[0];
+    let isMovie = true;
+    let apiKey = "e8d804d1f104509d3c1c5b1166485ae6";
+    let currentTMDBUrl = "";
+    let currentPosterPath = "";
+    let currentTrailerUrl = "";
+    let panelTimer;
+
+    async function getRandomTitle() {
+      isMovie = Math.random() < 0.5;
+      const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
+      const type = isMovie ? "movie" : "tv";
+      const randomPage = Math.floor(Math.random() * 50) + 1;
+      const url = `https://api.themoviedb.org/3/discover/${type}?api_key=${apiKey}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const results = data.results || [];
+
+        if (!results.length) {
+          console.log("No results found.");
+          return;
+        }
+
+        const item = results[Math.floor(Math.random() * results.length)];
+        const id = item.id;
+        const title = item.title || item.name || "Untitled";
+        const year = (item.release_date || item.first_air_date || "????").slice(0, 4);
+        const rating = item.vote_average || 0;
+        const overview = item.overview || "No description available.";
+        currentPosterPath = item.poster_path;
+        currentTMDBUrl = `https://www.themoviedb.org/${type}/${id}`;
+        currentTrailerUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + " " + year + " trailer")}`;
+
+        const detailUrl = `https://api.themoviedb.org/3/${type}/${id}?api_key=${apiKey}&language=en-US`;
+        const detailResponse = await fetch(detailUrl);
+        const detailData = await detailResponse.json();
+
+        let runtime;
+        if (isMovie) {
+          runtime = detailData.runtime;
+        } else {
+          const episodes = detailData.number_of_episodes || 1;
+          const avgRuntime = detailData.episode_run_time?.[0] || 0;
+          runtime = episodes > 1 ? `${episodes} eps × ${avgRuntime}` : `${avgRuntime}`;
+        }
+
+        document.getElementById("movie-poster").src = "https://image.tmdb.org/t/p/original" + currentPosterPath;
+        document.getElementById("movie-poster").alt = title;
+
+        document.getElementById("info-title").innerText = `${title} (${year})`;
+        document.getElementById("info-meta").innerText = `⭐️ ${Math.round(rating * 10)}% • ${isMovie ? '🎬 Film' : '📺 TV'} • ${runtime || "--"} mins`;
+        document.getElementById("info-description").innerText = overview;
+        document.getElementById("info-genre").innerText = `Genre: ${currentGenre.name}`;
+
+      } catch (err) {
+        console.error("Fetch failed:", err);
+      }
+    }
+
+    function togglePanel() {
+      const panel = document.getElementById('info-panel');
+      panel.classList.toggle('expanded');
+
+      if (panel.classList.contains('expanded')) {
+        clearTimeout(panelTimer);
+        panelTimer = setTimeout(() => panel.classList.remove('expanded'), 10000);
+      }
+    }
+
+    document.getElementById("next-button").onclick = () => getRandomTitle();
+
+    document.getElementById("genre-button").onclick = () => {
+      const randomIndex = Math.floor(Math.random() * genres.length);
+      currentGenre = genres[randomIndex];
+      isMovie = Math.random() < 0.5;
+      getRandomTitle();
+    };
+
+    document.getElementById("tmdb-button").onclick = () => {
+      if (currentTMDBUrl) window.open(currentTMDBUrl, "_blank");
+    };
+
+    document.getElementById("trailer-button").onclick = () => {
+      if (currentTrailerUrl) window.open(currentTrailerUrl, "_blank");
+    };
+
+    document.getElementById("save-button").onclick = () => {
+      const link = document.createElement("a");
+      link.href = "https://image.tmdb.org/t/p/original" + currentPosterPath;
+      link.download = "movie-poster.jpg";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    setInterval(() => getRandomTitle(), 60000);
+
+    window.onload = () => {
+      const poster = document.getElementById("movie-poster");
+      if (poster) {
+        poster.onclick = () => getRandomTitle();
+      }
+      getRandomTitle();
+    };
+  </script>
+</body>
+</html>
