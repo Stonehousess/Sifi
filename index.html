@@ -238,11 +238,6 @@ function hideButtonsAfterDelay() {
 async function getRandomTitle(retries = 0) {
     if (isFetching) return;
     isFetching = true;
-    document.getElementById("movie-title").innerText = "Loading...";
-    document.getElementById("movie-description").innerText = "";
-    document.getElementById("movie-year").innerText = "";
-    document.getElementById("movie-rating").innerText = "";
-    document.getElementById("movie-runtime").innerText = "";
     document.getElementById("movie-type").innerText = "";
 
     const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
@@ -259,7 +254,6 @@ async function getRandomTitle(retries = 0) {
                 isMovie = !isMovie;
                 return getRandomTitle(retries + 1);
             } else {
-                document.getElementById("movie-title").innerText = "No suggestions found.";
                 isFetching = false;
                 return;
             }
@@ -277,10 +271,6 @@ async function getRandomTitle(retries = 0) {
         currentPosterPath = posterPath;
         console.log("Poster path:", posterPath);
 
-        document.getElementById("movie-title").innerText = title + (year ? ` (${year})` : "");
-        document.getElementById("movie-description").innerText = item.overview || "No description available.";
-        document.getElementById("movie-rating").innerText = `⭐️ ${rating}`;
-        document.getElementById("movie-runtime").innerText = runtime + " min";
         document.getElementById("movie-type").innerText = typeEmoji;
 
         console.log("Setting poster src", "https://image.tmdb.org/t/p/w780" + posterPath);
