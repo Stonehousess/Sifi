@@ -101,12 +101,7 @@ body {
 }
 
 
-#movie-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 10px;
-}
+
     width: 100vw;
     max-width: 500px;
     border-radius: 10px;
@@ -189,6 +184,15 @@ body {
     height: 100vh;
     display: block;
     margin: 0 auto;
+}
+
+#movie-container {
+    border: 2px solid red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #000;
 }
 </style></head><body><div id="movie-container"><img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/></div>
 <div id="loading-spinner">Loading...</div>
