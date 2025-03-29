@@ -294,7 +294,9 @@ if (posterPath && posterPath.startsWith('/')) {
             document.getElementById("movie-poster").src = "https://via.placeholder.com/500x750?text=No+Image";
         }
         document.getElementById("movie-poster").style.cursor = "pointer";
-        document.getElementById("movie-poster").onclick = () => getRandomTitle(); "https://image.tmdb.org/t/p/w780" + posterPath;
+window.onload = () => {
+  document.getElementById("movie-poster").onclick = () => getRandomTitle(); "https://image.tmdb.org/t/p/w780" + posterPath;
+};
 
         const tmdbUrl = `https://www.themoviedb.org/${isMovie ? "movie" : "tv"}/${id}`;
         document.getElementById("tmdb-button").onclick = () => window.open(tmdbUrl, "_blank");
@@ -393,5 +395,4 @@ function handleSwipe() {
         infoBox.classList.remove("expanded");
         infoBox.classList.add("collapsed");
     }
-}
-</script></body></html>
+}</script></body></html>
