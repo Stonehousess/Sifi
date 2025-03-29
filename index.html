@@ -177,15 +177,12 @@ async function getRandomTitle(retries = 0) {
 
 
 let buttonTimeout;
-function hideButtonsAfterDelay() {
     clearTimeout(buttonTimeout);
     buttonTimeout = setTimeout(() => {
         document.querySelector('.floating-buttons').classList.add('hidden');
     }, 10000);
-['click', 'scroll', 'touchstart'].forEach(evt => {
     document.addEventListener(evt, () => {
         document.querySelector('.floating-buttons').classList.remove('hidden');
-        hideButtonsAfterDelay();
     });
 });
 
@@ -216,19 +213,38 @@ const link = document.createElement('a');
 
 setInterval(getRandomTitle, 60000);
 };
+    clearTimeout(buttonTimeout);
+    buttonTimeout = setTimeout(() => {
+        document.querySelector('.floating-buttons').classList.add('hidden');
+    }, 10000);
+    document.addEventListener(evt, () => {
+        document.querySelector('.floating-buttons').classList.remove('hidden');
+    });
+});
+
+    getRandomTitle();
+};
+
+let buttonTimeout;
 function hideButtonsAfterDelay() {
     clearTimeout(buttonTimeout);
     buttonTimeout = setTimeout(() => {
         document.querySelector('.floating-buttons').classList.add('hidden');
     }, 10000);
+}
+
 ['click', 'scroll', 'touchstart'].forEach(evt => {
     document.addEventListener(evt, () => {
-        document.querySelector('.floating-buttons').classList.remove('hidden');
-        hideButtonsAfterDelay();
+        const buttons = document.querySelector('.floating-buttons');
+        if (buttons) {
+            buttons.classList.remove('hidden');
+            hideButtonsAfterDelay();
+        }
     });
 });
 
 window.onload = () => {
     getRandomTitle();
     hideButtonsAfterDelay();
-};</script></body></html>
+};
+</script></body></html>
