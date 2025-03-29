@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Random Movie TV Viewer</title>
+  <title>VCR</title>
   <style>
     html, body {
       background-color: #000;
@@ -187,7 +187,7 @@
     { name: "Mystery", movie: "9648", tv: "9648" }
   ];
 
-  let currentGenre = genres[0];
+  let currentGenre = genres.find(g => g.movie === "16");
   let isMovie;
   let apiKey = "e8d804d1f104509d3c1c5b1166485ae6";
   let currentTMDBUrl = "";
