@@ -90,6 +90,92 @@ body {
 <button id="genre-button">Genre</button>
 </div>
 <script>
+const genres = [
+    { name: "Animation", movieId: 16, tvId: 16 },
+    { name: "Science Fiction", movieId: 878, tvId: 10765 },
+    { name: "Romance", movieId: 10749, tvId: 18 },
+    { name: "Mystery", movieId: 9648, tvId: 9648 },
+    { name: "Adventure", movieId: 12, tvId: 10759 },
+    { name: "Documentary", movieId: 99, tvId: 99 },
+    { name: "Crime", movieId: 80, tvId: 80 },
+    { name: "Drama", movieId: 18, tvId: 18 }
+];
+
+let currentGenre = genres[0];
+let isFetching = false;
+let currentPosterPath = '';
+let isMovie = true;
+
+async function getRandomTitle(retries = 0) {
+    if (isFetching) return;
+    isFetching = true;
+    document.getElementById("movie-title").innerText = "Loading...";
+    document.getElementById("movie-description").innerText = "";
+    document.getElementById("movie-year").innerText = "";
+    document.getElementById("movie-rating").innerText = "";
+    document.getElementById("movie-runtime").innerText = "";
+    document.getElementById("movie-type").innerText = "";
+
+    const genreId = isMovie ? currentGenre.movieId : currentGenre.tvId;
+    const endpoint = isMovie ? "movie" : "tv";
+    const randomPage = Math.floor(Math.random() * 50) + 1;
+
+    try {
+        const response = await fetch(`https://api.themoviedb.org/3/discover/${endpoint}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`);
+        const data = await response.json();
+        const items = data.results;
+
+        if (!items || items.length === 0) {
+            if (retries < 3) {
+                isMovie = !isMovie; // try the other type
+                return getRandomTitle(retries + 1);
+            } else {
+                document.getElementById("movie-title").innerText = "No suggestions found.";
+                isFetching = false;
+                return;
+            }
+        }
+
+        const item = items[Math.floor(Math.random() * items.length)];
+        const title = item.title || item.name || "Untitled";
+        const year = (item.release_date || item.first_air_date || "").split("-")[0];
+        const rating = item.vote_average || "N/A";
+        const posterPath = item.poster_path;
+        const id = item.id;
+        const typeEmoji = isMovie ? "🎬" : "📺";
+        const runtime = item.runtime || item.episode_run_time?.[0] || "??";
+
+        currentPosterPath = posterPath;
+
+        document.getElementById("movie-title").innerText = title + (year ? ` (${year})` : "");
+        document.getElementById("movie-description").innerText = item.overview || "No description available.";
+        document.getElementById("movie-rating").innerText = `⭐️ ${rating}`;
+        document.getElementById("movie-runtime").innerText = runtime + " min";
+        document.getElementById("movie-type").innerText = typeEmoji;
+
+        document.getElementById("movie-poster").src = "https://image.tmdb.org/t/p/w500" + posterPath;
+
+        const tmdbUrl = `https://www.themoviedb.org/${isMovie ? "movie" : "tv"}/${id}`;
+        document.getElementById("tmdb-button").onclick = () => window.open(tmdbUrl, "_blank");
+        document.getElementById("trailer-button").onclick = () => window.open("https://www.youtube.com/results?search_query=" + encodeURIComponent(title + " trailer"), "_blank");
+        document.getElementById("save-button").onclick = () => {
+            if (!currentPosterPath) return;
+            const link = document.createElement("a");
+            link.href = "https://image.tmdb.org/t/p/w500" + currentPosterPath;
+            link.download = title + ".jpg";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+    } catch (err) {
+        console.error("Fetch failed:", err);
+    }
+
+    isFetching = false;
+}
+
+
 let buttonTimeout;
 function hideButtonsAfterDelay() {
     clearTimeout(buttonTimeout);
