@@ -234,7 +234,7 @@
     isMovie = Math.random() < 0.5;
     const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
     const type = isMovie ? "movie" : "tv";
-    const randomPage = Math.floor(Math.random() * 60) + 1;
+    const randomPage = Math.floor(Math.random() * 70) + 1;
     const url = `https://api.themoviedb.org/3/discover/${type}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
 
     try {
