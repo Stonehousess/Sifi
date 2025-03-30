@@ -219,7 +219,14 @@
       document.getElementById("info-genre").innerHTML = `Genre: ${genreNames} <span id="tmdb-link"></span>`;
 
       currentTMDBUrl = `https://www.themoviedb.org/${type}/${item.id}`;
-      currentTrailerUrl = "";
+
+      // Fetch trailer
+      const trailerRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US`);
+      const trailerData = await trailerRes.json();
+      const trailers = trailerData.results.filter(v => v.site === "YouTube" && v.type === "Trailer");
+      currentTrailerUrl = trailers.length > 0 ? `https://www.youtube.com/watch?v=${trailers[0].key}` : "";
+      document.getElementById("trailer-button").disabled = !currentTrailerUrl;
+
     } catch (err) {
       console.error("Failed to fetch from TMDB:", err);
     }
