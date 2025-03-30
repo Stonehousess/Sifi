@@ -210,14 +210,21 @@
       const title = item.title || item.name || "Untitled";
       const overview = item.overview || "No description available.";
       const rating = item.vote_average || "--";
-      const runtime = item.runtime || item.episode_run_time?.[0] || "--";
-      const episodeCount = item.number_of_episodes || "";
+      const releaseDate = item.release_date || item.first_air_date || "";
+      const year = releaseDate ? ` (${releaseDate.substring(0, 4)})` : "";
+
+      const detailUrl = `https://api.themoviedb.org/3/${type}/${item.id}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US`;
+      const detailRes = await fetch(detailUrl);
+      const detailData = await detailRes.json();
+
+      const runtime = detailData.runtime || detailData.episode_run_time?.[0] || "--";
+      const episodeCount = detailData.number_of_episodes || "--";
       const metaText = isMovie
         ? `⭐️ ${rating} • 🎬 • ${runtime} mins`
-        : `⭐️ ${rating} • 📺 • ~${runtime} mins × ${episodeCount} eps`;
+        : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ~${runtime} mins`;
 
       document.getElementById("movie-poster").src = posterPath;
-      document.getElementById("info-title").textContent = title;
+      document.getElementById("info-title").textContent = title + year;
       document.getElementById("info-meta").textContent = metaText;
       document.getElementById("info-description").textContent = overview;
       document.getElementById("genre-name").textContent = currentGenre.name;
