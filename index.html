@@ -60,8 +60,8 @@
     }
 
     .floating-buttons button img {
-      width: 60px;
-      height: 60px;
+      width: 120px;
+      height: 120px;
       filter: drop-shadow(0 0 8px #00ccff);
       transition: transform 0.3s ease;
     }
@@ -112,7 +112,7 @@
 
     #info-panel.expanded {
       height: auto;
-      opacity: 0.8;
+      opacity: 0.9;
     }
 
     #info-content {
@@ -122,7 +122,7 @@
     }
 
     #info-panel.expanded #info-content {
-      opacity: 0.9;
+      opacity: 0.95;
     }
 
     #info-title {
@@ -156,12 +156,12 @@
     <div id="movie-runtime"></div>
   </div>
 
-  <div id="info-panel" onclick="togglePanel()">
+  <div id="info-panel">
     <div id="info-content">
       <div id="info-title">Loading...</div>
       <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins</div>
       <div id="info-description">Loading description...</div>
-      <div id="info-genre">Genre: <span id="genre-name">Loading...</span> <span id="tmdb-link"></span></div>
+      <div id="info-genre">Genre: <span id="genre-name">Loading...</span> <span id="flag"></span> <span id="tmdb-link"></span></div>
     </div>
   </div>
 
@@ -191,6 +191,14 @@
   let currentGenre = genres.find(g => g.name === "Animation") || genres[0];
   let currentTMDBUrl = "", currentTrailerUrl = "";
   let panelTimer;
+  let lastScrollTop = 0;
+
+  function getFlagEmoji(countryCode) {
+    if (!countryCode) return "";
+    return countryCode
+      .toUpperCase()
+      .replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt()));
+  }
 
   async function getRandomTitle() {
     isMovie = Math.random() < 0.5;
@@ -219,6 +227,7 @@
 
       const runtime = detailData.runtime || detailData.episode_run_time?.[0] || "--";
       const episodeCount = detailData.number_of_episodes || "--";
+      const originCountry = detailData.origin_country?.[0] || detailData.production_countries?.[0]?.iso_3166_1 || "";
       const metaText = isMovie
         ? `⭐️ ${rating} • 🎬 • ${runtime} mins`
         : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ~${runtime} mins`;
@@ -228,8 +237,16 @@
       document.getElementById("info-meta").textContent = metaText;
       document.getElementById("info-description").textContent = overview;
       document.getElementById("genre-name").textContent = currentGenre.name;
+      document.getElementById("flag").textContent = getFlagEmoji(originCountry);
 
       currentTMDBUrl = `https://www.themoviedb.org/${type}/${item.id}`;
+      const tmdbLink = document.createElement("a");
+      tmdbLink.href = currentTMDBUrl;
+      tmdbLink.textContent = "TMDB";
+      tmdbLink.style.color = "#00ccff";
+      tmdbLink.target = "_blank";
+      document.getElementById("tmdb-link").innerHTML = "| ";
+      document.getElementById("tmdb-link").appendChild(tmdbLink);
 
       const trailerRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US`);
       const trailerData = await trailerRes.json();
@@ -253,12 +270,11 @@
     }
   }
 
-  document.getElementById("tmdb-button").onclick = () => {
-    togglePanel(true);
-    if (currentTMDBUrl) {
-      document.getElementById("tmdb-link").innerHTML = ` | <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
-    }
-  };
+  document.addEventListener("wheel", e => {
+    const panel = document.getElementById('info-panel');
+    if (e.deltaY < 0) panel.classList.add("expanded");
+    else if (e.deltaY > 0) panel.classList.remove("expanded");
+  });
 
   document.getElementById("save-button").onclick = () => {
     const posterUrl = document.getElementById('movie-poster').src;
