@@ -160,9 +160,9 @@
   <div id="info-panel" onclick="togglePanel()">
     <div id="info-content">
       <div id="info-title">Loading...</div>
-      <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins</div>
+      <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins <span id="flag"></span></div>
       <div id="info-description">Loading description...</div>
-      <div id="info-genre">Genre: <span id="genre-name">Loading...</span> <span id="flag"></span> <span id="tmdb-link"></span></div>
+      <div id="info-genre">Genre: <span id="genre-name">Loading...</span> <span id="tmdb-link"></span></div>
     </div>
   </div>
 
@@ -192,7 +192,6 @@
   let currentGenre = genres.find(g => g.name === "Animation") || genres[0];
   let currentTMDBUrl = "", currentTrailerUrl = "";
   let panelTimer;
-  let lastScrollY = window.scrollY;
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
@@ -242,15 +241,14 @@
       const episodeCount = detailData.number_of_episodes || "--";
       const originCountry = detailData.origin_country?.[0] || detailData.production_countries?.[0]?.iso_3166_1 || "";
       const metaText = isMovie
-        ? `⭐️ ${rating} • 🎬 • ${runtime} mins`
-        : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ~${runtime} mins`;
+        ? `⭐️ ${rating} • 🎬 • ${runtime} mins ${getFlagEmoji(originCountry)}`
+        : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ~${runtime} mins ${getFlagEmoji(originCountry)}`;
 
       document.getElementById("movie-poster").src = posterPath;
       document.getElementById("info-title").textContent = title + year;
-      document.getElementById("info-meta").textContent = metaText;
+      document.getElementById("info-meta").innerHTML = metaText;
       document.getElementById("info-description").textContent = overview;
       document.getElementById("genre-name").textContent = currentGenre.name;
-      document.getElementById("flag").textContent = getFlagEmoji(originCountry);
 
       currentTMDBUrl = `https://www.themoviedb.org/${type}/${item.id}`;
       document.getElementById("tmdb-link").innerHTML = `| <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
@@ -267,8 +265,8 @@
 
   document.addEventListener("wheel", e => {
     const panel = document.getElementById('info-panel');
-    if (e.deltaY < 0) panel.classList.add("expanded");
-    else if (e.deltaY > 0) panel.classList.remove("expanded");
+    if (e.deltaY > 0) panel.classList.add("expanded");
+    else if (e.deltaY < 0) panel.classList.remove("expanded");
   });
 
   document.getElementById("tmdb-button").onclick = () => togglePanel(true);
@@ -278,7 +276,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'VCR.jpg';
+      link.download = 'vcr.jpg';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
