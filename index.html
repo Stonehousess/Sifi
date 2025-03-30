@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>VCR</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>🎭VCR🌙</title>
   <style>
     html, body {
       background-color: #000;
@@ -113,12 +114,12 @@
 
     #info-panel.expanded {
       transform: translateY(0);
-      opacity: 0.8;
+      opacity: 0.7;
     }
 
     #info-content {
       pointer-events: none;
-      opacity: 0;
+      opacity: 0.2;
       transition: opacity 0.4s ease 0.2s;
     }
 
@@ -170,10 +171,10 @@
 
   <div class="floating-buttons">
     <button id="tmdb-button">TMDB</button>
-    <button id="save-button">Poster</button>
-    <button id="trailer-button" disabled>Trailer</button>
+    <button id="save-button">Record</button>
+    <button id="trailer-button" disabled>Play</button>
     <button id="next-button">Next</button>
-    <button id="genre-button">Genre</button>
+    <button id="genre-button">Shuffle</button>
   </div>
 <script>
   let genres = [
