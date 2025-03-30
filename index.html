@@ -104,11 +104,16 @@
       padding: 10px 20px;
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
-      transition: height 0.4s ease, opacity 0.4s ease;
+      transition: height 0.4s ease, opacity 2s ease;
       z-index: 1500;
       opacity: 0.5;
       overflow: hidden;
       cursor: pointer;
+    }
+
+    #info-panel.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
     #info-panel.expanded {
@@ -191,11 +196,12 @@
   let isMovie;
   let currentGenre = genres.find(g => g.name === "Animation") || genres[0];
   let currentTMDBUrl = "", currentTrailerUrl = "";
-  let panelTimer;
+  let panelTimer, panelFadeTimer;
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
     const shouldExpand = forceExpand !== null ? forceExpand : !panel.classList.contains('expanded');
+    panel.classList.remove('hidden');
     if (shouldExpand) {
       panel.classList.add('expanded');
       clearTimeout(panelTimer);
@@ -203,6 +209,16 @@
     } else {
       panel.classList.remove('expanded');
     }
+    resetPanelFade();
+  }
+
+  function resetPanelFade() {
+    const panel = document.getElementById('info-panel');
+    panel.classList.remove("hidden");
+    clearTimeout(panelFadeTimer);
+    panelFadeTimer = setTimeout(() => {
+      if (!panel.classList.contains("expanded")) panel.classList.add("hidden");
+    }, 10000);
   }
 
   function getFlagEmoji(countryCode) {
@@ -229,7 +245,7 @@
       const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
       const title = item.title || item.name || "Untitled";
       const overview = item.overview || "No description available.";
-      const rating = item.vote_average || "--";
+      const rating = item.vote_average ? `${Math.round(item.vote_average * 10)}%` : "--";
       const releaseDate = item.release_date || item.first_air_date || "";
       const year = releaseDate ? ` (${releaseDate.substring(0, 4)})` : "";
 
@@ -242,7 +258,7 @@
       const originCountry = detailData.origin_country?.[0] || detailData.production_countries?.[0]?.iso_3166_1 || "";
       const metaText = isMovie
         ? `⭐️ ${rating} • 🎬 • ${runtime} mins ${getFlagEmoji(originCountry)}`
-        : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ~${runtime} mins ${getFlagEmoji(originCountry)}`;
+        : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ${runtime} mins ${getFlagEmoji(originCountry)}`;
 
       document.getElementById("movie-poster").src = posterPath;
       document.getElementById("info-title").textContent = title + year;
@@ -267,6 +283,7 @@
     const panel = document.getElementById('info-panel');
     if (e.deltaY > 0) panel.classList.add("expanded");
     else if (e.deltaY < 0) panel.classList.remove("expanded");
+    resetPanelFade();
   });
 
   document.getElementById("tmdb-button").onclick = () => togglePanel(true);
@@ -296,11 +313,20 @@
   const buttons = document.querySelector(".floating-buttons");
   function showButtons() {
     buttons.classList.remove("hidden");
+    document.getElementById("info-panel").classList.remove("hidden");
     clearTimeout(fadeTimer);
-    fadeTimer = setTimeout(() => buttons.classList.add("hidden"), 5000);
+    fadeTimer = setTimeout(() => {
+      buttons.classList.add("hidden");
+      if (!document.getElementById("info-panel").classList.contains("expanded")) {
+        document.getElementById("info-panel").classList.add("hidden");
+      }
+    }, 5000);
   }
   ['mousemove', 'click', 'touchstart'].forEach(event => window.addEventListener(event, showButtons));
-  setTimeout(() => buttons.classList.add("hidden"), 5000);
+  setTimeout(() => {
+    buttons.classList.add("hidden");
+    document.getElementById("info-panel").classList.add("hidden");
+  }, 5000);
 
   document.getElementById("movie-poster").onclick = getRandomTitle;
   window.onload = () => {
