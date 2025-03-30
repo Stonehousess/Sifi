@@ -63,6 +63,7 @@
     .floating-buttons button img {
       width: 120px;
       height: 120px;
+      opacity: 0.9;
       filter: drop-shadow(0 0 1px #00ccff);
       transition: transform 0.3s ease;
     }
@@ -105,7 +106,7 @@
       padding: 10px 20px;
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
-      transition: height 0.4s ease, opacity 2s ease;
+      transition: height 0.4s ease, opacity 1s ease;
       z-index: 1500;
       opacity: 0.5;
       overflow: hidden;
@@ -129,7 +130,7 @@
     }
 
     #info-panel.expanded #info-content {
-      opacity: 0.95;
+      opacity: 0.85;
     }
 
     #info-title {
@@ -206,7 +207,7 @@
     if (shouldExpand) {
       panel.classList.add('expanded');
       clearTimeout(panelTimer);
-      panelTimer = setTimeout(() => panel.classList.remove('expanded'), 10000);
+      panelTimer = setTimeout(() => panel.classList.remove('expanded'), 6000);
     } else {
       panel.classList.remove('expanded');
     }
