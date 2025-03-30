@@ -161,7 +161,7 @@
       <div id="info-title">Loading...</div>
       <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins</div>
       <div id="info-description">Loading description...</div>
-      <div id="info-genre">Genre: Loading... <span id="tmdb-link"></span></div>
+      <div id="info-genre">Genre: <span id="genre-name">Loading...</span> <span id="tmdb-link"></span></div>
     </div>
   </div>
 
@@ -187,7 +187,8 @@
     { name: "Mystery", movie: "9648", tv: "9648" }
   ];
 
-  let isMovie, currentGenre = genres[0];
+  let isMovie;
+  let currentGenre = genres.find(g => g.name === "Animation") || genres[0];
   let currentTMDBUrl = "", currentTrailerUrl = "";
   let panelTimer;
 
@@ -210,23 +211,24 @@
       const overview = item.overview || "No description available.";
       const rating = item.vote_average || "--";
       const runtime = item.runtime || item.episode_run_time?.[0] || "--";
-      const genreNames = item.genre_ids?.join(", ");
+      const episodeCount = item.number_of_episodes || "";
+      const metaText = isMovie
+        ? `⭐️ ${rating} • 🎬 • ${runtime} mins`
+        : `⭐️ ${rating} • 📺 • ~${runtime} mins × ${episodeCount} eps`;
 
       document.getElementById("movie-poster").src = posterPath;
       document.getElementById("info-title").textContent = title;
-      document.getElementById("info-meta").textContent = `⭐️ ${rating} • ${isMovie ? "🎬" : "📺"} • ${runtime} mins`;
+      document.getElementById("info-meta").textContent = metaText;
       document.getElementById("info-description").textContent = overview;
-      document.getElementById("info-genre").innerHTML = `Genre: ${genreNames} <span id="tmdb-link"></span>`;
+      document.getElementById("genre-name").textContent = currentGenre.name;
 
       currentTMDBUrl = `https://www.themoviedb.org/${type}/${item.id}`;
 
-      // Fetch trailer
       const trailerRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US`);
       const trailerData = await trailerRes.json();
       const trailers = trailerData.results.filter(v => v.site === "YouTube" && v.type === "Trailer");
       currentTrailerUrl = trailers.length > 0 ? `https://www.youtube.com/watch?v=${trailers[0].key}` : "";
       document.getElementById("trailer-button").disabled = !currentTrailerUrl;
-
     } catch (err) {
       console.error("Failed to fetch from TMDB:", err);
     }
@@ -257,7 +259,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'movie-poster.jpg';
+      link.download = 'VCR.jpg';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
