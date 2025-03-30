@@ -134,18 +134,18 @@
     }
 
     #info-title {
-      font-size: 26px;
+      font-size: 27px;
       font-weight: bold;
     }
 
     #info-meta {
-      font-size: 18px;
+      font-size: 19px;
       margin-top: 5px;
       color: #ffcc00;
     }
 
     #info-description {
-      margin-top: 10px;
+      margin-top: 6px;
       font-size: 16px;
       line-height: 1.4;
     }
@@ -259,8 +259,8 @@
       const episodeCount = detailData.number_of_episodes || "--";
       const originCountry = detailData.origin_country?.[0] || detailData.production_countries?.[0]?.iso_3166_1 || "";
       const metaText = isMovie
-        ? `⭐️ ${rating} • 🎬 • ${runtime} mins ${getFlagEmoji(originCountry)}`
-        : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ${runtime} mins ${getFlagEmoji(originCountry)}`;
+        ? `⭐️ ${rating} • 🎬 • ${runtime} mins • ${getFlagEmoji(originCountry)}`
+        : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ${runtime} mins • ${getFlagEmoji(originCountry)}`;
 
       document.getElementById("movie-poster").src = posterPath;
       document.getElementById("info-title").textContent = title + year;
