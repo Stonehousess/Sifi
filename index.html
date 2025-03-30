@@ -244,7 +244,7 @@
       if (!results || results.length === 0) return;
 
       const item = results[Math.floor(Math.random() * results.length)];
-      const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
+      const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/original${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
       const title = item.title || item.name || "Untitled";
       const overview = item.overview || "No description available.";
       const rating = item.vote_average ? `${Math.round(item.vote_average * 10)}%` : "--";
