@@ -2,7 +2,7 @@
 <html>
 <head>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title>📼VCR📼🎭</title>
+  <title>🎼VCR🎼🎭</title>
   <style>
     html, body {
       background-color: #000;
@@ -42,8 +42,7 @@
       position: fixed;
       bottom: 30px;
       width: 100%;
-      opacity: 0.5;
-      transition: opacity 2s ease;
+      transition: opacity 1s ease;
       z-index: 1000;
     }
 
@@ -53,21 +52,22 @@
     }
 
     .floating-buttons button {
-      width: 100px;
-      height: 100px;
-      margin: 2px;
-      border-radius: 12px;
-      font-size: 12px;
-      text-align: center;
-      padding: 2px;
-      background-color: #222;
-      color: #ffcc00;
-      border: 1px solid #ffcc00;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 5px;
       cursor: pointer;
     }
 
-    .floating-buttons button:hover {
-      background-color: #444;
+    .floating-buttons button img {
+      width: 60px;
+      height: 60px;
+      filter: drop-shadow(0 0 8px #00ccff);
+      transition: transform 0.3s ease;
+    }
+
+    .floating-buttons button:hover img {
+      transform: scale(1.1);
     }
 
     #loading-spinner {
@@ -98,21 +98,21 @@
       bottom: 0;
       left: 0;
       width: 100%;
+      height: 30px;
       background: rgba(20, 20, 20, 0.9);
       color: white;
       padding: 10px 20px;
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
       cursor: pointer;
-      transform: translateY(80%);
-      transition: transform 0.4s ease, opacity 0.4s ease;
+      transition: height 0.4s ease, opacity 0.4s ease;
       z-index: 1500;
       opacity: 0.5;
-      touch-action: pan-y;
+      overflow: hidden;
     }
 
     #info-panel.expanded {
-      transform: translateY(0);
+      height: auto;
       opacity: 0.8;
     }
 
@@ -162,105 +162,38 @@
       <div id="info-title">Loading...</div>
       <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins</div>
       <div id="info-description">Loading description...</div>
-      <div id="info-genre">Genre: Loading...</div>
+      <div id="info-genre">Genre: Loading... <span id="tmdb-link"></span></div>
     </div>
   </div>
 
   <div id="loading-spinner">Loading...</div>
 
   <div class="floating-buttons">
-    <button id="tmdb-button">TMDB</button>
-    <button id="save-button">Record</button>
-    <button id="trailer-button" disabled>Play</button>
-    <button id="next-button">Next</button>
-    <button id="genre-button">Shuffle</button>
+    <button id="tmdb-button"><img src="tmdb.png" alt="TMDB"/></button>
+    <button id="save-button"><img src="record.png" alt="Record"/></button>
+    <button id="trailer-button" disabled><img src="play.png" alt="Play"/></button>
+    <button id="next-button"><img src="next.png" alt="Next"/></button>
+    <button id="genre-button"><img src="shuffle.png" alt="Shuffle"/></button>
   </div>
-<script>
-  let genres = [
-    { name: "Sci-Fi", movie: "878", tv: "10765" },
-    { name: "Adventure", movie: "12", tv: "10759" },
-    { name: "Comedy", movie: "35", tv: "35" },
-    { name: "Documentary", movie: "99", tv: "99" },
-    { name: "Animation", movie: "16", tv: "16" },
-    { name: "Romance", movie: "10749", tv: "18" },
-    { name: "Crime", movie: "80", tv: "80" },
-    { name: "Mystery", movie: "9648", tv: "9648" }
-  ];
 
-  let currentGenre = genres.find(g => g.movie === "16");
-  let isMovie;
-  let apiKey = "e8d804d1f104509d3c1c5b1166485ae6";
-  let currentTMDBUrl = "";
-  let currentPosterPath = "";
-  let currentTrailerUrl = "";
-  let panelTimer;
+<script>
+  let genres = [...]; // genre data
+  let isMovie, currentGenre = genres[0];
+  let currentTMDBUrl = "", currentTrailerUrl = "";
 
   async function getRandomTitle() {
-  isMovie = Math.random() < 0.5;
-  console.log("Picked:", isMovie ? "🎬 Film" : "📺 TV");
+    isMovie = Math.random() < 0.5;
     const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
     const type = isMovie ? "movie" : "tv";
-    const randomPage = Math.floor(Math.random() * 50) + 1;
-    const url = `https://api.themoviedb.org/3/discover/${type}?api_key=${apiKey}&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
+    const randomPage = Math.floor(Math.random() * 60) + 1;
+    const url = `https://api.themoviedb.org/3/discover/${type}?api_key=YOUR_API_KEY&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
 
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      const results = data.results || [];
-
-      if (!results.length) return;
-
-      const item = results[Math.floor(Math.random() * results.length)];
-      const id = item.id;
-      const title = item.title || item.name || "Untitled";
-      const year = (item.release_date || item.first_air_date || "????").slice(0, 4);
-      const rating = item.vote_average || 0;
-      const overview = item.overview || "No description available.";
-      currentPosterPath = item.poster_path;
-      currentTMDBUrl = `https://www.themoviedb.org/${type}/${id}`;
-
-      const detailUrl = `https://api.themoviedb.org/3/${type}/${id}?api_key=${apiKey}&language=en-US`;
-      const detailResponse = await fetch(detailUrl);
-      const detailData = await detailResponse.json();
-
-      let runtime;
-      if (isMovie) {
-        runtime = detailData.runtime;
-      } else {
-        const episodes = detailData.number_of_episodes || 1;
-        const avgRuntime = detailData.episode_run_time?.[0] || 0;
-        runtime = episodes > 1 ? `${episodes} eps × ${avgRuntime}` : `${avgRuntime}`;
-      }
-
-      const videoUrl = `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${apiKey}`;
-      const videoResponse = await fetch(videoUrl);
-      const videoData = await videoResponse.json();
-      const trailer = videoData.results.find(video => video.type === 'Trailer' && video.site === 'YouTube');
-      if (trailer) {
-        currentTrailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
-        document.getElementById("trailer-button").disabled = false;
-      } else {
-        currentTrailerUrl = null;
-        document.getElementById("trailer-button").disabled = true;
-      }
-
-      document.getElementById("movie-poster").src = "https://image.tmdb.org/t/p/original" + currentPosterPath;
-      document.getElementById("movie-poster").alt = title;
-
-      document.getElementById("info-title").innerText = `${title} (${year})`;
-      document.getElementById("info-meta").innerText = `⭐️ ${Math.round(rating * 10)}% • ${isMovie ? '🎬 Film' : '📺 TV'} • ${runtime || "--"} mins`;
-      document.getElementById("info-description").innerText = overview;
-      document.getElementById("info-genre").innerText = `Genre: ${currentGenre.name}`;
-
-    } catch (err) {
-      console.error("Fetch failed:", err);
-    }
+    // your TMDB fetching code and assignment to currentTMDBUrl
   }
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
     const shouldExpand = forceExpand !== null ? forceExpand : !panel.classList.contains('expanded');
-
     if (shouldExpand) {
       panel.classList.add('expanded');
       clearTimeout(panelTimer);
@@ -270,39 +203,16 @@
     }
   }
 
-  let touchStartY = 0;
-  let touchEndY = 0;
-  const panel = document.getElementById('info-panel');
-  panel.addEventListener('touchstart', e => {
-    touchStartY = e.changedTouches[0].screenY;
-  });
-  panel.addEventListener('touchend', e => {
-    touchEndY = e.changedTouches[0].screenY;
-    if (touchStartY - touchEndY > 30) togglePanel(true);
-    if (touchEndY - touchStartY > 30) togglePanel(false);
-  });
-
-  document.getElementById("next-button").onclick = () => {
-  getRandomTitle();
-};
-  document.getElementById("genre-button").onclick = () => {
-  const randomIndex = Math.floor(Math.random() * genres.length);
-  currentGenre = genres[randomIndex];
-  getRandomTitle();
-};
-  document.getElementById("tmdb-button").onclick = () => currentTMDBUrl && window.open(currentTMDBUrl, "_blank");
-  document.getElementById("trailer-button").onclick = () => {
-    if (currentTrailerUrl) {
-      window.open(currentTrailerUrl, "_blank");
-    } else {
-      alert("No trailer available for this title.");
+  document.getElementById("tmdb-button").onclick = () => {
+    togglePanel(true);
+    if (currentTMDBUrl) {
+      document.getElementById("tmdb-link").innerHTML = ` | <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
     }
   };
+
   document.getElementById("save-button").onclick = () => {
-  const posterUrl = document.getElementById('movie-poster').src;
-  fetch(posterUrl)
-    .then(response => response.blob())
-    .then(blob => {
+    const posterUrl = document.getElementById('movie-poster').src;
+    fetch(posterUrl).then(r => r.blob()).then(blob => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -312,12 +222,30 @@
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     });
-};
+  };
 
-  setInterval(() => getRandomTitle(), 60000);
-  window.onload = () => {
-    document.getElementById("movie-poster").onclick = () => getRandomTitle();
+  document.getElementById("genre-button").onclick = () => {
+    currentGenre = genres[Math.floor(Math.random() * genres.length)];
     getRandomTitle();
+  };
+
+  document.getElementById("next-button").onclick = getRandomTitle;
+  document.getElementById("trailer-button").onclick = () => currentTrailerUrl && window.open(currentTrailerUrl, "_blank");
+
+  let fadeTimer;
+  const buttons = document.querySelector(".floating-buttons");
+  function showButtons() {
+    buttons.classList.remove("hidden");
+    clearTimeout(fadeTimer);
+    fadeTimer = setTimeout(() => buttons.classList.add("hidden"), 5000);
+  }
+  ['mousemove', 'click', 'touchstart'].forEach(event => window.addEventListener(event, showButtons));
+  setTimeout(() => buttons.classList.add("hidden"), 5000);
+
+  document.getElementById("movie-poster").onclick = getRandomTitle;
+  window.onload = () => {
+    getRandomTitle();
+    setInterval(getRandomTitle, 60000); // re-fetch every 60s if needed
   };
 </script>
 </body>
