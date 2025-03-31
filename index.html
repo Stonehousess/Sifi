@@ -269,6 +269,7 @@
   let autoTrailerMode = false;
   let longPressTimer;
   let fetchTimer = null; // 🔁 Track the fetch loop
+  let trailerLoopFirst = true;
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
@@ -335,6 +336,7 @@ function playTrailer(url) {
 function closeTrailer() {
   trailerPlaying = false;
   autoTrailerMode = false;
+  trailerLoopFirst = true
   trailerPlayer.stopVideo();
   document.getElementById('trailer-overlay').classList.remove('active');
   fetchTimer = setTimeout(startAutoFetch, 30000);
@@ -420,7 +422,7 @@ if (requireTrailer && !currentTrailerUrl) {
     }
   }
 async function findTrailerAndPlay() {
-  if (currentTrailerUrl) {
+  if (trailerLoopFirst && currentTrailerUrl) {
     console.log("▶️ Playing trailer for current title");
     playTrailer(currentTrailerUrl); // ✅ play current title’s trailer
     return;
