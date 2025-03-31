@@ -422,29 +422,29 @@ if (requireTrailer && !currentTrailerUrl) {
     }
   }
 async function findTrailerAndPlay() {
-  // If trailer mode was just started
+  // If we’re just starting trailer mode
   if (trailerLoopFirst) {
     trailerLoopFirst = false;
 
-    // If the current title has a trailer, play it
     if (currentTrailerUrl) {
       console.log("▶️ Playing trailer for current title");
       playTrailer(currentTrailerUrl);
       return;
     }
 
-    console.log("⏭ Current title has no trailer — finding a new one...");
+    console.log("⏭ No trailer on current title — starting search loop...");
   }
 
-  // Loop to find a title with a trailer
-  const found = await getRandomTitle(true);
-  if (!found) {
-    console.warn("🔁 Retrying fetch until trailer is found...");
-    return findTrailerAndPlay();
+  // Keep looking for titles with a trailer
+  let found = false;
+  while (!found) {
+    found = await getRandomTitle(true);
+    if (!found) {
+      console.warn("🔁 Still searching for a trailer...");
+    }
   }
 
-  // Play the trailer for the newly fetched title
-  console.log("🎬 Playing new trailer");
+  console.log("🎬 Found trailer — playing");
   playTrailer(currentTrailerUrl);
 }
   document.addEventListener("wheel", e => {
