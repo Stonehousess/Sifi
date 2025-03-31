@@ -419,11 +419,17 @@ if (requireTrailer && !currentTrailerUrl) {
     }
   }
 async function findTrailerAndPlay() {
-  const found = await getRandomTitle(true); // pass `true` to require trailer
-  if (!found) return findTrailerAndPlay();  // keep looking
-  playTrailer(currentTrailerUrl);
-}
+  if (currentTrailerUrl) {
+    console.log("▶️ Playing trailer for current title");
+    playTrailer(currentTrailerUrl); // ✅ play current title’s trailer
+    return;
+  }
 
+  console.log("⏭ No trailer on current title — seeking a new one...");
+  const found = await getRandomTitle(true); // force fetch with trailer
+  if (!found) return findTrailerAndPlay();  // loop until success
+  playTrailer(currentTrailerUrl);           // finally play it
+}
   document.addEventListener("wheel", e => {
     const panel = document.getElementById('info-panel');
     if (e.deltaY > 0) panel.classList.add("expanded");
