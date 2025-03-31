@@ -168,8 +168,11 @@
       font-size: 16px;
       color: #aaa;
     }
-  #trailer-overlay {
-  display: none !important;
+#trailer-overlay {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.95);
@@ -178,6 +181,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+#trailer-overlay.active {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: all;
 }
 
   .player-wrapper {
@@ -306,7 +315,7 @@ function playTrailer(url) {
   if (!videoId || !trailerPlayer) return;
 
   trailerPlaying = true;
-  document.getElementById('trailer-overlay').style.display = 'flex';
+  document.getElementById('trailer-overlay').classList.add('active');
   trailerPlayer.loadVideoById(videoId);
   clearTimeout(fadeTimer);
 }
@@ -315,7 +324,7 @@ function closeTrailer() {
   trailerPlaying = false;
   autoTrailerMode = false;
   trailerPlayer.stopVideo();
-  document.getElementById('trailer-overlay').style.display = 'none';
+  document.getElementById('trailer-overlay').classList.remove('active');
   startAutoFetch();
 }
 
