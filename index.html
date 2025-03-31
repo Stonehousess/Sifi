@@ -332,10 +332,15 @@
   }, 5000);
 
   document.getElementById("movie-poster").onclick = getRandomTitle;
+  function startAutoFetch() {
+  getRandomTitle().then(() => {
+    setTimeout(startAutoFetch, 60000);
+  });
+}
+
   window.onload = () => {
-    getRandomTitle();
-    setInterval(getRandomTitle, 60000);
-  };
+  startAutoFetch();
+};
 </script>
 </body>
 </html>
