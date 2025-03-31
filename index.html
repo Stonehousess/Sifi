@@ -168,6 +168,42 @@
       font-size: 16px;
       color: #aaa;
     }
+  #trailer-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+  .player-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+  #player {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+}
+.close-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
   </style>
 </head>
 <body>
@@ -194,10 +230,11 @@
     </div>
   </div>
 
-  <div id="loading-spinner">Loading...</div>
-<div id="trailer-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; justify-content: center; align-items: center; flex-direction: column;">
-  <div id="player"></div>
-  <button onclick="closeTrailer()" style="margin-top: 20px; padding: 10px 20px; font-size: 16px; background: red; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>
+  <div id="trailer-overlay">
+  <div class="player-wrapper">
+    <div id="player"></div>
+  </div>
+  <button onclick="closeTrailer()" class="close-button">Close</button>
 </div>
 <script src="https://www.youtube.com/iframe_api"></script>
   
