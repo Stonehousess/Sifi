@@ -490,7 +490,7 @@ trailerBtn.addEventListener("click", () => {
 
   document.getElementById("movie-poster").onclick = getRandomTitle;
   function startAutoFetch() {
-  getRandomTitle().then(() => {
+  getRandomTitle(false).then(() => {
     setTimeout(startAutoFetch, 60000);
   });
 }
