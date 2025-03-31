@@ -245,6 +245,10 @@
       if (!results || results.length === 0) return;
 
       const item = results[Math.floor(Math.random() * results.length)];
+if (!item.poster_path) {
+  console.warn("Missing poster — retrying...");
+  return getRandomTitle(); // Retry if no poster
+}
       const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/original${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
       const title = item.title || item.name || "Untitled";
       const overview = item.overview || "No description available.";
