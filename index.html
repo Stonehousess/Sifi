@@ -310,6 +310,8 @@ function onYouTubeIframeAPIReady() {
   });
 }
 
+let failSafeTimeout; // Define globally near trailerPlayer
+
 function playTrailer(url) {
   const videoId = extractYouTubeId(url);
   if (!videoId || !trailerPlayer) return;
@@ -318,8 +320,16 @@ function playTrailer(url) {
   document.getElementById('trailer-overlay').classList.add('active');
   trailerPlayer.loadVideoById(videoId);
   clearTimeout(fadeTimer);
-}
 
+ failSafeTimeout = setTimeout(() => {
+  if (trailerPlayer && typeof trailerPlayer.getPlayerState === "function") {
+    const state = trailerPlayer.getPlayerState();
+    if (state !== YT.PlayerState.PLAYING && autoTrailerMode) {
+      console.warn("Trailer failed to play — skipping...");
+      findTrailerAndPlay();
+    }
+  }
+}, 6000);
 function closeTrailer() {
   trailerPlaying = false;
   autoTrailerMode = false;
@@ -329,13 +339,19 @@ function closeTrailer() {
 }
 
 function onPlayerStateChange(event) {
+  if (event.data === YT.PlayerState.PLAYING) {
+    clearTimeout(failSafeTimeout);
+  }
+
   if (event.data === YT.PlayerState.ENDED) {
-    document.getElementById('trailer-overlay').style.display = 'none';
     trailerPlaying = false;
-    if (autoTrailerMode) findTrailerAndPlay(); // fetch next valid trailer
+    if (autoTrailerMode) {
+      findTrailerAndPlay();
+    } else {
+      document.getElementById('trailer-overlay').classList.remove('active');
+    }
   }
 }
-
 function extractYouTubeId(url) {
   const match = url.match(/v=([a-zA-Z0-9_-]+)/);
   return match ? match[1] : null;
@@ -356,9 +372,8 @@ function extractYouTubeId(url) {
       const item = results[Math.floor(Math.random() * results.length)];
 if (!item.poster_path) {
   console.warn("Missing poster — retrying...");
-  return getRandomTitle(requireYTailer); // Retry if no poster
+  return getRandomTitle(requireTrailer); // Retry if no poster
 }
-
 
       const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/original${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
       const title = item.title || item.name || "Untitled";
