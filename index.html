@@ -44,13 +44,14 @@
 
  .floating-buttons {
   position: absolute;
-  bottom: 12px;
+  bottom: 32px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: space-between;
   width: 100%;
-  padding: 0 5%;
+  padding: 0 0;
+  Max-width: 100%;
   box-sizing: border-box;
   transition: opacity 1s ease;
   z-index: 1000;
@@ -171,6 +172,7 @@
 </head>
 <body>
   <div id="movie-container">
+  <div id="poster-wrapper">
     <img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/>
     <div class="floating-buttons">
     <button id="tmdb-button"><img src="tmdb.png" alt="TMDB"/></button>
@@ -303,12 +305,12 @@ function extractYouTubeId(url) {
       const res = await fetch(url);
       const data = await res.json();
       const results = data.results;
-      if (!results || results.length === 0) return;
+      if (!results || results.length === 0) return false;
 
       const item = results[Math.floor(Math.random() * results.length)];
 if (!item.poster_path) {
   console.warn("Missing poster — retrying...");
-  return getRandomTitle(); // Retry if no poster
+  return getRandomTitle(requireYTailer); // Retry if no poster
 }
 
 
@@ -343,9 +345,15 @@ if (!item.poster_path) {
       const trailerData = await trailerRes.json();
       const trailers = trailerData.results.filter(v => v.site === "YouTube" && v.type === "Trailer");
       currentTrailerUrl = trailers.length > 0 ? `https://www.youtube.com/watch?v=${trailers[0].key}` : "";
+if (requireTrailer && !currentTrailerUrl) {
+  console.warn("No trailer — retrying...");
+  return false;
+}
       document.getElementById("trailer-button").disabled = !currentTrailerUrl;
+      return true; 
     } catch (err) {
       console.error("Failed to fetch from TMDB:", err);
+      return false;
     }
   }
 async function findTrailerAndPlay() {
