@@ -59,6 +59,10 @@
   transition: opacity 1s ease;
   z-index: 1000;
 }
+.floating-buttons > button,
+.floating-buttons > #save-button-wrapper {
+  flex: 0 0 auto;
+}
 
 .floating-buttons.hidden {
   opacity: 0;
@@ -261,7 +265,11 @@
   border: none;
   padding: 0;
   background: none;
+  display: inline-block;
+  vertical-align: middle;
   cursor: pointer;
+  aspect-ratio: 1 / 1;
+  box-sizing: content-box;
 }
 
 #save-button {
@@ -529,9 +537,16 @@ if (requireTrailer && !currentTrailerUrl) {
 async function findTrailerAndPlay() {
   // 🚀 Begin trailer autoplay mode
   if (trailerLoopFirst) {
-    trailerLoopFirst = false;
-    console.log("⏭ Starting trailer autoplay — searching for valid trailer...");
+  trailerLoopFirst = false;
+
+  if (currentTrailerUrl) {
+    console.log("🎬 Playing current trailer before continuing autoplay...");
+    playTrailer(currentTrailerUrl);
+    return;
   }
+
+  console.log("⏭ No trailer on current title — searching for next...");
+}
 
   // 🔁 Loop to fetch titles until we find one with a trailer
   let found = false;
