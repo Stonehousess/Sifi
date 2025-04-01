@@ -551,7 +551,7 @@ async function findTrailerAndPlay() {
 
   document.getElementById("tmdb-button").onclick = () => togglePanel(true);
 document.getElementById("save-button").onclick = () => {
-  startSaveCountdown(5000); // ⏱️ Trigger the visual ring overlay (5 sec)
+  
 
   const posterUrl = document.getElementById('movie-poster').src;
   fetch(posterUrl).then(r => r.blob()).then(blob => {
@@ -640,9 +640,9 @@ document.getElementById("trailer-overlay").addEventListener("touchstart", () => 
     overlayInfo.style.opacity = "0";
   }, 3000);
 });
-function startSaveCountdown(duration = 5000) {
+function startFetchCountdown(duration = 60000) {
   const circle = document.querySelector("#save-timer-ring circle");
-  const totalLength = 2 * Math.PI * 36; // 2πr for r=36
+  const totalLength = 2 * Math.PI * 36; // circle length for r=36
 
   let startTime = performance.now();
 
@@ -656,9 +656,9 @@ function startSaveCountdown(duration = 5000) {
     }
   }
 
-  // Reset stroke before starting
+  // Reset before starting
   circle.style.strokeDasharray = totalLength;
-  circle.style.strokeDashoffset = totalLength;
+  circle.style.strokeDashoffset = 0;
 
   requestAnimationFrame(animate);
 }
@@ -667,6 +667,7 @@ function startSaveCountdown(duration = 5000) {
   if (fetchTimer) clearTimeout(fetchTimer); // ✅ Clear any previous timer
 
   getRandomTitle(false).then(() => {
+    startFetchCountdown(60000); // ⏱️ visual countdown ring
     fetchTimer = setTimeout(startAutoFetch, 60000); // ✅ Save the new timer
   });
 }
