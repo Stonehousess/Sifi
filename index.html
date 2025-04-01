@@ -316,7 +316,7 @@
     <button id="save-button-wrapper">
     <img id="save-button" src="record.png" alt="Record" />
     <svg id="save-timer-ring" viewBox="0 0 80 80">
-  <circle r="18" cx="40" cy="40" />
+  <circle r="20" cx="40" cy="40" />
 </svg>
 </button>
     <button id="trailer-button" disabled><img src="play.png" alt="Play"/></button>
@@ -353,6 +353,8 @@
   <button onclick="closeTrailer()" class="overlay-btn">Close</button>
 </div>
 </div>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
   
 
@@ -379,6 +381,22 @@
   let fetchTimer = null; // 🔁 Track the fetch loop
   let trailerLoopFirst = true;
   let trailerPaused = false;
+
+// Your Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAXYSUXhSJLVU07sjFtJsczhkQ1PTHdiO0",
+  authDomain: "vcrt-a6276.firebaseapp.com",
+  projectId: "vcrt-a6276",
+  storageBucket: "vcrt-a6276.firebasestorage.app",
+  messagingSenderId: "523622505700",
+  appId: "1:523622505700:web:c798b13019eceedb2ce0f1"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Initialize Firestore
+const db = firebase.firestore();
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
@@ -507,6 +525,15 @@ function extractYouTubeId(url) {
       if (!results || results.length === 0) return false;
 
       const item = results[Math.floor(Math.random() * results.length)];
+      // 🔎 Firestore check before fetching
+const docRef = db.collection("films").doc(String(item.id));
+const cachedDoc = await docRef.get();
+
+if (cachedDoc.exists) {
+  console.log("✅ Loaded from Firestore:", cachedDoc.data().title);
+  applyFilmToUI(cachedDoc.data());
+  return true; // ✅ Use cached result, skip fetching
+}
 if (!item.poster_path) {
   console.warn("Missing poster — retrying...");
   return getRandomTitle(requireTrailer); // Retry if no poster
@@ -551,6 +578,24 @@ if (requireTrailer && !currentTrailerUrl) {
   console.warn("No trailer — retrying...");
   return false;
 }
+// ✅ Save to Firestore if successful
+await docRef.set({
+  id: item.id,
+  title,
+  overview,
+  year,
+  rating,
+  metaText,
+  posterPath,
+  trailerUrl: currentTrailerUrl,
+  genre: currentGenre.name,
+  type,
+  tmdbUrl: currentTMDBUrl,
+  timestamp: Date.now()
+});
+
+return true;
+
       document.getElementById("trailer-button").disabled = !currentTrailerUrl;
       return true; 
     } catch (err) {
@@ -689,7 +734,7 @@ function showOverlayInfo() {
 });
 function startFetchCountdown(duration = 60000) {
   const circle = document.querySelector("#save-timer-ring circle");
-  const totalLength = 2 * Math.PI * 18; // circle length for r=36
+  const totalLength = 2 * Math.PI * 20; // circle length for r=36
 
   let startTime = performance.now();
 
