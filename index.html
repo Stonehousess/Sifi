@@ -551,7 +551,7 @@ async function findTrailerAndPlay() {
   // 🔁 Loop to fetch titles until we find one with a trailer
   let found = false;
   while (!found) {
-    found = await getRandomTitle(true);
+    found = await fetchWithCountdown(true);
     if (!found) {
       console.warn("🔁 Still searching for a trailer...");
     }
@@ -587,10 +587,10 @@ document.getElementById("save-button").onclick = () => {
   document.getElementById("genre-button").onclick = () => {
   currentGenre = genres[Math.floor(Math.random() * genres.length)];
   document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
-  getRandomTitle();
+ fetchWithCountdown();
 };
 
-  document.getElementById("next-button").onclick = getRandomTitle;
+  document.getElementById("next-button").onclick = () => fetchWithCountdown();
 const trailerBtn = document.getElementById("trailer-button");
 
 trailerBtn.addEventListener("mousedown", () => {
@@ -680,13 +680,19 @@ function startFetchCountdown(duration = 60000) {
 
   requestAnimationFrame(animate);
 }
-  document.getElementById("movie-poster").onclick = getRandomTitle;
+  document.getElementById("movie-poster").onclick = () => fetchWithCountdown();
  function startAutoFetch() {
   if (fetchTimer) clearTimeout(fetchTimer); // ✅ Clear any previous timer
 
-  getRandomTitle(false).then(() => {
+  fetchWithCountdown(false).then(() => {
     startFetchCountdown(60000); // ⏱️ visual countdown ring
     fetchTimer = setTimeout(startAutoFetch, 60000); // ✅ Save the new timer
+  });
+}
+function fetchWithCountdown(requireTrailer = false) {
+  return getRandomTitle(requireTrailer).then((success) => {
+    if (success) startFetchCountdown(60000);
+    return success;
   });
 }
 
