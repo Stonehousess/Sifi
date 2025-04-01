@@ -54,7 +54,7 @@
   justify-content: space-between;
   width: 100%;
   padding: 0 0;
-  Max-width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
   transition: opacity 1s ease;
   z-index: 1000;
@@ -489,7 +489,8 @@ function onPlayerStateChange(event) {
   }
 }
 function extractYouTubeId(url) {
-  const match = url.match(/v=([a-zA-Z0-9_-]+)/);
+  const regExp = /(?:v=|\/)([0-9A-Za-z_-]{11})/;
+  const match = url.match(regExp);
   return match ? match[1] : null;
 }
   async function getRandomTitle(requireTrailer = false) {
@@ -708,15 +709,16 @@ function startFetchCountdown(duration = 60000) {
 
   requestAnimationFrame(animate);
 }
-  document.getElementById("movie-poster").onclick = () => fetchWithCountdown();
- function startAutoFetch() {
-  if (fetchTimer) clearTimeout(fetchTimer); // ✅ Clear any previous timer
+document.getElementById("movie-poster").onclick = () => fetchWithCountdown();
+
+function startAutoFetch() {
+  if (fetchTimer) clearTimeout(fetchTimer);
 
   fetchWithCountdown(false).then(() => {
-    startFetchCountdown(60000); // ⏱️ visual countdown ring
-    fetchTimer = setTimeout(startAutoFetch, 60000); // ✅ Save the new timer
+    fetchTimer = setTimeout(startAutoFetch, 60000);
   });
 }
+
 function fetchWithCountdown(requireTrailer = false) {
   return getRandomTitle(requireTrailer).then((success) => {
     if (success) startFetchCountdown(60000);
