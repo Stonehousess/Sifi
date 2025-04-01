@@ -259,8 +259,8 @@
   width: 80px;
   height: 80px;
   border: none;
-  background: none;
   padding: 0;
+  background: none;
   cursor: pointer;
 }
 
@@ -275,17 +275,20 @@
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
   transform: rotate(-90deg);
   z-index: 2;
   pointer-events: none;
+  opacity: 0.6;
 }
 
 #save-timer-ring circle {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.8);
-  stroke-width: 6;
-  stroke-dasharray: 226.2; /* 2π * r (r = 36) */
-  stroke-dashoffset: 226.2;
+  stroke: red;
+  stroke-width: 5.5;
+  stroke-dasharray: 226.2; /* 2π * r */
+  stroke-dashoffset: 0;
   transition: stroke-dashoffset 0.1s linear;
 }
   </style>
@@ -298,9 +301,9 @@
     <button id="tmdb-button"><img src="tmdb.png" alt="TMDB"/></button>
     <button id="save-button-wrapper">
     <img id="save-button" src="record.png" alt="Record" />
-    <svg id="save-timer-ring" width="80" height="80">
-    <circle r="36" cx="40" cy="40" />
-  </svg>
+    <<svg id="save-timer-ring" viewBox="0 0 80 80">
+  <circle r="36" cx="40" cy="40" />
+</svg>
 </button>
     <button id="trailer-button" disabled><img src="play.png" alt="Play"/></button>
     <button id="next-button"><img src="next.png" alt="Next"/></button>
