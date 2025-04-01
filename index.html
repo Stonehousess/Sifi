@@ -602,8 +602,7 @@ await docRef.set({
 });
 return true;
 
-      document.getElementById("trailer-button").disabled = !currentTrailerUrl;
-      return true; 
+       
     } catch (err) {
       console.error("Failed to fetch from TMDB:", err);
       return false;
