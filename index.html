@@ -273,10 +273,12 @@
 }
 
 #save-button {
-  width: 100%;
-  height: 100%;
+  width: 90%;
+  height: 90%;
+  margin: 5%;
   display: block;
   z-index: 1;
+  object-fit: contain;
 }
 
 #save-timer-ring {
@@ -309,7 +311,7 @@
     <button id="tmdb-button"><img src="tmdb.png" alt="TMDB"/></button>
     <button id="save-button-wrapper">
     <img id="save-button" src="record.png" alt="Record" />
-    <<svg id="save-timer-ring" viewBox="0 0 80 80">
+    <svg id="save-timer-ring" viewBox="0 0 80 80">
   <circle r="36" cx="40" cy="40" />
 </svg>
 </button>
@@ -535,23 +537,22 @@ if (requireTrailer && !currentTrailerUrl) {
     }
   }
 async function findTrailerAndPlay() {
-  // 🚀 Begin trailer autoplay mode
   if (trailerLoopFirst) {
-  trailerLoopFirst = false;
+    trailerLoopFirst = false;
 
-  if (currentTrailerUrl) {
-    console.log("🎬 Playing current trailer before continuing autoplay...");
-    playTrailer(currentTrailerUrl);
-    return;
+    // ✅ Check current title before fetching
+    if (currentTrailerUrl) {
+      console.log("🎬 Playing current trailer before continuing autoplay...");
+      playTrailer(currentTrailerUrl);
+      return;
+    }
+
+    console.log("⏭ No trailer on current title — searching for next...");
   }
 
-  console.log("⏭ No trailer on current title — searching for next...");
-}
-
-  // 🔁 Loop to fetch titles until we find one with a trailer
   let found = false;
   while (!found) {
-    found = await fetchWithCountdown(true);
+    found = await fetchWithCountdown(true); // force fetch w/ trailer
     if (!found) {
       console.warn("🔁 Still searching for a trailer...");
     }
@@ -651,12 +652,16 @@ window.addEventListener("keydown", (e) => {
 let overlayInfo = document.getElementById("overlay-info");
 let overlayFadeTimer;
 
-document.getElementById("trailer-overlay").addEventListener("touchstart", () => {
+function showOverlayInfo() {
   overlayInfo.style.opacity = "1";
   clearTimeout(overlayFadeTimer);
   overlayFadeTimer = setTimeout(() => {
     overlayInfo.style.opacity = "0";
   }, 3000);
+}
+
+['mousemove', 'touchstart', 'keydown'].forEach(event => {
+  document.getElementById("trailer-overlay").addEventListener(event, showOverlayInfo);
 });
 function startFetchCountdown(duration = 60000) {
   const circle = document.querySelector("#save-timer-ring circle");
