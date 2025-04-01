@@ -24,19 +24,20 @@
       overflow: hidden;
     }
 
-   #poster-wrapper {
+  #poster-wrapper {
   position: relative;
-  width: 100%;
-  max-width: 500px;
-  aspect-ratio: 2 / 3;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
-  margin: 0 auto;
 }
 
 #movie-poster {
-  width: 100%;
-  height: auto;
+  width: auto;
+  height: 100vh;
+  max-width: 100vw;
   display: block;
+  margin: 0 auto;
+  object-fit: cover;
   border-left: 1px outset red;
   border-right: 1px outset red;
   animation: glowing-border 5s infinite ease-in-out;
@@ -289,7 +290,7 @@
   <div id="overlay-description">Description</div>
 </div>
   <div class="overlay-buttons">
-  <button onclick="getRandomTitle()" class="overlay-btn">Next</button>
+  <button onclick="findTrailerAndPlay()" class="overlay-btn">Next</button>
   <button onclick="document.getElementById('genre-button').click()" class="overlay-btn">Genre</button>
   <button onclick="window.open(currentTMDBUrl, '_blank')" class="overlay-btn">TMDB</button>
   <button onclick="document.getElementById('save-button').click()" class="overlay-btn">Save</button>
@@ -533,7 +534,7 @@ while (!found) {
 
   document.getElementById("genre-button").onclick = () => {
   currentGenre = genres[Math.floor(Math.random() * genres.length)];
-  document.getElementById("genre-button").querySelector("img").src = `genre-icons/${currentGenre.name.toLowerCase()}.png`;
+  document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
   getRandomTitle();
 };
 
