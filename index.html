@@ -24,22 +24,24 @@
       overflow: hidden;
     }
 
-    #movie-poster {
-      height: 100vh;
-      width: auto;
-      max-height: 100vh;
-      display: block;
-      margin: 0 12px;
-      border-left: 1px outset red;
-      border-right: 1px outset red;
-      animation: glowing-border 5s infinite ease-in-out;
-      background: #222;
-      user-select: none;
-    }
-    #poster-wrapper {
-      position: relative;
-      display: inline-block;
-      width: auto;
+   #poster-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+#movie-poster {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-left: 1px outset red;
+  border-right: 1px outset red;
+  animation: glowing-border 5s infinite ease-in-out;
+  background: #222;
+  user-select: none;
 }
 
  .floating-buttons {
@@ -168,6 +170,44 @@
       font-size: 16px;
       color: #aaa;
     }
+.overlay-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.overlay-btn {
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: 1px solid white;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+#overlay-info {
+  opacity: 0;
+  transition: opacity 2s;
+  text-align: center;
+  margin-top: 20px;
+  color: white;
+  max-width: 80%;
+}
+
+#overlay-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+#overlay-meta {
+  color: #ffcc00;
+  font-size: 16px;
+}
+#overlay-description {
+  font-size: 14px;
+  margin-top: 8px;
+}
 #trailer-overlay {
   visibility: hidden;
   opacity: 0;
@@ -243,7 +283,18 @@
   <div class="player-wrapper">
     <div id="player"></div>
   </div>
-  <button onclick="closeTrailer()" class="close-button">Close</button>
+<div id="overlay-info">
+  <div id="overlay-title">Title</div>
+  <div id="overlay-meta">Meta</div>
+  <div id="overlay-description">Description</div>
+</div>
+  <div class="overlay-buttons">
+  <button onclick="getRandomTitle()" class="overlay-btn">Next</button>
+  <button onclick="document.getElementById('genre-button').click()" class="overlay-btn">Genre</button>
+  <button onclick="window.open(currentTMDBUrl, '_blank')" class="overlay-btn">TMDB</button>
+  <button onclick="document.getElementById('save-button').click()" class="overlay-btn">Save</button>
+  <button onclick="closeTrailer()" class="overlay-btn">Close</button>
+</div>
 </div>
 <script src="https://www.youtube.com/iframe_api"></script>
   
@@ -318,11 +369,16 @@ function playTrailer(url) {
   const videoId = extractYouTubeId(url);
   if (!videoId || !trailerPlayer) return;
 
+  if (fetchTimer) clearTimeout(fetchTimer);
   trailerPlaying = true;
   document.getElementById('trailer-overlay').classList.add('active');
   trailerPlayer.loadVideoById(videoId);
   clearTimeout(fadeTimer);
-
+  overlayInfo.style.opacity = "1";
+  clearTimeout(overlayFadeTimer);
+  overlayFadeTimer = setTimeout(() => {
+    overlayInfo.style.opacity = "0";
+  }, 3000);
  failSafeTimeout = setTimeout(() => {
   if (trailerPlayer && typeof trailerPlayer.getPlayerState === "function") {
     const state = trailerPlayer.getPlayerState();
@@ -339,7 +395,9 @@ function closeTrailer() {
   trailerLoopFirst = true
   trailerPlayer.stopVideo();
   document.getElementById('trailer-overlay').classList.remove('active');
+  if (!autoTrailerMode) {
   fetchTimer = setTimeout(startAutoFetch, 30000);
+ }
 }
 
 function onPlayerStateChange(event) {
@@ -403,6 +461,10 @@ if (!item.poster_path) {
       document.getElementById("info-description").textContent = overview;
       document.getElementById("genre-name").textContent = currentGenre.name;
 
+      document.getElementById("overlay-title").textContent = document.getElementById("info-title").textContent;
+      document.getElementById("overlay-meta").textContent = document.getElementById("info-meta").textContent;
+      document.getElementById("overlay-description").textContent = document.getElementById("info-description").textContent;
+
       currentTMDBUrl = `https://www.themoviedb.org/${type}/${item.id}`;
       document.getElementById("tmdb-link").innerHTML = `| <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
 
@@ -423,26 +485,26 @@ if (requireTrailer && !currentTrailerUrl) {
   }
 async function findTrailerAndPlay() {
   // If we’re just starting trailer mode
-  if (trailerLoopFirst) {
-    trailerLoopFirst = false;
+if (trailerLoopFirst) {
+  trailerLoopFirst = false;
 
-    if (currentTrailerUrl) {
-      console.log("▶️ Playing trailer for current title");
-      playTrailer(currentTrailerUrl);
-      return;
-    }
-
-    console.log("⏭ No trailer on current title — starting search loop...");
+  if (currentTrailerUrl) {
+    playTrailer(currentTrailerUrl);
+    return;
   }
 
-  // Keep looking for titles with a trailer
-  let found = false;
-  while (!found) {
-    found = await getRandomTitle(true);
-    if (!found) {
-      console.warn("🔁 Still searching for a trailer...");
-    }
+  console.log("⏭ No trailer on current title — starting search loop...");
+}
+
+// 🔁 Loop to fetch titles with trailers
+let found = false;
+while (!found) {
+  found = await getRandomTitle(true);
+  if (!found) {
+    console.warn("🔁 Still searching for a trailer...");
   }
+}
+
 
   console.log("🎬 Found trailer — playing");
   playTrailer(currentTrailerUrl);
@@ -470,9 +532,10 @@ async function findTrailerAndPlay() {
   };
 
   document.getElementById("genre-button").onclick = () => {
-    currentGenre = genres[Math.floor(Math.random() * genres.length)];
-    getRandomTitle();
-  };
+  currentGenre = genres[Math.floor(Math.random() * genres.length)];
+  document.getElementById("genre-button").querySelector("img").src = `genre-icons/${currentGenre.name.toLowerCase()}.png`;
+  getRandomTitle();
+};
 
   document.getElementById("next-button").onclick = getRandomTitle;
 const trailerBtn = document.getElementById("trailer-button");
@@ -491,7 +554,7 @@ trailerBtn.addEventListener("mouseleave", () => clearTimeout(longPressTimer));
 
 trailerBtn.addEventListener("click", () => {
   if (!autoTrailerMode && currentTrailerUrl) {
-    window.open(currentTrailerUrl, "_blank");
+    playTrailer(currentTrailerUrl);
   }
 });
   let fadeTimer;
@@ -501,18 +564,33 @@ trailerBtn.addEventListener("click", () => {
     document.getElementById("info-panel").classList.remove("hidden");
     clearTimeout(fadeTimer);
     fadeTimer = setTimeout(() => {
-      buttons.classList.add("hidden");
-      if (!document.getElementById("info-panel").classList.contains("expanded")) {
-        document.getElementById("info-panel").classList.add("hidden");
-      }
-    }, 5000);
+  buttons.classList.add("hidden");
+}, 5000);
+resetPanelFade(); // keeps panel for 10 seconds separately
   }
   ['mousemove', 'click', 'touchstart'].forEach(event => window.addEventListener(event, showButtons));
   setTimeout(() => {
     buttons.classList.add("hidden");
     document.getElementById("info-panel").classList.add("hidden");
   }, 5000);
+window.addEventListener("keydown", (e) => {
+  if (e.key === "n") {
+    getRandomTitle();
+  }
+  if (e.key === "Escape" && trailerPlaying) {
+    closeTrailer();
+  }
+});
+let overlayInfo = document.getElementById("overlay-info");
+let overlayFadeTimer;
 
+document.getElementById("trailer-overlay").addEventListener("touchstart", () => {
+  overlayInfo.style.opacity = "1";
+  clearTimeout(overlayFadeTimer);
+  overlayFadeTimer = setTimeout(() => {
+    overlayInfo.style.opacity = "0";
+  }, 3000);
+});
   document.getElementById("movie-poster").onclick = getRandomTitle;
  function startAutoFetch() {
   if (fetchTimer) clearTimeout(fetchTimer); // ✅ Clear any previous timer
