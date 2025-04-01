@@ -609,13 +609,23 @@ resetPanelFade(); // keeps panel for 10 seconds separately
     document.getElementById("info-panel").classList.add("hidden");
   }, 5000);
 window.addEventListener("keydown", (e) => {
+  // Don't intercept keys if the trailer player is visible and focused
+  const trailerVisible = document.getElementById("trailer-overlay")?.classList.contains("active");
+
+  if (trailerVisible) {
+    // Let YouTube player handle keyboard shortcuts
+    return;
+  }
+
+  // Global shortcuts
   if (e.key === "n") {
     if (autoTrailerMode) {
-      findTrailerAndPlay(); // ✅ Ensures only trailer titles are fetched
+      findTrailerAndPlay();
     } else {
       getRandomTitle();
     }
   }
+
   if (e.key === "Escape" && trailerPlaying) {
     closeTrailer();
   }
