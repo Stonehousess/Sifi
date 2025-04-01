@@ -485,27 +485,20 @@ if (requireTrailer && !currentTrailerUrl) {
     }
   }
 async function findTrailerAndPlay() {
-  // If we’re just starting trailer mode
-if (trailerLoopFirst) {
-  trailerLoopFirst = false;
-
-  if (currentTrailerUrl) {
-    playTrailer(currentTrailerUrl);
-    return;
+  // 🚀 Begin trailer autoplay mode
+  if (trailerLoopFirst) {
+    trailerLoopFirst = false;
+    console.log("⏭ Starting trailer autoplay — searching for valid trailer...");
   }
 
-  console.log("⏭ No trailer on current title — starting search loop...");
-}
-
-// 🔁 Loop to fetch titles with trailers
-let found = false;
-while (!found) {
-  found = await getRandomTitle(true);
-  if (!found) {
-    console.warn("🔁 Still searching for a trailer...");
+  // 🔁 Loop to fetch titles until we find one with a trailer
+  let found = false;
+  while (!found) {
+    found = await getRandomTitle(true);
+    if (!found) {
+      console.warn("🔁 Still searching for a trailer...");
+    }
   }
-}
-
 
   console.log("🎬 Found trailer — playing");
   playTrailer(currentTrailerUrl);
