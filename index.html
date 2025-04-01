@@ -576,7 +576,11 @@ resetPanelFade(); // keeps panel for 10 seconds separately
   }, 5000);
 window.addEventListener("keydown", (e) => {
   if (e.key === "n") {
-    getRandomTitle();
+    if (autoTrailerMode) {
+      findTrailerAndPlay(); // ✅ Ensures only trailer titles are fetched
+    } else {
+      getRandomTitle();
+    }
   }
   if (e.key === "Escape" && trailerPlaying) {
     closeTrailer();
