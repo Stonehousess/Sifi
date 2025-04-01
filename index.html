@@ -75,8 +75,12 @@
   padding: 0;
   margin: 0 4px;
   cursor: pointer;
-  flex: 1;
-  Max-width: 160px;
+  flex: 1 1 0;
+  max-width: 160px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .floating-buttons button img {
@@ -260,16 +264,16 @@
 }
 #save-button-wrapper {
   position: relative;
-  width: 80px;
-  height: 80px;
+  background: none;
   border: none;
   padding: 0;
-  background: none;
-  display: inline-block;
-  vertical-align: middle;
+  margin: 0 4px;
   cursor: pointer;
+  flex: 1 1 0;
   aspect-ratio: 1 / 1;
-  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #save-button {
@@ -296,8 +300,8 @@
 #save-timer-ring circle {
   fill: none;
   stroke: red;
-  stroke-width: 5.5;
-  stroke-dasharray: 226.2; /* 2π * r */
+  stroke-width: 4;
+  stroke-dasharray: 113.1; /* 2π * 18 */
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 0.1s linear;
 }
@@ -312,7 +316,7 @@
     <button id="save-button-wrapper">
     <img id="save-button" src="record.png" alt="Record" />
     <svg id="save-timer-ring" viewBox="0 0 80 80">
-  <circle r="36" cx="40" cy="40" />
+  <circle r="18" cx="40" cy="40" />
 </svg>
 </button>
     <button id="trailer-button" disabled><img src="play.png" alt="Play"/></button>
@@ -374,6 +378,7 @@
   let longPressTimer;
   let fetchTimer = null; // 🔁 Track the fetch loop
   let trailerLoopFirst = true;
+  let trailerPaused = false;
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
@@ -423,24 +428,33 @@ function playTrailer(url) {
   if (!videoId || !trailerPlayer) return;
 
   if (fetchTimer) clearTimeout(fetchTimer);
+  if (fadeTimer) clearTimeout(fadeTimer);
+  if (overlayFadeTimer) clearTimeout(overlayFadeTimer);
+
   trailerPlaying = true;
-  document.getElementById('trailer-overlay').classList.add('active');
+  trailerPaused = false;
+
+  const overlay = document.getElementById('trailer-overlay');
+  overlay.classList.add('active');
+
   trailerPlayer.loadVideoById(videoId);
-  clearTimeout(fadeTimer);
   overlayInfo.style.opacity = "1";
-  clearTimeout(overlayFadeTimer);
+
+  setTimeout(() => window.focus(), 100);
+
   overlayFadeTimer = setTimeout(() => {
     overlayInfo.style.opacity = "0";
   }, 3000);
- failSafeTimeout = setTimeout(() => {
-  if (trailerPlayer && typeof trailerPlayer.getPlayerState === "function") {
-    const state = trailerPlayer.getPlayerState();
-    if (state !== YT.PlayerState.PLAYING && autoTrailerMode) {
-      console.warn("Trailer failed to play — skipping...");
-      findTrailerAndPlay();
+
+  failSafeTimeout = setTimeout(() => {
+    if (trailerPlayer && typeof trailerPlayer.getPlayerState === "function") {
+      const state = trailerPlayer.getPlayerState();
+      if (state !== YT.PlayerState.PLAYING && autoTrailerMode) {
+        console.warn("Trailer failed to play — skipping...");
+        findTrailerAndPlay();
+      }
     }
-  }
-}, 6000);
+  }, 6000);
 }
 function closeTrailer() {
   trailerPlaying = false;
@@ -455,16 +469,23 @@ function closeTrailer() {
 
 function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.PLAYING) {
+    trailerPaused = false;
     clearTimeout(failSafeTimeout);
   }
 
   if (event.data === YT.PlayerState.ENDED) {
     trailerPlaying = false;
+    trailerPaused = false;
     if (autoTrailerMode) {
       findTrailerAndPlay();
     } else {
       document.getElementById('trailer-overlay').classList.remove('active');
     }
+  }
+
+  if (event.data === YT.PlayerState.PAUSED) {
+    trailerPaused = true;
+    overlayInfo.style.opacity = "1"; // 👁 Keep info panel visible
   }
 }
 function extractYouTubeId(url) {
@@ -475,7 +496,7 @@ function extractYouTubeId(url) {
     isMovie = Math.random() < 0.5;
     const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
     const type = isMovie ? "movie" : "tv";
-    const randomPage = Math.floor(Math.random() * 70) + 1;
+    const randomPage = Math.floor(Math.random() * 80) + 1;
     const url = `https://api.themoviedb.org/3/discover/${type}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
 
     try {
@@ -628,12 +649,11 @@ resetPanelFade(); // keeps panel for 10 seconds separately
     document.getElementById("info-panel").classList.add("hidden");
   }, 5000);
 window.addEventListener("keydown", (e) => {
-  // Don't intercept keys if the trailer player is visible and focused
   const trailerVisible = document.getElementById("trailer-overlay")?.classList.contains("active");
 
-  if (trailerVisible) {
-    // Let YouTube player handle keyboard shortcuts
-    return;
+  // Only intercept our own shortcuts if trailer is visible
+  if (trailerVisible && !["n", "Escape"].includes(e.key)) {
+    return; // Let YouTube handle all other keys
   }
 
   // Global shortcuts
@@ -641,7 +661,7 @@ window.addEventListener("keydown", (e) => {
     if (autoTrailerMode) {
       findTrailerAndPlay();
     } else {
-      getRandomTitle();
+      fetchWithCountdown(); // Use the global fetch wrapper
     }
   }
 
@@ -655,9 +675,12 @@ let overlayFadeTimer;
 function showOverlayInfo() {
   overlayInfo.style.opacity = "1";
   clearTimeout(overlayFadeTimer);
-  overlayFadeTimer = setTimeout(() => {
-    overlayInfo.style.opacity = "0";
-  }, 3000);
+
+  if (!trailerPaused) {
+    overlayFadeTimer = setTimeout(() => {
+      overlayInfo.style.opacity = "0";
+    }, 3000);
+  }
 }
 
 ['mousemove', 'touchstart', 'keydown'].forEach(event => {
@@ -665,7 +688,7 @@ function showOverlayInfo() {
 });
 function startFetchCountdown(duration = 60000) {
   const circle = document.querySelector("#save-timer-ring circle");
-  const totalLength = 2 * Math.PI * 36; // circle length for r=36
+  const totalLength = 2 * Math.PI * 18; // circle length for r=36
 
   let startTime = performance.now();
 
