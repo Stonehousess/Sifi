@@ -578,22 +578,28 @@ if (requireTrailer && !currentTrailerUrl) {
   console.warn("No trailer — retrying...");
   return false;
 }
+// ✅ Disable trailer button if no trailer
+document.getElementById("trailer-button").disabled = !currentTrailerUrl;
 // ✅ Save to Firestore if successful
 await docRef.set({
   id: item.id,
   title,
   overview,
   year,
+  releaseDate,
+  runtime,
   rating,
-  metaText,
+  popularity: item.popularity,
+  originCountry,
   posterPath,
   trailerUrl: currentTrailerUrl,
   genre: currentGenre.name,
   type,
   tmdbUrl: currentTMDBUrl,
-  timestamp: Date.now()
+  timestamp: Date.now(),
+  timestampReadable: new Date().toISOString(),
+  cachedBy: "public"
 });
-
 return true;
 
       document.getElementById("trailer-button").disabled = !currentTrailerUrl;
