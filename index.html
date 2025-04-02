@@ -402,6 +402,7 @@
   let fetchTimer = null; // 🔁 Track the fetch loop
   let trailerLoopFirst = true;
   let trailerPaused = false;
+  let overlayInfo;
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
@@ -432,17 +433,7 @@
       .toUpperCase()
       .replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt()));
   }
-function onYouTubeIframeAPIReady() {
-  trailerPlayer = new YT.Player('player', {
-    height: '390',
-    width: '640',
-    videoId: '',
-    playerVars: { autoplay: 1 },
-    events: {
-      onStateChange: onPlayerStateChange
-    }
-  });
-}
+
 function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.PLAYING) {
     trailerPaused = false;
@@ -505,6 +496,7 @@ function playTrailer(url) {
   }, 6000);
 }
 function closeTrailer() {
+  clearTimeout(failSafeTimeout);
   trailerPlaying = false;
   autoTrailerMode = false;
   trailerLoopFirst = true
@@ -739,7 +731,7 @@ window.addEventListener("keydown", (e) => {
     closeTrailer();
   }
 });
-let overlayInfo = document.getElementById("overlay-info");
+
 let overlayFadeTimer;
 
 function showOverlayInfo() {
@@ -796,6 +788,7 @@ function fetchWithCountdown(requireTrailer = false) {
 }
 
   window.onload = () => {
+  overlayInfo = document.getElementById("overlay-info");
   startAutoFetch();
 };
 </script>
