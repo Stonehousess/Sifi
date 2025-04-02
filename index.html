@@ -529,10 +529,13 @@ function extractYouTubeId(url) {
 const docRef = doc(db, "films", String(item.id));
 const cachedDoc = await getDoc(docRef);
 
-if (cachedDoc.exists) {
-  console.log("✅ Loaded from Firestore:", cachedDoc.data().title);
-  applyFilmToUI(cachedDoc.data());
-  return true; // ✅ Use cached result, skip fetching
+if (cachedDoc.exists()) {
+  const data = cachedDoc.data();
+  if (data?.title) {
+    console.log("✅ Loaded from Firestore:", data.title);
+    applyFilmToUI(data);
+    return true;
+  }
 }
 if (!item.poster_path) {
   console.warn("Missing poster — retrying...");
