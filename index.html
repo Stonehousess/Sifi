@@ -629,7 +629,6 @@ async function findTrailerAndPlay() {
     // ✅ Check current title before fetching
     if (currentTrailerUrl) {
       console.log("🎬 Playing current trailer before continuing autoplay...");
-      trailerPlayer.loadVideoById(videoId);
       console.log("▶️ Called loadVideoById for", videoId);
       playTrailer(currentTrailerUrl);
       return;
