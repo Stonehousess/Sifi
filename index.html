@@ -553,16 +553,16 @@ window.onYouTubeIframeAPIReady = function () {
 
       const item = results[Math.floor(Math.random() * results.length)];
       // 🔎 Firestore check before fetching
-const docRef = doc(db, "films", String(item.id));
-const cachedDoc = await getDoc(docRef);
+//const docRef = doc(db, "films", String(item.id));
+//const cachedDoc = await getDoc(docRef);
 
-if (cachedDoc.exists()) {
-  const data = cachedDoc.data();
-  if (data?.title) {
-    console.log("✅ Loaded from Firestore:", data.title);
-    applyFilmToUI(data);
-    return true;
-  }
+//if (cachedDoc.exists()) {
+  //const data = cachedDoc.data();
+  //if (data?.title) {
+    //console.log("✅ Loaded from Firestore:", data.title);
+    //applyFilmToUI(data);
+    //return true;
+  //}
 }
 if (!item.poster_path) {
   console.warn("Missing poster — retrying...");
