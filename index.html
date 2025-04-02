@@ -400,6 +400,8 @@
   window.autoTrailerMode = false;
   let longPressTimer;
   let fetchTimer = null; // 🔁 Track the fetch loop
+  let isFetching = false; // ✅ Prevent double fetches
+  let fadeTimer = null;   // ✅ Ensure fadeTimer is declared early
   let trailerLoopFirst = true;
   let trailerPaused = false;
   let overlayInfo = document.getElementById("overlay-info");
@@ -503,7 +505,8 @@ function closeTrailer() {
   trailerPlayer.stopVideo();
   document.getElementById('trailer-overlay').classList.remove('active');
   if (!window.autoTrailerMode) {
-  fetchTimer = setTimeout(startAutoFetch, 30000);
+   if (fetchTimer) clearTimeout(fetchTimer); // ✅ Clear old timer
+   fetchTimer = setTimeout(startAutoFetch, 30000);
  }
 }
 
@@ -644,20 +647,27 @@ window.findTrailerAndPlay = findTrailerAndPlay;
   });
 
   document.getElementById("tmdb-button").onclick = () => togglePanel(true);
+let saving = false;
 document.getElementById("save-button").onclick = () => {
-  
+  if (saving) return;         // ✅ Guard to prevent double call
+  saving = true;
 
   const posterUrl = document.getElementById('movie-poster').src;
-  fetch(posterUrl).then(r => r.blob()).then(blob => {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'vcr.jpg';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  });
+  fetch(posterUrl)
+    .then(r => r.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'vcr.jpg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    })
+    .finally(() => {
+      setTimeout(() => saving = false, 1000); // ✅ Unlock
+    });
 };
 
   document.getElementById("genre-button").onclick = () => {
@@ -765,23 +775,30 @@ function startFetchCountdown(duration = 60000) {
 document.getElementById("movie-poster").onclick = () => fetchWithCountdown();
 
 function startAutoFetch() {
-  if (fetchTimer) clearTimeout(fetchTimer);
-
+  if (fetchTimer) clearTimeout(fetchTimer); // ✅ Clear old timer
   fetchWithCountdown(false).then(() => {
     fetchTimer = setTimeout(startAutoFetch, 60000);
   });
 }
 
 function fetchWithCountdown(requireTrailer = false) {
+  if (isFetching) return false; // ✅ Guard: skip if already fetching
+  isFetching = true;
+  console.log("🎲 Fetching new title at", new Date().toLocaleTimeString());
   return getRandomTitle(requireTrailer).then((success) => {
     if (success) startFetchCountdown(60000);
+    isFetching = false;
     return success;
+  }).catch((err) => {
+    console.error("Error in fetchWithCountdown:", err);
+    isFetching = false;
   });
 }
 // Prevent double-save by handling wrapper click cleanly
-document.getElementById("save-button-wrapper").addEventListener("click", (e) => {
-  e.stopPropagation(); // ✅ Prevent bubble
-  document.getElementById("save-button").click(); // 👉 Triggers save logic
+const wrapper = document.getElementById("save-button-wrapper");
+wrapper.addEventListener("click", (e) => {
+  e.stopPropagation();
+  document.getElementById("save-button").click(); // Now guarded
 });
   window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
