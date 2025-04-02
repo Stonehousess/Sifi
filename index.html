@@ -635,6 +635,7 @@ async function findTrailerAndPlay() {
   console.log("🎬 Found trailer — playing");
   playTrailer(currentTrailerUrl);
 }
+window.findTrailerAndPlay = findTrailerAndPlay;
   document.addEventListener("wheel", e => {
     const panel = document.getElementById('info-panel');
     if (e.deltaY > 0) panel.classList.add("expanded");
