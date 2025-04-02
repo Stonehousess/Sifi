@@ -406,6 +406,7 @@
   let trailerLoopFirst = true;
   let trailerPaused = false;
   let overlayInfo;
+  let youtubeReady = false;
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
@@ -522,6 +523,7 @@ window.onYouTubeIframeAPIReady = function () {
       onStateChange: onPlayerStateChange,
     }
   });
+  youtubeReady = true; // ✅ Mark the player as ready
 };
   async function getRandomTitle(requireTrailer = false) {
     isMovie = Math.random() < 0.5;
@@ -623,13 +625,16 @@ return true;
     }
   }
 async function findTrailerAndPlay() {
+  if (!youtubeReady || !trailerPlayer) {
+    console.warn("⏳ YouTube Player not ready — please wait...");
+    return;
+  }
+
   if (trailerLoopFirst) {
     trailerLoopFirst = false;
 
-    // ✅ Check current title before fetching
     if (currentTrailerUrl) {
       console.log("🎬 Playing current trailer before continuing autoplay...");
-      console.log("▶️ Called loadVideoById for", videoId);
       playTrailer(currentTrailerUrl);
       return;
     }
