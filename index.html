@@ -313,11 +313,12 @@
     <img alt="" draggable="false" id="movie-poster" src="https://via.placeholder.com/500x750?text=Loading..."/>
     <div class="floating-buttons">
     <button id="tmdb-button"><img src="tmdb.png" alt="TMDB"/></button>
-    <button id="save-button-wrapper">
-    <img id="save-button" src="record.png" alt="Record" />
-    <svg id="save-timer-ring" viewBox="0 0 80 80">
-  <circle r="20" cx="40" cy="40" />
-</svg>
+   <div id="save-button-wrapper" role="button" onclick="document.getElementById('save-button').click()">
+  <img id="save-button" src="record.png" alt="Record" />
+  <svg id="save-timer-ring" viewBox="0 0 80 80">
+    <circle r="20" cx="40" cy="40" />
+  </svg>
+</div>
 </button>
     <button id="trailer-button" disabled><img src="play.png" alt="Play"/></button>
     <button id="next-button"><img src="next.png" alt="Next"/></button>
