@@ -463,7 +463,6 @@ function extractYouTubeId(url) {
   const match = url.match(regExp);
   return match ? match[1] : null;
 }
-let failSafeTimeout; // Define globally near trailerPlayer
 
 function playTrailer(url) {
   const videoId = extractYouTubeId(url);
