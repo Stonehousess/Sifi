@@ -542,7 +542,7 @@ if (!item.poster_path) {
   return getRandomTitle(requireTrailer); // Retry if no poster
 }
 
-      const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/original${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
+      const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
       const title = item.title || item.name || "Untitled";
       const overview = item.overview || "No description available.";
       const rating = item.vote_average ? `${Math.round(item.vote_average * 10)}%` : "--";
