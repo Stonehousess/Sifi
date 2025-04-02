@@ -397,7 +397,7 @@
   let currentTMDBUrl = "", currentTrailerUrl = "";
   let panelTimer, panelFadeTimer;
   let trailerPlaying = false;
-  let autoTrailerMode = false;
+  window.autoTrailerMode = false;
   let longPressTimer;
   let fetchTimer = null; // 🔁 Track the fetch loop
   let trailerLoopFirst = true;
@@ -444,7 +444,7 @@ function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.ENDED) {
     trailerPlaying = false;
     trailerPaused = false;
-    if (autoTrailerMode) {
+    if (window.autoTrailerMode) {
       findTrailerAndPlay();
     } else {
       document.getElementById('trailer-overlay').classList.remove('active');
@@ -488,7 +488,7 @@ function playTrailer(url) {
   failSafeTimeout = setTimeout(() => {
     if (trailerPlayer && typeof trailerPlayer.getPlayerState === "function") {
       const state = trailerPlayer.getPlayerState();
-      if (state !== YT.PlayerState.PLAYING && autoTrailerMode) {
+      if (state !== YT.PlayerState.PLAYING && window.autoTrailerMode) {
         console.warn("Trailer failed to play — skipping...");
         findTrailerAndPlay();
       }
@@ -498,11 +498,11 @@ function playTrailer(url) {
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
   trailerPlaying = false;
-  autoTrailerMode = false;
+  window.autoTrailerMode = false;
   trailerLoopFirst = true
   trailerPlayer.stopVideo();
   document.getElementById('trailer-overlay').classList.remove('active');
-  if (!autoTrailerMode) {
+  if (!window.autoTrailerMode) {
   fetchTimer = setTimeout(startAutoFetch, 30000);
  }
 }
@@ -671,7 +671,7 @@ const trailerBtn = document.getElementById("trailer-button");
 trailerBtn.addEventListener("mousedown", () => {
   longPressTimer = setTimeout(() => {
     if (fetchTimer) clearTimeout(fetchTimer);
-    autoTrailerMode = true;
+    window.autoTrailerMode = true;
     trailerLoopFirst = true;
     findTrailerAndPlay(); // start autoplay mode
   }, 600); // long press threshold
@@ -681,7 +681,7 @@ trailerBtn.addEventListener("mouseup", () => clearTimeout(longPressTimer));
 trailerBtn.addEventListener("mouseleave", () => clearTimeout(longPressTimer));
 
 trailerBtn.addEventListener("click", () => {
-  if (!autoTrailerMode && currentTrailerUrl) {
+  if (!window.autoTrailerMode && currentTrailerUrl) {
     playTrailer(currentTrailerUrl);
   }
 });
@@ -711,7 +711,7 @@ window.addEventListener("keydown", (e) => {
 
   // Global shortcuts
   if (e.key === "n") {
-    if (autoTrailerMode) {
+    if (window.autoTrailerMode) {
       findTrailerAndPlay();
     } else {
       fetchWithCountdown(); // Use the global fetch wrapper
@@ -799,7 +799,7 @@ window.closeTrailer = closeTrailer;
     if (event.data === YT.PlayerState.ENDED) {
       trailerPlaying = false;
       trailerPaused = false;
-      if (autoTrailerMode) {
+      if (window.autoTrailerMode) {
         findTrailerAndPlay();
       } else {
         document.getElementById('trailer-overlay').classList.remove('active');
