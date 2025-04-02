@@ -398,7 +398,6 @@
   let currentGenre = genres.find(g => g.name === "Animation") || genres[0];
   let currentTMDBUrl = "", currentTrailerUrl = "";
   let panelTimer, panelFadeTimer;
-  let trailerPlayer = null;
   let trailerPlaying = false;
   let autoTrailerMode = false;
   let longPressTimer;
@@ -406,7 +405,6 @@
   let trailerLoopFirst = true;
   let trailerPaused = false;
   let overlayInfo;
-  let youtubeReady = false;
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
@@ -511,20 +509,6 @@ function closeTrailer() {
  }
 }
 
-
-// YouTube player callback (must be global)
-window.onYouTubeIframeAPIReady = function () {
-  trailerPlayer = new YT.Player("player", {
-    height: "390",
-    width: "640",
-    videoId: "",
-    playerVars: { autoplay: 1 },
-    events: {
-      onStateChange: onPlayerStateChange,
-    }
-  });
-  youtubeReady = true; // ✅ Mark the player as ready
-};
   async function getRandomTitle(requireTrailer = false) {
     isMovie = Math.random() < 0.5;
     const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
@@ -800,6 +784,49 @@ function fetchWithCountdown(requireTrailer = false) {
   overlayInfo = document.getElementById("overlay-info");
   startAutoFetch();
 };
+</script>
+<script>
+  // These must also exist globally for the player to work
+  let trailerPlayer = null;
+  let youtubeReady = false;
+
+  // If your playerStateChange logic is in the module, reattach it globally
+  window.onPlayerStateChange = function (event) {
+    if (event.data === YT.PlayerState.PLAYING) {
+      trailerPaused = false;
+      clearTimeout(failSafeTimeout);
+    }
+
+    if (event.data === YT.PlayerState.ENDED) {
+      trailerPlaying = false;
+      trailerPaused = false;
+      if (autoTrailerMode) {
+        findTrailerAndPlay();
+      } else {
+        document.getElementById('trailer-overlay').classList.remove('active');
+      }
+    }
+
+    if (event.data === YT.PlayerState.PAUSED) {
+      trailerPaused = true;
+      overlayInfo.style.opacity = "1";
+    }
+  };
+
+  window.onYouTubeIframeAPIReady = function () {
+    trailerPlayer = new YT.Player("player", {
+      height: "390",
+      width: "640",
+      videoId: "",
+      playerVars: { autoplay: 1 },
+      events: {
+        onStateChange: window.onPlayerStateChange,
+      }
+    });
+
+    youtubeReady = true;
+    console.log("✅ YouTube Player ready");
+  };
 </script>
 </body>
 </html>
