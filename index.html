@@ -356,9 +356,20 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
-  
-
 <script>
+const firebaseConfig = {
+    apiKey: "AIzaSyACJHIOV-OAC8HYdAF8byCBseK7Hrqkdfk",
+    authDomain: "vcra-44ef7.firebaseapp.com",
+    projectId: "vcra-44ef7",
+    storageBucket: "vcra-44ef7.appspot.com",
+    messagingSenderId: "7232539586",
+    appId: "1:27232539586:web:6c01859c308b6a6ec37c5b"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+
   let genres = [
     { name: "Sci-Fi", movie: "878", tv: "10765" },
     { name: "Adventure", movie: "12", tv: "10759" },
@@ -381,20 +392,6 @@
   let fetchTimer = null; // 🔁 Track the fetch loop
   let trailerLoopFirst = true;
   let trailerPaused = false;
-
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyACJHIOV-OAC8HYdAF8byCBseK7Hrqkdfk",
-    authDomain: "vcra-44ef7.firebaseapp.com",
-    projectId: "vcra-44ef7",
-    storageBucket: "vcra-44ef7.appspot.com",
-    messagingSenderId: "7232539586",
-    appId: "1:27232539586:web:6c01859c308b6a6ec37c5b"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
