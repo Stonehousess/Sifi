@@ -692,8 +692,15 @@ trailerBtn.addEventListener("mouseup", () => clearTimeout(longPressTimer));
 trailerBtn.addEventListener("mouseleave", () => clearTimeout(longPressTimer));
 
 trailerBtn.addEventListener("click", () => {
-  if (!window.autoTrailerMode && currentTrailerUrl) {
-    playTrailer(currentTrailerUrl);
+  if (!window.autoTrailerMode) {
+    if (currentTrailerUrl) {
+      playTrailer(currentTrailerUrl);
+    } else {
+      console.warn("No trailer for this title — entering autoplay to find one...");
+      window.autoTrailerMode = true;
+      trailerLoopFirst = true;
+      findTrailerAndPlay();
+    }
   }
 });
 
