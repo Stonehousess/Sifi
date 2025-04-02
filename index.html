@@ -576,7 +576,6 @@ if (requireTrailer && !currentTrailerUrl) {
 // ✅ Disable trailer button if no trailer
 document.getElementById("trailer-button").disabled = !currentTrailerUrl;
 // ✅ Save to Firestore if successful
-const docRef = doc(db, "films", String(item.id));
 await docRef.set({
   id: item.id,
   title,
