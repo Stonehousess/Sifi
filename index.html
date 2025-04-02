@@ -404,8 +404,8 @@
   let fetchTimer = null; // 🔁 Track the fetch loop
   let trailerLoopFirst = true;
   let trailerPaused = false;
-  let failSafeTimeout = null;
   let overlayInfo = document.getElementById("overlay-info");
+  let failSafeTimeout = null;
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
