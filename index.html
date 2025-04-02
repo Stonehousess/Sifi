@@ -317,7 +317,7 @@
     <img alt="" draggable="false" id="movie-poster" src="https://placehold.co/500x750?text=Loading..."/>
     <div class="floating-buttons">
     <button id="tmdb-button"><img src="tmdb.png" alt="TMDB"/></button>
-   <div id="save-button-wrapper" role="button" onclick="document.getElementById('save-button').click()">
+   <div id="save-button-wrapper" role="button">
   <img id="save-button" src="record.png" alt="Record" />
   <svg id="save-timer-ring" viewBox="0 0 80 80">
     <circle r="30" cx="40" cy="40" />
@@ -778,7 +778,11 @@ function fetchWithCountdown(requireTrailer = false) {
     return success;
   });
 }
-
+// Prevent double-save by handling wrapper click cleanly
+document.getElementById("save-button-wrapper").addEventListener("click", (e) => {
+  e.stopPropagation(); // ✅ Prevent bubble
+  document.getElementById("save-button").click(); // 👉 Triggers save logic
+});
   window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
   startAutoFetch();
