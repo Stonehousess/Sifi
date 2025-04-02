@@ -553,7 +553,7 @@ window.onYouTubeIframeAPIReady = function () {
 
       const item = results[Math.floor(Math.random() * results.length)];
       // 🔎 Firestore check before fetching
-//const docRef = doc(db, "films", String(item.id));
+const docRef = doc(db, "films", String(item.id));
 //const cachedDoc = await getDoc(docRef);
 
 //if (cachedDoc.exists()) {
