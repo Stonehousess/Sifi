@@ -521,8 +521,8 @@ function extractYouTubeId(url) {
 
       const item = results[Math.floor(Math.random() * results.length)];
       // 🔎 Firestore check before fetching
-const docRef = db.collection("films").doc(String(item.id));
-const cachedDoc = await docRef.get();
+const docRef = doc(db, "films", String(item.id));
+const cachedDoc = await getDoc(docRef);
 
 if (cachedDoc.exists) {
   console.log("✅ Loaded from Firestore:", cachedDoc.data().title);
@@ -576,6 +576,7 @@ if (requireTrailer && !currentTrailerUrl) {
 // ✅ Disable trailer button if no trailer
 document.getElementById("trailer-button").disabled = !currentTrailerUrl;
 // ✅ Save to Firestore if successful
+const docRef = doc(db, "films", String(item.id));
 await docRef.set({
   id: item.id,
   title,
