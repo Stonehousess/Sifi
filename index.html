@@ -318,12 +318,12 @@
    <div id="save-button-wrapper" role="button" onclick="document.getElementById('save-button').click()">
   <img id="save-button" src="record.png" alt="Record" />
   <svg id="save-timer-ring" viewBox="0 0 80 80">
-    <circle r="20" cx="40" cy="40" />
+    <circle r="30" cx="40" cy="40" />
   </svg>
 </div>
     <button id="trailer-button" disabled><img src="play.png" alt="Play"/></button>
-    <button id="next-button"><img src="next.png" alt="Next"/></button>
     <button id="genre-button"><img src="shuffle.png" alt="Shuffle"/></button>
+    <button id="next-button"><img src="next.png" alt="Next"/></button>
   </div>
     <div id="movie-type"></div>
     <div id="movie-runtime"></div>
@@ -769,7 +769,7 @@ function showOverlayInfo() {
 });
 function startFetchCountdown(duration = 60000) {
   const circle = document.querySelector("#save-timer-ring circle");
-  const totalLength = 2 * Math.PI * 20; // circle length for r=36
+  const totalLength = 2 * Math.PI * 30; // circle length for r=36
 
   let startTime = performance.now();
 
