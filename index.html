@@ -267,20 +267,20 @@
   background: none;
   border: none;
   padding: 0;
-  margin: 0 4px;
+  margin: 0 6px;
   cursor: pointer;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  
-  flex: 0 0 auto;       /* ⬅️ Prevent flex growth */
+  width: clamp(80px, 10vw, 160px); /* ✅ Scales smoothly across screen sizes */
   aspect-ratio: 1 / 1;
+  flex: 0 0 auto;
 }
 
 #save-button {
-  width: 90%;
+  width: 100%;
   height: auto;
   display: block;
   z-index: 1;
