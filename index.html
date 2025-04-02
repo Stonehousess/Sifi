@@ -405,6 +405,8 @@
   let trailerLoopFirst = true;
   let trailerPaused = false;
   let overlayInfo;
+  let failSafeTimeout = null;
+  let overlayInfo = document.getElementById("overlay-info");
 
   function togglePanel(forceExpand = null) {
     const panel = document.getElementById('info-panel');
