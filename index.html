@@ -511,6 +511,18 @@ function extractYouTubeId(url) {
   const match = url.match(regExp);
   return match ? match[1] : null;
 }
+// YouTube player callback (must be global)
+window.onYouTubeIframeAPIReady = function () {
+  trailerPlayer = new YT.Player("player", {
+    height: "390",
+    width: "640",
+    videoId: "",
+    playerVars: { autoplay: 1 },
+    events: {
+      onStateChange: onPlayerStateChange,
+    }
+  });
+};
   async function getRandomTitle(requireTrailer = false) {
     isMovie = Math.random() < 0.5;
     const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
