@@ -453,7 +453,32 @@ function onYouTubeIframeAPIReady() {
     }
   });
 }
+function onPlayerStateChange(event) {
+  if (event.data === YT.PlayerState.PLAYING) {
+    trailerPaused = false;
+    clearTimeout(failSafeTimeout);
+  }
 
+  if (event.data === YT.PlayerState.ENDED) {
+    trailerPlaying = false;
+    trailerPaused = false;
+    if (autoTrailerMode) {
+      findTrailerAndPlay();
+    } else {
+      document.getElementById('trailer-overlay').classList.remove('active');
+    }
+  }
+
+  if (event.data === YT.PlayerState.PAUSED) {
+    trailerPaused = true;
+    overlayInfo.style.opacity = "1"; // 👁 Keep info panel visible
+  }
+}
+function extractYouTubeId(url) {
+  const regExp = /(?:v=|\/)([0-9A-Za-z_-]{11})/;
+  const match = url.match(regExp);
+  return match ? match[1] : null;
+}
 let failSafeTimeout; // Define globally near trailerPlayer
 
 function playTrailer(url) {
@@ -500,32 +525,7 @@ function closeTrailer() {
  }
 }
 
-function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.PLAYING) {
-    trailerPaused = false;
-    clearTimeout(failSafeTimeout);
-  }
 
-  if (event.data === YT.PlayerState.ENDED) {
-    trailerPlaying = false;
-    trailerPaused = false;
-    if (autoTrailerMode) {
-      findTrailerAndPlay();
-    } else {
-      document.getElementById('trailer-overlay').classList.remove('active');
-    }
-  }
-
-  if (event.data === YT.PlayerState.PAUSED) {
-    trailerPaused = true;
-    overlayInfo.style.opacity = "1"; // 👁 Keep info panel visible
-  }
-}
-function extractYouTubeId(url) {
-  const regExp = /(?:v=|\/)([0-9A-Za-z_-]{11})/;
-  const match = url.match(regExp);
-  return match ? match[1] : null;
-}
 // YouTube player callback (must be global)
 window.onYouTubeIframeAPIReady = function () {
   trailerPlayer = new YT.Player("player", {
@@ -563,7 +563,7 @@ window.onYouTubeIframeAPIReady = function () {
     //applyFilmToUI(data);
     //return true;
   //}
-}
+//}
 if (!item.poster_path) {
   console.warn("Missing poster — retrying...");
   return getRandomTitle(requireTrailer); // Retry if no poster
