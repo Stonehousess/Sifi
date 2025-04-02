@@ -586,6 +586,15 @@ if (requireTrailer && !currentTrailerUrl) {
 }
 // ✅ Disable trailer button if no trailer
 document.getElementById("trailer-button").disabled = !currentTrailerUrl;
+const trailerImg = document.getElementById("trailer-button").querySelector("img");
+
+if (currentTrailerUrl) {
+  trailerImg.src = "play.png";
+  trailerImg.style.opacity = "0.6";
+} else {
+  trailerImg.src = "play-disabled.png";
+  trailerImg.style.opacity = "0.3";
+}
 // ✅ Save to Firestore if successful
 await setDoc(docRef, {
   id: item.id,
