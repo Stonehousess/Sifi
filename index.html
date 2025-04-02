@@ -355,7 +355,7 @@
   <button onclick="closeTrailer()" class="overlay-btn">Close</button>
 </div>
 </div>
-<script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
   window.onYouTubeIframeAPIReady = function () {
     trailerPlayer = new YT.Player("player", {
@@ -369,6 +369,7 @@
     });
   };
 </script>
+<script src="https://www.youtube.com/iframe_api"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
