@@ -424,15 +424,15 @@
   resetPanelFade();
 }
 
-  function resetPanelFade() {
-    const panel = document.getElementById('info-panel');
-    panel.classList.remove("hidden");
-    clearTimeout(panelFadeTimer);
-    panelFadeTimer = setTimeout(() => {
-      if (!panel.classList.contains("expanded")) panel.classList.add("hidden");
-    }, 10000);
-  }
-
+function resetPanelFade() {
+  const panel = document.getElementById('info-panel');
+  clearTimeout(panelFadeTimer);
+  panelFadeTimer = setTimeout(() => {
+    if (!panel.classList.contains("expanded")) {
+      panel.classList.add("hidden");
+    }
+  }, 10000); // Keep unexpanded panel visible for 10s
+}
   function getFlagEmoji(countryCode) {
     if (!countryCode) return "";
     return countryCode
