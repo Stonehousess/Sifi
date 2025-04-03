@@ -482,17 +482,18 @@ function playTrailer(url) {
   const overlay = document.getElementById('trailer-overlay');
 
   // ✅ If trailer is already active, treat this as a close
-  if (overlay.classList.contains('active')) {
-    trailerPlayer.stopVideo();
-    overlay.classList.remove('active');
-    trailerPlaying = false;
+  if (overlay.classList.contains('active') && !window.autoTrailerMode) {
+  trailerPlayer.stopVideo();
+  overlay.classList.remove('active');
+  trailerPlaying = false;
+  if (!overlay.classList.contains('active')) {
+  overlay.classList.add('active');
+}
+  if (fetchTimer) clearTimeout(fetchTimer);
+  fetchTimer = setTimeout(startAutoFetch, 60000);
 
-    // ✅ Restart fetch loop
-    if (fetchTimer) clearTimeout(fetchTimer);
-    fetchTimer = setTimeout(startAutoFetch, 60000);
-
-    return; // ✅ Exit early
-  }
+  return;
+}
 
   // Normal play flow
   if (fetchTimer) clearTimeout(fetchTimer);
@@ -509,7 +510,7 @@ function playTrailer(url) {
   trailerPlayer.playVideo?.();
   overlayInfo.style.opacity = "1";
 
-  setTimeout(() => window.focus(), 100);
+  
 
   overlayFadeTimer = setTimeout(() => {
     overlayInfo.style.opacity = "0";
