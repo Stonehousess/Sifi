@@ -722,9 +722,25 @@ document.getElementById("genre-button").onclick = () => {
 
 document.getElementById("next-button").onclick = () => {
   if (fetchTimer) clearTimeout(fetchTimer);
+
   window.autoTrailerMode = true;
   trailerLoopFirst = true;
-  findTrailerAndPlay(); // 🔁 starts auto trailer mode
+
+  // ✅ Ensure overlay is visible
+  const overlay = document.getElementById("trailer-overlay");
+  if (!overlay.classList.contains("active")) {
+    overlay.classList.add("active");
+  }
+
+  // ✅ Force fetch with trailer immediately
+  fetchWithCountdown(true).then(success => {
+    if (success && currentTrailerUrl) {
+      playTrailer(currentTrailerUrl);
+    } else {
+      // fallback: loop until one found
+      findTrailerAndPlay();
+    }
+  });
 };
 const trailerBtn = document.getElementById("trailer-button");
 
