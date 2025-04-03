@@ -450,22 +450,19 @@ function onPlayerStateChange(event) {
   }
 
   if (event.data === YT.PlayerState.ENDED) {
-  trailerPlaying = false;
-  trailerPaused = false;
-  console.log("🔚 Trailer ended");
+    trailerPlaying = false;
+    trailerPaused = false;
+    console.log("🔚 Trailer ended");
 
-  if (window.autoTrailerMode) {
-    setTimeout(() => {
-      const nextBtn = document.getElementById("overlay-next");
-      if (nextBtn) {
-        console.log("🔁 Auto-clicking overlay next...");
-        nextBtn.click();
-      }
-    }, 1000);
-  } else {
-    closeTrailer();
+    if (window.autoTrailerMode) {
+      setTimeout(() => {
+        console.log("🔁 Trailer ended — finding next...");
+        findTrailerAndPlay(); // ✅ no click simulation
+      }, 1000);
+    } else {
+      closeTrailer();
+    }
   }
-}
 
   if (event.data === YT.PlayerState.PAUSED) {
     trailerPaused = true;
@@ -533,6 +530,18 @@ function playTrailer(url) {
     }
   }, 6000);
 }
+setTimeout(() => {
+    if (window.autoTrailerMode && trailerPlayer?.getPlayerState() !== YT.PlayerState.ENDED) {
+      const duration = trailerPlayer?.getDuration?.();
+      const currentTime = trailerPlayer?.getCurrentTime?.();
+      const timeLeft = duration - currentTime;
+
+      if (!trailerPlaying || isNaN(timeLeft) || timeLeft < 3) {
+        console.warn("⏳ Trailer likely stuck or failed to finish — forcing next...");
+        findTrailerAndPlay();
+      }
+    }
+  }, 10000);
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
   trailerPlaying = false;
@@ -961,7 +970,6 @@ window.failSafeTimeout = null;
     width: "640",
     videoId: "",
     playerVars: {
-      autoplay: 1,
       enablejsapi: 1,       // ✅ This is the key fix
       controls: 1,
       modestbranding: 1,
