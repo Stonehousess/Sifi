@@ -736,12 +736,6 @@ function showButtons() {
   resetPanelFade(); // 🔁 Restart 10s fade for info panel
 }
 
-function resetPanelFade() {
-  clearTimeout(panelFadeTimer);
-  panelFadeTimer = setTimeout(() => {
-    infoPanel.classList.add("hidden");
-  }, 10000); // Info panel fades after 10s
-}
 
 // Register events
 ['mousemove', 'click', 'touchstart'].forEach(event =>
