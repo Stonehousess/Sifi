@@ -477,7 +477,7 @@ function extractYouTubeId(url) {
 }
 function playTrailer(url) {
   const videoId = extractYouTubeId(url);
-  if (!videoId || !trailerPlayer) return;
+  if (!videoId || !trailerPlayer || !youtubeReady) return; // <-- updated
 
   const overlay = document.getElementById('trailer-overlay');
 
@@ -504,11 +504,9 @@ function playTrailer(url) {
 
   overlay.classList.add('active');
   trailerPlayer.loadVideoById(videoId);
-setTimeout(() => {
-  if (trailerPlayer && typeof trailerPlayer.playVideo === 'function') {
-    trailerPlayer.playVideo(); // ✅ force autoplay
-  }
-}, 500); // wait for buffering
+
+
+  trailerPlayer.playVideo?.();
   overlayInfo.style.opacity = "1";
 
   setTimeout(() => window.focus(), 100);
@@ -940,8 +938,12 @@ window.failSafeTimeout = null;
       showinfo: 0
     },
     events: {
-      onStateChange: window.onPlayerStateChange
-    }
+  onReady: () => {
+    youtubeReady = true;
+    console.log("✅ YouTube Player is fully ready");
+  },
+  onStateChange: window.onPlayerStateChange
+}
   });
 
   youtubeReady = true;
