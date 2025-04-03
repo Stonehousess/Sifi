@@ -126,7 +126,7 @@
       height: 30px;
       background: rgba(20, 20, 20, 0.9);
       margin-left: 1px;
-      margin-right: 5px;
+      margin-right: 1px;
       color: white;
       padding: 10px 20px;
       border-top-left-radius: 16px;
@@ -735,7 +735,7 @@ resetPanelFade(); // keeps panel for 10 seconds separately
   setTimeout(() => {
     buttons.classList.add("hidden");
     document.getElementById("info-panel").classList.add("hidden");
-  }, 5000);
+  }, 10000);
 window.addEventListener("keydown", (e) => {
   const trailerVisible = document.getElementById("trailer-overlay")?.classList.contains("active");
 
