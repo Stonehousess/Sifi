@@ -908,28 +908,7 @@ window.failSafeTimeout = null;
   let youtubeReady = false;
 
   // If your playerStateChange logic is in the module, reattach it globally
-  window.onPlayerStateChange = function (event) {
-    if (event.data === YT.PlayerState.PLAYING) {
-      trailerPaused = false;
-      clearTimeout(failSafeTimeout);
-    }
-
-    if (event.data === YT.PlayerState.ENDED) {
-      trailerPlaying = false;
-      trailerPaused = false;
-      if (window.autoTrailerMode) {
-        findTrailerAndPlay();
-      } else {
-        document.getElementById('trailer-overlay').classList.remove('active');
-      }
-    }
-
-    if (event.data === YT.PlayerState.PAUSED) {
-      trailerPaused = true;
-      overlayInfo.style.opacity = "1";
-    }
-  };
-
+  
   window.onYouTubeIframeAPIReady = function () {
     trailerPlayer = new YT.Player("player", {
       height: "390",
