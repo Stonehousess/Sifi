@@ -450,15 +450,15 @@ function onPlayerStateChange(event) {
   }
 
   if (event.data === YT.PlayerState.ENDED) {
-    trailerPlaying = false;
-    trailerPaused = false;
-    console.log("🔚 Trailer ended");
-    if (window.autoTrailerMode) {
-      findTrailerAndPlay();
-    } else {
-      closeTrailer();
-    }
+  trailerPlaying = false;
+  trailerPaused = false;
+  console.log("🔚 Trailer ended");
+  if (window.autoTrailerMode) {
+    setTimeout(() => findTrailerAndPlay(), 1000); // ⏱ smoother transition
+  } else {
+    closeTrailer();
   }
+}
 
   if (event.data === YT.PlayerState.PAUSED) {
     trailerPaused = true;
@@ -645,6 +645,7 @@ return true;
     }
   }
 async function findTrailerAndPlay() {
+  window.autoTrailerMode = true; // ✅ Ensure loop stays
   if (!youtubeReady || !trailerPlayer) {
     console.warn("⏳ YouTube Player not ready — please wait...");
     return;
@@ -828,7 +829,12 @@ function startFetchCountdown(duration = 60000) {
 
   requestAnimationFrame(animate);
 }
-document.getElementById("movie-poster").onclick = () => fetchWithCountdown();
+document.getElementById("movie-poster").onclick = () => {
+  if (fetchTimer) clearTimeout(fetchTimer);           // 🔁 cancel old timer
+  fetchWithCountdown().then(() => {
+    fetchTimer = setTimeout(startAutoFetch, 60000);   // 🕑 start new loop
+  });
+};
 
 function startAutoFetch() {
   if (fetchTimer) clearTimeout(fetchTimer); // ✅ Clear old timer
