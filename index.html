@@ -656,30 +656,41 @@ return true;
     }
   }
 async function findTrailerAndPlay() {
-  window.autoTrailerMode = true; // ✅ Ensure loop stays
+  window.autoTrailerMode = true;
+
   if (!youtubeReady || !trailerPlayer) {
     console.warn("⏳ YouTube Player not ready — please wait...");
     return;
   }
 
   if (trailerLoopFirst && currentTrailerUrl) {
-  trailerLoopFirst = false;
-  console.log("🎬 Playing current trailer before continuing autoplay...");
-  playTrailer(currentTrailerUrl);
-  return;
-}
+    trailerLoopFirst = false;
+    console.log("🎬 Playing current trailer before continuing autoplay...");
+    playTrailer(currentTrailerUrl);
+    return;
+  } else {
+    trailerLoopFirst = false;
+  }
 
   let found = false;
-  while (!found) {
+  let attempts = 0;
+
+  while (!found && attempts < 10) {
     found = await fetchWithCountdown(true); // force fetch w/ trailer
+    attempts++;
     if (!found) {
-      console.warn("🔁 Still searching for a trailer...");
+      console.warn(`🔁 Attempt ${attempts}: Still searching for a trailer...`);
     }
   }
 
-  console.log("🎬 Found trailer — playing");
-  console.log("🔁 Trailer loop continues...");
-  playTrailer(currentTrailerUrl);
+  if (currentTrailerUrl) {
+    console.log("🎬 Found trailer — playing");
+    console.log("🔁 Trailer loop continues...");
+    playTrailer(currentTrailerUrl);
+  } else {
+    console.warn("⛔ No trailer URL found. Loop will not continue.");
+    window.autoTrailerMode = false; // Failsafe: disable loop if all fails
+  }
 }
 window.findTrailerAndPlay = findTrailerAndPlay;
   document.addEventListener("wheel", e => {
