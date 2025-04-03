@@ -461,6 +461,7 @@ function onPlayerStateChange(event) {
     overlayInfo.style.opacity = "1"; // 👁 Keep info panel visible
   }
 }
+window.onPlayerStateChange = onPlayerStateChange;
 function extractYouTubeId(url) {
   try {
     const urlObj = new URL(url);
