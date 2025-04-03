@@ -404,9 +404,8 @@
   let fadeTimer = null;   // ✅ Ensure fadeTimer is declared early
   let trailerLoopFirst = true;
   let trailerPaused = false;
-  let overlayInfo = document.getElementById("overlay-info");
-  let failSafeTimeout = null;
   let overlayInfo = null;
+  let failSafeTimeout = null; // This is fine to declare here too
 
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
