@@ -527,7 +527,7 @@ function closeTrailer() {
 
   // Always restart fetch timer after closing trailer manually
   if (fetchTimer) clearTimeout(fetchTimer);
-  fetchTimer = setTimeout(startAutoFetch, 60000); // Or 30000 if intentional
+  fetchTimer = setTimeout(startAutoFetch, 20000); // Or 30000 if intentional
 }
 
   async function getRandomTitle(requireTrailer = false) {
