@@ -469,11 +469,26 @@ function extractYouTubeId(url) {
     return null;
   }
 }
-
 function playTrailer(url) {
   const videoId = extractYouTubeId(url);
   if (!videoId || !trailerPlayer) return;
 
+  const overlay = document.getElementById('trailer-overlay');
+
+  // ✅ If trailer is already active, treat this as a close
+  if (overlay.classList.contains('active')) {
+    trailerPlayer.stopVideo();
+    overlay.classList.remove('active');
+    trailerPlaying = false;
+
+    // ✅ Restart fetch loop
+    if (fetchTimer) clearTimeout(fetchTimer);
+    fetchTimer = setTimeout(startAutoFetch, 60000);
+
+    return; // ✅ Exit early
+  }
+
+  // Normal play flow
   if (fetchTimer) clearTimeout(fetchTimer);
   if (fadeTimer) clearTimeout(fadeTimer);
   if (overlayFadeTimer) clearTimeout(overlayFadeTimer);
@@ -481,9 +496,7 @@ function playTrailer(url) {
   trailerPlaying = true;
   trailerPaused = false;
 
-  const overlay = document.getElementById('trailer-overlay');
   overlay.classList.add('active');
-
   trailerPlayer.loadVideoById(videoId);
   overlayInfo.style.opacity = "1";
 
@@ -507,13 +520,14 @@ function closeTrailer() {
   clearTimeout(failSafeTimeout);
   trailerPlaying = false;
   window.autoTrailerMode = false;
-  trailerLoopFirst = true
+  trailerLoopFirst = true;
+
   trailerPlayer.stopVideo();
   document.getElementById('trailer-overlay').classList.remove('active');
-  if (!window.autoTrailerMode) {
-   if (fetchTimer) clearTimeout(fetchTimer); // ✅ Clear old timer
-   fetchTimer = setTimeout(startAutoFetch, 30000);
- }
+
+  // Always restart fetch timer after closing trailer manually
+  if (fetchTimer) clearTimeout(fetchTimer);
+  fetchTimer = setTimeout(startAutoFetch, 60000); // Or 30000 if intentional
 }
 
   async function getRandomTitle(requireTrailer = false) {
