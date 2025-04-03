@@ -462,9 +462,12 @@ function onPlayerStateChange(event) {
   }
 }
 function extractYouTubeId(url) {
-  const regExp = /(?:v=|\/)([0-9A-Za-z_-]{11})/;
-  const match = url.match(regExp);
-  return match ? match[1] : null;
+  try {
+    const urlObj = new URL(url);
+    return urlObj.searchParams.get("v") || urlObj.pathname.split("/").pop();
+  } catch {
+    return null;
+  }
 }
 
 function playTrailer(url) {
