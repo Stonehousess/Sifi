@@ -685,10 +685,14 @@ document.getElementById("save-button").onclick = () => {
     });
 };
 
-  document.getElementById("genre-button").onclick = () => {
+document.getElementById("genre-button").onclick = () => {
   currentGenre = genres[Math.floor(Math.random() * genres.length)];
   document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
- fetchWithCountdown();
+
+  if (fetchTimer) clearTimeout(fetchTimer); // ✅ Stop current loop
+  fetchWithCountdown().then(() => {
+    fetchTimer = setTimeout(startAutoFetch, 60000); // ✅ Restart loop
+  });
 };
 
 document.getElementById("next-button").onclick = () => {
