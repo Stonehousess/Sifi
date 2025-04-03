@@ -721,21 +721,35 @@ trailerBtn.addEventListener("click", () => {
   }
 });
 
-  const buttons = document.querySelector(".floating-buttons");
-  function showButtons() {
-    buttons.classList.remove("hidden");
-    document.getElementById("info-panel").classList.remove("hidden");
-    clearTimeout(fadeTimer);
-    fadeTimer = setTimeout(() => {
-  buttons.classList.add("hidden");
-}, 5000);
-resetPanelFade(); // keeps panel for 10 seconds separately
-  }
-  ['mousemove', 'click', 'touchstart'].forEach(event => window.addEventListener(event, showButtons));
-  setTimeout(() => {
+const buttons = document.querySelector(".floating-buttons");
+const infoPanel = document.getElementById("info-panel");
+
+let fadeTimer;
+let panelFadeTimer;
+
+function showButtons() {
+  buttons.classList.remove("hidden");
+  infoPanel.classList.remove("hidden");
+
+  clearTimeout(fadeTimer);
+  fadeTimer = setTimeout(() => {
     buttons.classList.add("hidden");
-    document.getElementById("info-panel").classList.add("hidden");
-  }, 10000);
+  }, 5000); // Buttons fade after 5s
+
+  resetPanelFade(); // 🔁 Restart 10s fade for info panel
+}
+
+function resetPanelFade() {
+  clearTimeout(panelFadeTimer);
+  panelFadeTimer = setTimeout(() => {
+    infoPanel.classList.add("hidden");
+  }, 10000); // Info panel fades after 10s
+}
+
+// Register events
+['mousemove', 'click', 'touchstart'].forEach(event =>
+  window.addEventListener(event, showButtons)
+);
 window.addEventListener("keydown", (e) => {
   const trailerVisible = document.getElementById("trailer-overlay")?.classList.contains("active");
 
@@ -852,9 +866,18 @@ wrapper.addEventListener("click", (e) => {
   document.getElementById("save-button").click(); // Now guarded
 });
 
-  window.onload = () => {
+window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
   startAutoFetch();
+
+  // Initial visibility timers
+  fadeTimer = setTimeout(() => {
+    document.querySelector(".floating-buttons").classList.add("hidden");
+  }, 5000);
+
+  panelFadeTimer = setTimeout(() => {
+    document.getElementById("info-panel").classList.add("hidden");
+  }, 10000);
 };
 window.addEventListener("keydown", (e) => {
   if (e.key.toLowerCase() === "e") {
