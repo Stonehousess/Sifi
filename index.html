@@ -440,7 +440,7 @@ function resetPanelFade() {
       .replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt()));
   }
 
-unction onPlayerStateChange(event) {
+function onPlayerStateChange(event) {
   console.log("🎬 Player state changed:", event.data);
 
   if (event.data === YT.PlayerState.PLAYING) {
