@@ -688,7 +688,12 @@ document.getElementById("save-button").onclick = () => {
  fetchWithCountdown();
 };
 
-  document.getElementById("next-button").onclick = () => fetchWithCountdown();
+document.getElementById("next-button").onclick = () => {
+  if (fetchTimer) clearTimeout(fetchTimer);
+  window.autoTrailerMode = true;
+  trailerLoopFirst = true;
+  findTrailerAndPlay(); // 🔁 starts auto trailer mode
+};
 const trailerBtn = document.getElementById("trailer-button");
 
 trailerBtn.addEventListener("mousedown", () => {
