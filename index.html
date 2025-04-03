@@ -662,17 +662,12 @@ async function findTrailerAndPlay() {
     return;
   }
 
-  if (trailerLoopFirst) {
-    trailerLoopFirst = false;
-
-    if (currentTrailerUrl) {
-      console.log("🎬 Playing current trailer before continuing autoplay...");
-      playTrailer(currentTrailerUrl);
-      return;
-    }
-
-    console.log("⏭ No trailer on current title — searching for next...");
-  }
+  if (trailerLoopFirst && currentTrailerUrl) {
+  trailerLoopFirst = false;
+  console.log("🎬 Playing current trailer before continuing autoplay...");
+  playTrailer(currentTrailerUrl);
+  return;
+}
 
   let found = false;
   while (!found) {
@@ -683,6 +678,7 @@ async function findTrailerAndPlay() {
   }
 
   console.log("🎬 Found trailer — playing");
+  console.log("🔁 Trailer loop continues...");
   playTrailer(currentTrailerUrl);
 }
 window.findTrailerAndPlay = findTrailerAndPlay;
