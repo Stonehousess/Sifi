@@ -813,16 +813,52 @@ function fetchWithCountdown(requireTrailer = false) {
     isFetching = false;
   });
 }
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+
+const db = getFirestore();
+
+function convertToCSV(dataArray) {
+  if (!dataArray.length) return "";
+
+  const headers = Object.keys(dataArray[0]);
+  const rows = dataArray.map(row => headers.map(h => JSON.stringify(row[h] ?? "")).join(","));
+  return [headers.join(","), ...rows].join("\n");
+}
+
+async function exportFirestoreAsCSV() {
+  const snapshot = await getDocs(collection(db, "saved")); // replace "saved" if needed
+  const data = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  const csv = convertToCSV(data);
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "firebase-saved-films.csv";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 // Prevent double-save by handling wrapper click cleanly
 const wrapper = document.getElementById("save-button-wrapper");
 wrapper.addEventListener("click", (e) => {
   e.stopPropagation();
   document.getElementById("save-button").click(); // Now guarded
 });
+
   window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
   startAutoFetch();
 };
+window.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "e") {
+    exportFirestoreAsCSV();
+  }
+});
 window.closeTrailer = closeTrailer;
 window.togglePanel = togglePanel;
 window.playTrailer = playTrailer;
