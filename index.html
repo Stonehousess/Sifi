@@ -530,8 +530,8 @@ failSafeTimeout = setTimeout(() => {
       console.warn("⏭️ Trailer not playing — skipping to next");
       findTrailerAndPlay();
     }
-  }, 8000); // Slightly longer than before
-}
+  }
+}, 8000); // Slightly longer than before
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
   trailerPlaying = false;
