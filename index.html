@@ -504,6 +504,11 @@ function playTrailer(url) {
 
   overlay.classList.add('active');
   trailerPlayer.loadVideoById(videoId);
+setTimeout(() => {
+  if (trailerPlayer && typeof trailerPlayer.playVideo === 'function') {
+    trailerPlayer.playVideo(); // ✅ force autoplay
+  }
+}, 500); // wait for buffering
   overlayInfo.style.opacity = "1";
 
   setTimeout(() => window.focus(), 100);
