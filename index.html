@@ -441,32 +441,24 @@ function resetPanelFade() {
   }
 
 function onPlayerStateChange(event) {
-  console.log("🔄 onPlayerStateChange fired — player state:", event.data);
-
   if (event.data === YT.PlayerState.PLAYING) {
     trailerPaused = false;
     clearTimeout(failSafeTimeout);
-    console.log("▶️ Trailer is playing");
   }
 
   if (event.data === YT.PlayerState.ENDED) {
     trailerPlaying = false;
     trailerPaused = false;
-    console.log("⏹️ Trailer ended");
-
     if (window.autoTrailerMode) {
-      console.log("🔁 Auto mode active — finding next trailer");
       findTrailerAndPlay();
     } else {
-      console.log("📦 Closing trailer overlay");
       closeTrailer(); // ✅ replaces .remove('active')
     }
   }
 
   if (event.data === YT.PlayerState.PAUSED) {
     trailerPaused = true;
-    if (overlayInfo) overlayInfo.style.opacity = "1";
-    console.log("⏸️ Trailer paused");
+    overlayInfo.style.opacity = "1"; // 👁 Keep info panel visible
   }
 }
 window.onPlayerStateChange = onPlayerStateChange;
@@ -515,23 +507,16 @@ function playTrailer(url) {
     overlayInfo.style.opacity = "0";
   }, 3000);
 
-failSafeTimeout = setTimeout(() => {
-  if (
-    trailerPlayer &&
-    typeof trailerPlayer.getPlayerState === "function"
-  ) {
-    const state = trailerPlayer.getPlayerState();
-    console.log("▶️ failSafe check — player state is", state);
-    if (
-      state !== YT.PlayerState.PLAYING &&
-      state !== YT.PlayerState.BUFFERING &&
-      window.autoTrailerMode
-    ) {
-      console.warn("⏭️ Trailer not playing — skipping to next");
-      findTrailerAndPlay();
+  failSafeTimeout = setTimeout(() => {
+    if (trailerPlayer && typeof trailerPlayer.getPlayerState === "function") {
+      const state = trailerPlayer.getPlayerState();
+      if (state !== YT.PlayerState.PLAYING && window.autoTrailerMode) {
+        console.warn("Trailer failed to play — skipping...");
+        findTrailerAndPlay();
+      }
     }
-  }
-}, 8000); // Slightly longer than before
+  }, 6000);
+}
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
   trailerPlaying = false;
@@ -937,7 +922,7 @@ window.onYouTubeIframeAPIReady = function () {
       modestbranding: 1,
       rel: 0,
       showinfo: 0
-    }
+    },
     events: {
       onStateChange: window.onPlayerStateChange
     }
