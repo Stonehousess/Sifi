@@ -452,7 +452,7 @@ function onPlayerStateChange(event) {
     if (window.autoTrailerMode) {
       findTrailerAndPlay();
     } else {
-      document.getElementById('trailer-overlay').classList.remove('active');
+      closeTrailer(); // ✅ replaces .remove('active')
     }
   }
 
