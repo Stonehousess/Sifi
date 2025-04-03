@@ -441,24 +441,32 @@ function resetPanelFade() {
   }
 
 function onPlayerStateChange(event) {
+  console.log("🔄 onPlayerStateChange fired — player state:", event.data);
+
   if (event.data === YT.PlayerState.PLAYING) {
     trailerPaused = false;
     clearTimeout(failSafeTimeout);
+    console.log("▶️ Trailer is playing");
   }
 
   if (event.data === YT.PlayerState.ENDED) {
     trailerPlaying = false;
     trailerPaused = false;
+    console.log("⏹️ Trailer ended");
+
     if (window.autoTrailerMode) {
+      console.log("🔁 Auto mode active — finding next trailer");
       findTrailerAndPlay();
     } else {
+      console.log("📦 Closing trailer overlay");
       closeTrailer(); // ✅ replaces .remove('active')
     }
   }
 
   if (event.data === YT.PlayerState.PAUSED) {
     trailerPaused = true;
-    overlayInfo.style.opacity = "1"; // 👁 Keep info panel visible
+    if (overlayInfo) overlayInfo.style.opacity = "1";
+    console.log("⏸️ Trailer paused");
   }
 }
 window.onPlayerStateChange = onPlayerStateChange;
@@ -522,8 +530,8 @@ failSafeTimeout = setTimeout(() => {
       console.warn("⏭️ Trailer not playing — skipping to next");
       findTrailerAndPlay();
     }
-  }
-}, 8000); // Slightly longer than before
+  }, 8000); // Slightly longer than before
+}
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
   trailerPlaying = false;
