@@ -350,7 +350,7 @@
   <div id="overlay-description">Description</div>
 </div>
   <div class="overlay-buttons">
-  <button onclick="findTrailerAndPlay()" class="overlay-btn">Next</button>
+  <button id="overlay-next" onclick="findTrailerAndPlay()" class="overlay-btn">Next</button>
   <button onclick="document.getElementById('genre-button').click()" class="overlay-btn">Genre</button>
   <button onclick="window.open(currentTMDBUrl, '_blank')" class="overlay-btn">TMDB</button>
   <button onclick="document.getElementById('save-button').click()" class="overlay-btn">Save</button>
@@ -453,8 +453,15 @@ function onPlayerStateChange(event) {
   trailerPlaying = false;
   trailerPaused = false;
   console.log("🔚 Trailer ended");
+
   if (window.autoTrailerMode) {
-    setTimeout(() => findTrailerAndPlay(), 1000); // ⏱ smoother transition
+    setTimeout(() => {
+      const nextBtn = document.getElementById("overlay-next");
+      if (nextBtn) {
+        console.log("🔁 Auto-clicking overlay next...");
+        nextBtn.click();
+      }
+    }, 1000);
   } else {
     closeTrailer();
   }
