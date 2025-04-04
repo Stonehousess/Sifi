@@ -717,8 +717,6 @@ async function findTrailerAndPlay() {
     trailerLoopFirst = false;
   }
 
-  currentTrailerUrl = ""; // ✅ reset to force new trailer
-
   let found = false;
   let attempts = 0;
 
@@ -735,9 +733,13 @@ async function findTrailerAndPlay() {
   typeof currentTrailerUrl === "string" &&
   currentTrailerUrl.includes("youtube.com")
 ) {
-  console.log("🎬 Found trailer — playing");
-  console.log("🔁 Trailer loop continues...");
-  playTrailer(currentTrailerUrl);
+  if (!trailerPlaying) {  // ✅ Prevents overlap from polling + events
+    console.log("🎬 Found trailer — playing");
+    console.log("🔁 Trailer loop continues...");
+    playTrailer(currentTrailerUrl);
+  } else {
+    console.log("⏭️ Trailer already playing — skipping duplicate play.");
+  }
 } else {
   console.warn("⛔ No valid trailer URL found. Ending loop.");
   window.autoTrailerMode = false;
