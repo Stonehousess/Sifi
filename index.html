@@ -500,6 +500,10 @@ function extractYouTubeId(url) {
   }
 }
 function playTrailer(url) {
+  if (fetchTimer) {
+  clearTimeout(fetchTimer);
+  fetchTimer = null;
+}
   const videoId = extractYouTubeId(url);
   if (!videoId || !trailerPlayer || !youtubeReady) return;
 
@@ -695,7 +699,10 @@ return true;
   }
 async function findTrailerAndPlay() {
   window.autoTrailerMode = true;
-
+  if (fetchTimer) {
+  clearTimeout(fetchTimer);
+  fetchTimer = null;
+}
   if (!youtubeReady || !trailerPlayer) {
     console.warn("⏳ YouTube Player not ready — please wait...");
     return;
