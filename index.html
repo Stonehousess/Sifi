@@ -730,14 +730,21 @@ async function findTrailerAndPlay() {
     }
   }
 
-  if (currentTrailerUrl) {
-    console.log("🎬 Found trailer — playing");
-    console.log("🔁 Trailer loop continues...");
-    playTrailer(currentTrailerUrl);
-  } else {
-    console.warn("⛔ No trailer URL found. Loop will not continue.");
-    window.autoTrailerMode = false; // Failsafe: disable loop if all fails
-  }
+  if (
+  currentTrailerUrl &&
+  typeof currentTrailerUrl === "string" &&
+  currentTrailerUrl.includes("youtube.com")
+) {
+  console.log("🎬 Found trailer — playing");
+  console.log("🔁 Trailer loop continues...");
+  playTrailer(currentTrailerUrl);
+
+  // ✅ Only reset AFTER the trailer starts playing
+  currentTrailerUrl = "";
+} else {
+  console.warn("⛔ No valid trailer URL found. Ending loop.");
+  window.autoTrailerMode = false;
+}
 }
 window.findTrailerAndPlay = findTrailerAndPlay;
   document.addEventListener("wheel", e => {
