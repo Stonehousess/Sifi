@@ -598,7 +598,6 @@ if (++pollTries > maxPolls) {
 }
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
-  trailerPlaying = false;
   window.autoTrailerMode = false;
   trailerLoopFirst = true;
   trailerPlaying = false; // ✅ Reset
