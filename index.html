@@ -973,9 +973,17 @@ document.getElementById("movie-poster").onclick = () => {
 };
 
 function startAutoFetch() {
-  if (fetchTimer) clearTimeout(fetchTimer); // ✅ Clear old timer
+  if (window.autoTrailerMode) {
+    console.log("⏹️ Auto trailer mode active — not starting auto fetch loop.");
+    return;
+  }
+
+  if (fetchTimer) clearTimeout(fetchTimer);
+
   fetchWithCountdown(false).then(() => {
-    fetchTimer = setTimeout(startAutoFetch, 60000);
+    if (!window.autoTrailerMode) {
+      fetchTimer = setTimeout(startAutoFetch, 60000);
+    }
   });
 }
 
