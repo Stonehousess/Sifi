@@ -673,10 +673,19 @@ if (!item.poster_path) {
       document.getElementById("tmdb-link").innerHTML = `| <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
 
       const trailerRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US`);
-      const trailerData = await trailerRes.json();
-      const trailers = trailerData.results.filter(v => v.site === "YouTube" && v.type === "Trailer");
-      currentTrailerUrl = trailers.length > 0 ? `https://www.youtube.com/watch?v=${trailers[0].key}` : "";
-      console.log("🎞️ New trailer URL:", currentTrailerUrl);
+const trailerData = await trailerRes.json();
+
+// Always reset before assigning
+currentTrailerUrl = "";
+
+const trailers = trailerData.results.filter(v => v.site === "YouTube" && v.type === "Trailer");
+
+if (trailers.length > 0) {
+  currentTrailerUrl = `https://www.youtube.com/watch?v=${trailers[0].key}`;
+  console.log("🎞️ New trailer URL:", currentTrailerUrl);
+} else {
+  console.warn("⚠️ No trailer found for this title");
+}
 if (requireTrailer && !currentTrailerUrl) {
   console.warn("No trailer — retrying...");
   return false;
@@ -744,13 +753,17 @@ async function findTrailerAndPlay() {
   let found = false;
   let attempts = 0;
 
-  while (!found && attempts < 10) {
-    found = await fetchWithCountdown(true);
-    attempts++;
-    if (!found) {
-      console.warn(`🔁 Attempt ${attempts}: Still searching for a trailer...`);
-    }
+  while (attempts < 10) {
+  found = await fetchWithCountdown(true);
+  attempts++;
+
+  if (found && currentTrailerUrl && currentTrailerUrl.includes("youtube.com")) {
+    console.log("🎬 Found valid trailer:", currentTrailerUrl);
+    break;
   }
+
+  console.warn(`🔁 Attempt ${attempts}: No trailer found yet...`);
+}
 
   if (
     currentTrailerUrl &&
