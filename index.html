@@ -481,25 +481,22 @@ function extractYouTubeId(url) {
 }
 function playTrailer(url) {
   const videoId = extractYouTubeId(url);
-  if (!videoId || !trailerPlayer || !youtubeReady) return; // <-- updated
+  if (!videoId || !trailerPlayer || !youtubeReady) return;
 
   const overlay = document.getElementById('trailer-overlay');
 
-  // ✅ If trailer is already active, treat this as a close
+  // ✅ If trailer is already active, treat this as a close (manual toggle)
   if (overlay.classList.contains('active') && !window.autoTrailerMode) {
-  trailerPlayer.stopVideo();
-  overlay.classList.remove('active');
-  trailerPlaying = false;
-  if (!overlay.classList.contains('active')) {
-  overlay.classList.add('active');
-}
-  if (fetchTimer) clearTimeout(fetchTimer);
-  fetchTimer = setTimeout(startAutoFetch, 60000);
+    trailerPlayer.stopVideo();
+    overlay.classList.remove('active');
+    trailerPlaying = false;
 
-  return;
-}
+    if (fetchTimer) clearTimeout(fetchTimer);
+    fetchTimer = setTimeout(startAutoFetch, 60000);
+    return;
+  }
 
-  // Normal play flow
+  // ✅ Normal play flow
   if (fetchTimer) clearTimeout(fetchTimer);
   if (fadeTimer) clearTimeout(fadeTimer);
   if (overlayFadeTimer) clearTimeout(overlayFadeTimer);
@@ -509,28 +506,26 @@ function playTrailer(url) {
 
   overlay.classList.add('active');
   trailerPlayer.loadVideoById(videoId);
-
-
   trailerPlayer.playVideo?.();
+
   overlayInfo.style.opacity = "1";
-
-  
-
   overlayFadeTimer = setTimeout(() => {
     overlayInfo.style.opacity = "0";
   }, 3000);
 
+  // ⏳ If trailer never starts
   failSafeTimeout = setTimeout(() => {
     if (trailerPlayer && typeof trailerPlayer.getPlayerState === "function") {
       const state = trailerPlayer.getPlayerState();
       if (state !== YT.PlayerState.PLAYING && window.autoTrailerMode) {
-        console.warn("Trailer failed to play — skipping...");
+        console.warn("⛔ Trailer failed to play — skipping...");
         findTrailerAndPlay();
       }
     }
   }, 6000);
-}
-setTimeout(() => {
+
+  // 🔁 If trailer ends silently or stalls
+  setTimeout(() => {
     if (window.autoTrailerMode && trailerPlayer?.getPlayerState() !== YT.PlayerState.ENDED) {
       const duration = trailerPlayer?.getDuration?.();
       const currentTime = trailerPlayer?.getCurrentTime?.();
@@ -542,6 +537,7 @@ setTimeout(() => {
       }
     }
   }, 10000);
+}
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
   trailerPlaying = false;
