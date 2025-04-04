@@ -426,6 +426,7 @@
   let trailerPaused = false;
   let overlayInfo = null;
   let failSafeTimeout = null; // This is fine to declare here too
+  let isTrailerAdvancing = false;
 
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
@@ -501,11 +502,20 @@ function extractYouTubeId(url) {
 }
 function playTrailer(url) {
   if (fetchTimer) {
-  clearTimeout(fetchTimer);
-  fetchTimer = null;
-}
+    clearTimeout(fetchTimer);
+    fetchTimer = null;
+  }
+
   const videoId = extractYouTubeId(url);
   if (!videoId || !trailerPlayer || !youtubeReady) return;
+
+  // ✅ Prevent replaying the same trailer
+  if (currentTrailerUrl === url && trailerPlaying) {
+    console.log("⏭️ Same trailer already playing — skip replay");
+    return;
+  }
+
+  currentTrailerUrl = url; // ✅ Refresh the value to track curren
 
   const overlay = document.getElementById('trailer-overlay');
 
@@ -579,7 +589,7 @@ function closeTrailer() {
   trailerPlaying = false;
   window.autoTrailerMode = false;
   trailerLoopFirst = true;
-
+  trailerPlaying = false; // ✅ Reset
   trailerPlayer.stopVideo();
   document.getElementById('trailer-overlay').classList.remove('active');
 
@@ -698,13 +708,22 @@ return true;
     }
   }
 async function findTrailerAndPlay() {
+  if (isTrailerAdvancing) {
+    console.warn("🚦 Trailer advance already in progress — skipping...");
+    return;
+  }
+  isTrailerAdvancing = true;
+
   window.autoTrailerMode = true;
+
   if (fetchTimer) {
-  clearTimeout(fetchTimer);
-  fetchTimer = null;
-}
+    clearTimeout(fetchTimer);
+    fetchTimer = null;
+  }
+
   if (!youtubeReady || !trailerPlayer) {
     console.warn("⏳ YouTube Player not ready — please wait...");
+    isTrailerAdvancing = false; // ✅ release lock on error too
     return;
   }
 
@@ -712,6 +731,7 @@ async function findTrailerAndPlay() {
     trailerLoopFirst = false;
     console.log("🎬 Playing current trailer before continuing autoplay...");
     playTrailer(currentTrailerUrl);
+    isTrailerAdvancing = false; // ✅ release lock
     return;
   } else {
     trailerLoopFirst = false;
@@ -721,7 +741,7 @@ async function findTrailerAndPlay() {
   let attempts = 0;
 
   while (!found && attempts < 10) {
-    found = await fetchWithCountdown(true); // force fetch w/ trailer
+    found = await fetchWithCountdown(true);
     attempts++;
     if (!found) {
       console.warn(`🔁 Attempt ${attempts}: Still searching for a trailer...`);
@@ -729,21 +749,19 @@ async function findTrailerAndPlay() {
   }
 
   if (
-  currentTrailerUrl &&
-  typeof currentTrailerUrl === "string" &&
-  currentTrailerUrl.includes("youtube.com")
-) {
-  if (!trailerPlaying) {  // ✅ Prevents overlap from polling + events
+    currentTrailerUrl &&
+    typeof currentTrailerUrl === "string" &&
+    currentTrailerUrl.includes("youtube.com")
+  ) {
     console.log("🎬 Found trailer — playing");
     console.log("🔁 Trailer loop continues...");
     playTrailer(currentTrailerUrl);
   } else {
-    console.log("⏭️ Trailer already playing — skipping duplicate play.");
+    console.warn("⛔ No valid trailer URL found. Ending loop.");
+    window.autoTrailerMode = false;
   }
-} else {
-  console.warn("⛔ No valid trailer URL found. Ending loop.");
-  window.autoTrailerMode = false;
-}
+
+  isTrailerAdvancing = false; // ✅ ALWAYS release lock
 }
 window.findTrailerAndPlay = findTrailerAndPlay;
   document.addEventListener("wheel", e => {
@@ -793,18 +811,21 @@ document.getElementById("next-button").onclick = () => {
   window.autoTrailerMode = true;
   trailerLoopFirst = true;
 
+  // ✅ Stop current video before fetch
+  if (trailerPlayer && typeof trailerPlayer.stopVideo === "function") {
+    trailerPlayer.stopVideo();
+  }
+
   // ✅ Ensure overlay is visible
   const overlay = document.getElementById("trailer-overlay");
   if (!overlay.classList.contains("active")) {
     overlay.classList.add("active");
   }
 
-  // ✅ Force fetch with trailer immediately
   fetchWithCountdown(true).then(success => {
     if (success && currentTrailerUrl) {
       playTrailer(currentTrailerUrl);
     } else {
-      // fallback: loop until one found
       findTrailerAndPlay();
     }
   });
