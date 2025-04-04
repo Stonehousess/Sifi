@@ -310,6 +310,23 @@
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 0.1s linear;
 }
+#trailer-container {
+  position: relative;
+}
+
+#popout-overlay-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+#popout-overlay-button .overlay-btn {
+  padding: 6px 10px;
+  font-size: 14px;
+}
   </style>
 </head>
 <body>
@@ -343,6 +360,9 @@
   <div id="trailer-overlay">
   <div class="player-wrapper">
     <div id="player"></div>
+  <div id="popout-overlay-button" class="overlay-float">
+      <button onclick="popoutTrailer()" class="overlay-btn">Pop Out</button>
+    </div>
   </div>
 <div id="overlay-info">
   <div id="overlay-title">Title</div>
@@ -523,20 +543,32 @@ function playTrailer(url) {
       }
     }
   }, 6000);
+// 🔁 Active polling to detect end if YouTube event fails
+let pollTries = 0;
+const maxPolls = 30; // ~30 seconds
 
-  // 🔁 If trailer ends silently or stalls
-  setTimeout(() => {
-    if (window.autoTrailerMode && trailerPlayer?.getPlayerState() !== YT.PlayerState.ENDED) {
-      const duration = trailerPlayer?.getDuration?.();
-      const currentTime = trailerPlayer?.getCurrentTime?.();
-      const timeLeft = duration - currentTime;
+const trailerPollInterval = setInterval(() => {
+  if (!window.autoTrailerMode || !trailerPlayer) {
+    clearInterval(trailerPollInterval);
+    return;
+  }
 
-      if (!trailerPlaying || isNaN(timeLeft) || timeLeft < 3) {
-        console.warn("⏳ Trailer likely stuck or failed to finish — forcing next...");
-        findTrailerAndPlay();
-      }
-    }
-  }, 10000);
+  const state = trailerPlayer.getPlayerState?.();
+  const duration = trailerPlayer.getDuration?.();
+  const currentTime = trailerPlayer.getCurrentTime?.();
+
+  if (state === YT.PlayerState.ENDED || (!isNaN(duration) && duration - currentTime < 2)) {
+    console.warn("📽️ Poll detected trailer ended or near end — continuing...");
+    clearInterval(trailerPollInterval);
+    findTrailerAndPlay();
+  }
+
+  if (++pollTries > maxPolls) {
+    console.warn("⏳ Poll timeout — forcing next trailer.");
+    clearInterval(trailerPollInterval);
+    findTrailerAndPlay();
+  }
+}, 1000);
 }
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
@@ -790,6 +822,13 @@ trailerBtn.addEventListener("click", () => {
     }
   }
 });
+function popoutTrailer() {
+  if (currentTrailerUrl) {
+    window.open(currentTrailerUrl, '_blank', 'width=800,height=450');
+  } else {
+    console.warn("🎞️ No trailer URL to pop out.");
+  }
+}
 
 const buttons = document.querySelector(".floating-buttons");
 const infoPanel = document.getElementById("info-panel");
@@ -837,11 +876,15 @@ let overlayFadeTimer;
 
 function showOverlayInfo() {
   overlayInfo.style.opacity = "1";
+  const popoutBtn = document.getElementById("popout-overlay-button");
+  if (popoutBtn) popoutBtn.style.opacity = "1";
+
   clearTimeout(overlayFadeTimer);
 
   if (!trailerPaused) {
     overlayFadeTimer = setTimeout(() => {
       overlayInfo.style.opacity = "0";
+      if (popoutBtn) popoutBtn.style.opacity = "0";
     }, 3000);
   }
 }
