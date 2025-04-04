@@ -738,9 +738,6 @@ async function findTrailerAndPlay() {
   console.log("🎬 Found trailer — playing");
   console.log("🔁 Trailer loop continues...");
   playTrailer(currentTrailerUrl);
-
-  // ✅ Only reset AFTER the trailer starts playing
-  currentTrailerUrl = "";
 } else {
   console.warn("⛔ No valid trailer URL found. Ending loop.");
   window.autoTrailerMode = false;
