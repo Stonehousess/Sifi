@@ -659,57 +659,7 @@ if (!item.poster_path) {
         ? `⭐️ ${rating} • 🎬 • ${runtime} mins • ${getFlagEmoji(originCountry)}`
         : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ${runtime} mins • ${getFlagEmoji(originCountry)}`;
 
-      document.getElementById("movie-poster").src = posterPath;
-      document.getElementById("info-title").textContent = title + year;
-      document.getElementById("info-meta").innerHTML = metaText;
-      document.getElementById("info-description").textContent = overview;
-      document.getElementById("genre-name").textContent = currentGenre.name;
-
-      document.getElementById("overlay-title").textContent = document.getElementById("info-title").textContent;
-      document.getElementById("overlay-meta").textContent = document.getElementById("info-meta").textContent;
-      document.getElementById("overlay-description").textContent = document.getElementById("info-description").textContent;
-
-      currentTMDBUrl = `https://www.themoviedb.org/${type}/${item.id}`;
-      document.getElementById("tmdb-link").innerHTML = `| <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
-
-      const trailerRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US`);
-const trailerData = await trailerRes.json();
-
-// Always reset before assigning
-currentTrailerUrl = "";
-
-const trailers = trailerData.results.filter(v => v.site === "YouTube" && v.type === "Trailer");
-
-if (trailers.length > 0) {
-  const trailerKey = trailers[0].key;
-  currentTrailerUrl = `https://www.youtube.com/watch?v=${trailerKey}`;
-
-  // 🛡 Avoid repeating same trailer
-  if (requireTrailer && trailerKey === lastTrailerId) {
-    console.warn(`🛑 Duplicate trailer detected (${trailerKey}) — retrying...`);
-    return false;
-  }
-
-  lastTrailerId = trailerKey;
-  console.log("🎞️ New trailer URL:", currentTrailerUrl);
-} else {
-  console.warn("⚠️ No trailer found for this title");
-}
-if (requireTrailer && !currentTrailerUrl) {
-  console.warn("No trailer — retrying...");
-  return false;
-}
-// ✅ Disable trailer button if no trailer
-document.getElementById("trailer-button").disabled = !currentTrailerUrl;
-const trailerImg = document.getElementById("trailer-button").querySelector("img");
-
-if (currentTrailerUrl) {
-  trailerImg.src = "play.png";
-  trailerImg.style.opacity = "0.6";
-} else {
-  trailerImg.src = "play-disabled.png";
-  trailerImg.style.opacity = "0.5";
-}
+      
 // ✅ Save to Firestore if successful
 await setDoc(docRef, {
   id: item.id,
@@ -729,7 +679,24 @@ await setDoc(docRef, {
   timestampReadable: new Date().toISOString(),
   cachedBy: "public"
 });
-return true;
+return {
+  posterPath,
+  title,
+  overview,
+  rating,
+  releaseDate,
+  year,
+  runtime,
+  episodeCount,
+  originCountry,
+  metaText,
+  trailerUrl: currentTrailerUrl,
+  trailerKey: lastTrailerId,
+  tmdbUrl: currentTMDBUrl,
+  type,
+  genre: currentGenre.name,
+  id: item.id
+};
 
        
     } catch (err) {
@@ -737,6 +704,33 @@ return true;
       return false;
     }
   }
+function applyFilmToUI(data) {
+  document.getElementById("movie-poster").src = data.posterPath;
+  document.getElementById("info-title").textContent = data.title + data.year;
+  document.getElementById("info-meta").innerHTML = data.metaText;
+  document.getElementById("info-description").textContent = data.overview;
+  document.getElementById("genre-name").textContent = data.genre;
+
+  document.getElementById("overlay-title").textContent = data.title + data.year;
+  document.getElementById("overlay-meta").textContent = data.metaText;
+  document.getElementById("overlay-description").textContent = data.overview;
+
+  currentTMDBUrl = data.tmdbUrl;
+  currentTrailerUrl = data.trailerUrl;
+  lastTrailerId = data.trailerKey;
+
+  document.getElementById("tmdb-link").innerHTML = `| <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
+
+  const trailerImg = document.getElementById("trailer-button").querySelector("img");
+  document.getElementById("trailer-button").disabled = !data.trailerUrl;
+  if (data.trailerUrl) {
+    trailerImg.src = "play.png";
+    trailerImg.style.opacity = "0.6";
+  } else {
+    trailerImg.src = "play-disabled.png";
+    trailerImg.style.opacity = "0.5";
+  }
+}
 async function findTrailerAndPlay() {
   if (isTrailerAdvancing) {
     console.warn("🚦 Trailer advance already in progress — skipping...");
@@ -763,7 +757,18 @@ async function findTrailerAndPlay() {
   let attempts = 0;
 
   while (attempts < 10) {
-  found = await fetchWithCountdown(true);
+  const data = await getRandomTitle(true);
+
+if (
+  data &&
+  data.trailerUrl &&
+  data.trailerUrl.includes("youtube.com")
+) {
+  console.log("🎬 Found trailer — playing", data.trailerUrl);
+  applyFilmToUI(data);           // ✅ now safe to update the UI
+  found = true;
+  break;
+}
   attempts++;
 
   if (found && currentTrailerUrl && currentTrailerUrl.includes("youtube.com")) {
@@ -997,16 +1002,25 @@ function startAutoFetch() {
 }
 
 function fetchWithCountdown(requireTrailer = false) {
-  if (isFetching) return false; // ✅ Guard: skip if already fetching
+  if (isFetching) return false; // ✅ Prevent overlap
   isFetching = true;
   console.log("🎲 Fetching new title at", new Date().toLocaleTimeString());
-  return getRandomTitle(requireTrailer).then((success) => {
-    if (success) startFetchCountdown(60000);
-    isFetching = false;
-    return success;
+
+  return getRandomTitle(requireTrailer).then((data) => {
+    if (data && data.trailerUrl) {
+      applyFilmToUI(data);             // ✅ Safely apply UI updates
+      startFetchCountdown(60000);      // ⏳ Start countdown ring
+      isFetching = false;
+      return true;
+    } else {
+      console.warn("⚠️ No valid data returned");
+      isFetching = false;
+      return false;
+    }
   }).catch((err) => {
     console.error("Error in fetchWithCountdown:", err);
     isFetching = false;
+    return false;
   });
 }
 
