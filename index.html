@@ -572,16 +572,28 @@ const trailerPollInterval = setInterval(() => {
   const currentTime = trailerPlayer.getCurrentTime?.();
 
   if (state === YT.PlayerState.ENDED || (!isNaN(duration) && duration - currentTime < 2)) {
-    console.warn("📽️ Poll detected trailer ended or near end — continuing...");
-    clearInterval(trailerPollInterval);
-    findTrailerAndPlay();
+  console.warn("📽️ Poll detected trailer ended or near end — continuing...");
+  clearInterval(trailerPollInterval);
+
+  if (isTrailerAdvancing) {
+    console.warn("⏸️ Poll tried to advance while trailer is already advancing — skipping");
+    return;
   }
 
-  if (++pollTries > maxPolls) {
-    console.warn("⏳ Poll timeout — forcing next trailer.");
-    clearInterval(trailerPollInterval);
-    findTrailerAndPlay();
+  findTrailerAndPlay();
+}
+
+if (++pollTries > maxPolls) {
+  console.warn("⏳ Poll timeout — forcing next trailer.");
+  clearInterval(trailerPollInterval);
+
+  if (isTrailerAdvancing) {
+    console.warn("⏸️ Poll timeout triggered but trailer is advancing — skip");
+    return;
   }
+
+  findTrailerAndPlay();
+}
 }, 1000);
 }
 function closeTrailer() {
@@ -1061,7 +1073,7 @@ window.failSafeTimeout = null;
 }
   });
 
-  youtubeReady = true;
+  
   console.log("✅ YouTube Player ready");
 };
 </script>
