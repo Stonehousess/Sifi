@@ -735,19 +735,11 @@ async function findTrailerAndPlay() {
 
   if (!youtubeReady || !trailerPlayer) {
     console.warn("⏳ YouTube Player not ready — please wait...");
-    isTrailerAdvancing = false; // ✅ release lock on error too
+    isTrailerAdvancing = false;
     return;
   }
 
-  if (trailerLoopFirst && currentTrailerUrl) {
-    trailerLoopFirst = false;
-    console.log("🎬 Playing current trailer before continuing autoplay...");
-    playTrailer(currentTrailerUrl);
-    isTrailerAdvancing = false; // ✅ release lock
-    return;
-  } else {
-    trailerLoopFirst = false;
-  }
+  // Removed the trailerLoopFirst check to always fetch a new trailer
 
   let found = false;
   let attempts = 0;
@@ -773,7 +765,7 @@ async function findTrailerAndPlay() {
     window.autoTrailerMode = false;
   }
 
-  isTrailerAdvancing = false; // ✅ ALWAYS release lock
+  isTrailerAdvancing = false;
 }
 window.findTrailerAndPlay = findTrailerAndPlay;
   document.addEventListener("wheel", e => {
