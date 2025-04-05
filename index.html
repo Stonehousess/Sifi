@@ -874,27 +874,27 @@ document.getElementById("genre-button").onclick = () => {
 };
 document.getElementById("next-button").onclick = () => {
   if (fetchTimer) clearTimeout(fetchTimer);
-
   trailerLoopFirst = true;
 
-  // Stop the current trailer if playing
+  // Stop current trailer if playing
   if (trailerPlayer?.stopVideo) {
     trailerPlayer.stopVideo();
   }
 
+  // Show trailer overlay if not visible
   const overlay = document.getElementById("trailer-overlay");
   if (!overlay.classList.contains("active")) {
     overlay.classList.add("active");
   }
 
-  // ✅ NEW: Only fetch if there's no valid trailer
+  // ✅ Always enable autoplay mode
+  window.autoTrailerMode = true;
+
   if (currentTrailerUrl && currentTrailerUrl.includes("youtube.com")) {
     console.log("▶️ Playing current trailer via next-button");
-    window.autoTrailerMode = false; // 🚫 Do NOT start loop yet
     playTrailer(currentTrailerUrl);
   } else {
     console.warn("🔁 No trailer for current title — fetching next...");
-    window.autoTrailerMode = true; // ✅ allow it to loop once fetched
     findTrailerAndPlay();
   }
 };
@@ -1137,6 +1137,10 @@ window.onload = () => {
       console.log("🔇 Toggling mute");
       toggleMute?.();
     }
+    if (key === "n") {
+    console.log("⏭️ [n] Key pressed — activating next trailer");
+    document.getElementById("next-button")?.click();
+    }
 
     if (key === "arrowright") {
       console.log("⏭️ Skipping to next trailer");
@@ -1144,17 +1148,19 @@ window.onload = () => {
     }
 
     if (key === "f") {
-      const iframe = document.querySelector("#player iframe");
-      if (iframe) {
-        if (!document.fullscreenElement) {
-          iframe.requestFullscreen().catch(err => {
-            console.warn("❌ Failed to enter fullscreen:", err);
-          });
-        } else {
-          document.exitFullscreen();
-        }
-      }
+  const iframe = document.querySelector("#player iframe");
+  if (iframe) {
+    iframe.focus(); // ✨ Try giving it focus first
+
+    if (!document.fullscreenElement) {
+      iframe.requestFullscreen().catch(err => {
+        console.warn("❌ Failed to enter fullscreen:", err);
+      });
+    } else {
+      document.exitFullscreen();
     }
+  }
+}
   });
 
   // ✅ Restore focus when overlay clicked (helps re-enable key events)
