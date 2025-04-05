@@ -1007,7 +1007,7 @@ function fetchWithCountdown(requireTrailer = false) {
   console.log("🎲 Fetching new title at", new Date().toLocaleTimeString());
 
   return getRandomTitle(requireTrailer).then((data) => {
-    if (data && data.trailerUrl) {
+    if (data) {
       applyFilmToUI(data);             // ✅ Safely apply UI updates
       startFetchCountdown(60000);      // ⏳ Start countdown ring
       isFetching = false;
