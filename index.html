@@ -791,17 +791,17 @@ if (
 }
 
   if (
-    currentTrailerUrl &&
-    typeof currentTrailerUrl === "string" &&
-    currentTrailerUrl.includes("youtube.com")
-  ) {
-    console.log("🎬 Found trailer — playing");
-    console.log("🔁 Trailer loop continues...");
-    playTrailer(currentTrailerUrl);
-  } else {
-    console.warn("⛔ No valid trailer URL found. Ending loop.");
-    window.autoTrailerMode = false;
-  }
+  currentTrailerUrl &&
+  typeof currentTrailerUrl === "string" &&
+  currentTrailerUrl.includes("youtube.com")
+) {
+  console.log("🎬 Found trailer — playing");
+  console.log("🔁 Trailer loop continues...");
+  playTrailer(currentTrailerUrl);
+} else {
+  console.warn("⛔ No valid trailer URL found. Retrying...");
+  setTimeout(() => findTrailerAndPlay(), 500); // retry immediately
+}
 
   isTrailerAdvancing = false;
 }
@@ -1070,7 +1070,11 @@ wrapper.addEventListener("click", (e) => {
 
 window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
+  if (window.autoTrailerMode) {
+  findTrailerAndPlay();
+} else {
   startAutoFetch();
+}
 
   // Initial visibility timers
   fadeTimer = setTimeout(() => {
