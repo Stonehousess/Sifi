@@ -472,6 +472,7 @@ function onPlayerStateChange(event) {
   }
 
   if (event.data === YT.PlayerState.ENDED) {
+    clearTimeout(failSafeTimeout); // ✅ Extra layer 
     trailerPlaying = false;
     trailerPaused = false;
     console.log("🔚 Trailer ended");
@@ -541,12 +542,18 @@ function playTrailer(url) {
   }, 3000);
 
   failSafeTimeout = setTimeout(() => {
-    const state = trailerPlayer?.getPlayerState?.();
-    if (state !== YT.PlayerState.PLAYING && window.autoTrailerMode) {
-      console.warn("⛔ Trailer failed to play — skipping...");
-      findTrailerAndPlay();
-    }
-  }, 6000);
+  const state = trailerPlayer?.getPlayerState?.();
+  if (
+    state !== YT.PlayerState.PLAYING &&
+    state !== YT.PlayerState.ENDED &&
+    window.autoTrailerMode
+  ) {
+    console.warn("⛔ Trailer failed to play — skipping...");
+    findTrailerAndPlay();
+  } else {
+    console.log("✅ FailSafe check passed — trailer is playing or ended.");
+  }
+}, 6000);
 
   let pollTries = 0;
   const maxPolls = 30;
@@ -563,6 +570,7 @@ function playTrailer(url) {
     if (state === YT.PlayerState.ENDED || (!isNaN(duration) && duration - currentTime < 2)) {
       console.warn("📽️ Trailer ended — auto-playing next");
       clearInterval(trailerPollInterval);
+      clearTimeout(failSafeTimeout); // ✅ Prevent failsafe firing
       if (!isTrailerAdvancing) findTrailerAndPlay();
     }
 
@@ -760,11 +768,10 @@ async function findTrailerAndPlay() {
   }
 
   if (!found) {
-    console.warn("⛔ No valid trailer found after 7 tries. Retrying in 3 seconds...");
-    setTimeout(() => findTrailerAndPlay(), 3000); // keep trying
-  }
-
-  isTrailerAdvancing = false;
+  console.warn("⛔ No valid trailer found after 7 tries. Retrying in 3 seconds...");
+  isTrailerAdvancing = false; // ✅ release lock before retry
+  setTimeout(() => findTrailerAndPlay(), 3000);
+}
 }
 window.findTrailerAndPlay = findTrailerAndPlay;
   document.addEventListener("wheel", e => {
