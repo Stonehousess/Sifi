@@ -428,6 +428,7 @@
   let failSafeTimeout = null; // This is fine to declare here too
   let isTrailerAdvancing = false;
   let lastTrailerId = null;
+  let failSafeSkips = 0;
 
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
@@ -555,6 +556,30 @@ function playTrailer(url) {
   const state = trailerPlayer?.getPlayerState?.();
   if (
     state !== YT.PlayerState.PLAYING &&
+    state !== YT.PlayerState.BUFFERING &&
+    state !== YT.PlayerState.ENDED &&
+    window.autoTrailerMode
+  ) {
+    console.warn("⛔ Trailer failed to play — skipping...");
+    failSafeSkips++;
+
+    if (failSafeSkips >= 5) {
+      console.warn("🚨 Multiple failures — waiting before retrying...");
+      setTimeout(() => {
+        failSafeSkips = 0;
+        findTrailerAndPlay();
+      }, 3000);
+    } else {
+      findTrailerAndPlay();
+    }
+  } else {
+    console.log("✅ FailSafe check passed — trailer is playing or ended.");
+    failSafeSkips = 0; // ✅ reset counter on success
+  }
+}, 10000); // ⏳ give trailer time to buffer
+  const state = trailerPlayer?.getPlayerState?.();
+  if (
+    state !== YT.PlayerState.PLAYING &&
     state !== YT.PlayerState.ENDED &&
     window.autoTrailerMode
   ) {
@@ -598,7 +623,7 @@ function closeTrailer() {
   trailerPlaying = false; // ✅ Reset
   trailerPlayer.stopVideo();
   document.getElementById('trailer-overlay').classList.remove('active');
-
+  failSafeSkips = 0;
   // Always restart fetch timer after closing trailer manually
   if (fetchTimer) clearTimeout(fetchTimer);
   fetchTimer = setTimeout(startAutoFetch, 20000); // Or 30000 if intentional
