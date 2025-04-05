@@ -822,24 +822,25 @@ document.getElementById("next-button").onclick = () => {
   window.autoTrailerMode = true;
   trailerLoopFirst = true;
 
-  // ✅ Stop current video before fetch
+  // Stop current video
   if (trailerPlayer && typeof trailerPlayer.stopVideo === "function") {
     trailerPlayer.stopVideo();
   }
 
-  // ✅ Ensure overlay is visible
+  // Show overlay
   const overlay = document.getElementById("trailer-overlay");
   if (!overlay.classList.contains("active")) {
     overlay.classList.add("active");
   }
 
-  fetchWithCountdown(true).then(success => {
-    if (success && currentTrailerUrl) {
-      playTrailer(currentTrailerUrl);
-    } else {
-      findTrailerAndPlay();
-    }
-  });
+  // ✅ NEW: Only fetch if trailer is missing
+  if (currentTrailerUrl && currentTrailerUrl.includes("youtube.com")) {
+    console.log("▶️ Playing current trailer via next-button");
+    playTrailer(currentTrailerUrl);
+  } else {
+    console.warn("🔁 No trailer for current title — fetching next...");
+    findTrailerAndPlay();
+  }
 };
 const trailerBtn = document.getElementById("trailer-button");
 
