@@ -502,45 +502,36 @@ function extractYouTubeId(url) {
   }
 }
 function playTrailer(url) {
-  if (fetchTimer) {
-    clearTimeout(fetchTimer);
-    fetchTimer = null;
-  }
+  if (!url || !trailerPlayer || !youtubeReady) return;
 
   const videoId = extractYouTubeId(url);
-if (!videoId || !trailerPlayer || !youtubeReady) return;
+  if (!videoId) return;
 
-currentTrailerUrl = url; // ✅ Move this up BEFORE the comparison
+  const playerVideoUrl = trailerPlayer.getVideoUrl?.();
+  const isSameVideo = playerVideoUrl?.includes(videoId);
 
-const currentId = extractYouTubeId(currentTrailerUrl);
-
-if (videoId === currentId && trailerPlaying) {
-  console.log("⏭️ Same trailer already playing — skip replay");
-  return;
-}
-
-  const overlay = document.getElementById('trailer-overlay');
-
-  // ✅ If trailer is already active, treat this as a close (manual toggle)
-  if (overlay.classList.contains('active') && !window.autoTrailerMode) {
-    trailerPlayer.stopVideo();
-    overlay.classList.remove('active');
-    trailerPlaying = false;
-
-    if (fetchTimer) clearTimeout(fetchTimer);
-    fetchTimer = setTimeout(startAutoFetch, 60000);
+  if (isSameVideo) {
+    console.log("⏭️ Same trailer already loaded — skip replay");
     return;
   }
 
-  // ✅ Normal play flow
+  // ✅ Update global trailer references
+  currentTrailerUrl = url;
+  lastTrailerId = videoId;
+
+  // Clean up timers
   if (fetchTimer) clearTimeout(fetchTimer);
   if (fadeTimer) clearTimeout(fadeTimer);
   if (overlayFadeTimer) clearTimeout(overlayFadeTimer);
 
+  const overlay = document.getElementById('trailer-overlay');
+  if (!overlay.classList.contains('active')) {
+    overlay.classList.add('active');
+  }
+
   trailerPlaying = true;
   trailerPaused = false;
 
-  overlay.classList.add('active');
   trailerPlayer.loadVideoById(videoId);
   trailerPlayer.playVideo?.();
 
@@ -549,54 +540,38 @@ if (videoId === currentId && trailerPlaying) {
     overlayInfo.style.opacity = "0";
   }, 3000);
 
-  // ⏳ If trailer never starts
   failSafeTimeout = setTimeout(() => {
-    if (trailerPlayer && typeof trailerPlayer.getPlayerState === "function") {
-      const state = trailerPlayer.getPlayerState();
-      if (state !== YT.PlayerState.PLAYING && window.autoTrailerMode) {
-        console.warn("⛔ Trailer failed to play — skipping...");
-        findTrailerAndPlay();
-      }
+    const state = trailerPlayer?.getPlayerState?.();
+    if (state !== YT.PlayerState.PLAYING && window.autoTrailerMode) {
+      console.warn("⛔ Trailer failed to play — skipping...");
+      findTrailerAndPlay();
     }
   }, 6000);
-// 🔁 Active polling to detect end if YouTube event fails
-let pollTries = 0;
-const maxPolls = 30; // ~30 seconds
 
-const trailerPollInterval = setInterval(() => {
-  if (!window.autoTrailerMode || !trailerPlayer) {
-    clearInterval(trailerPollInterval);
-    return;
-  }
+  let pollTries = 0;
+  const maxPolls = 30;
+  const trailerPollInterval = setInterval(() => {
+    if (!window.autoTrailerMode || !trailerPlayer) {
+      clearInterval(trailerPollInterval);
+      return;
+    }
 
-  const state = trailerPlayer.getPlayerState?.();
-  const duration = trailerPlayer.getDuration?.();
-  const currentTime = trailerPlayer.getCurrentTime?.();
+    const state = trailerPlayer.getPlayerState?.();
+    const duration = trailerPlayer.getDuration?.();
+    const currentTime = trailerPlayer.getCurrentTime?.();
 
-  if (state === YT.PlayerState.ENDED || (!isNaN(duration) && duration - currentTime < 2)) {
-  console.warn("📽️ Poll detected trailer ended or near end — continuing...");
-  clearInterval(trailerPollInterval);
+    if (state === YT.PlayerState.ENDED || (!isNaN(duration) && duration - currentTime < 2)) {
+      console.warn("📽️ Trailer ended — auto-playing next");
+      clearInterval(trailerPollInterval);
+      if (!isTrailerAdvancing) findTrailerAndPlay();
+    }
 
-  if (isTrailerAdvancing) {
-    console.warn("⏸️ Poll tried to advance while trailer is already advancing — skipping");
-    return;
-  }
-
-  findTrailerAndPlay();
-}
-
-if (++pollTries > maxPolls) {
-  console.warn("⏳ Poll timeout — forcing next trailer.");
-  clearInterval(trailerPollInterval);
-
-  if (isTrailerAdvancing) {
-    console.warn("⏸️ Poll timeout triggered but trailer is advancing — skip");
-    return;
-  }
-
-  findTrailerAndPlay();
-}
-}, 1000);
+    if (++pollTries > maxPolls) {
+      console.warn("⏳ Poll timeout — forcing next trailer.");
+      clearInterval(trailerPollInterval);
+      if (!isTrailerAdvancing) findTrailerAndPlay();
+    }
+  }, 1000);
 }
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
@@ -728,8 +703,7 @@ function applyFilmToUI(data) {
   document.getElementById("overlay-description").textContent = data.overview;
 
   currentTMDBUrl = data.tmdbUrl;
-  currentTrailerUrl = data.trailerUrl;
-  lastTrailerId = data.trailerKey;
+  currentTrailerUrl = data.trailerUrl; // ✅ used for manual button play
 
   document.getElementById("tmdb-link").innerHTML = `| <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
 
