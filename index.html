@@ -469,7 +469,7 @@ function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.PLAYING) {
     trailerPaused = false;
     clearTimeout(failSafeTimeout);
-
+    isTrailerAdvancing = false; // ✅ Reset here
     
     console.log("✅ Trailer is now playing");
   }
@@ -484,7 +484,8 @@ function onPlayerStateChange(event) {
       console.log("🔁 Enabling autoplay after first trailer ends");
       window.autoTrailerMode = true;
     }
-
+    // ✅ Reset advancing lock (important!)
+    isTrailerAdvancing = false;
     setTimeout(() => {
       console.log("🔁 Trailer ended — finding next...");
       findTrailerAndPlay();
@@ -601,6 +602,7 @@ function playTrailer(url) {
     if (++pollTries > maxPolls) {
       console.warn("⏳ Poll timeout — forcing next trailer.");
       clearInterval(trailerPollInterval);
+      clearTimeout(failSafeTimeout); // ✅ same here
       if (!isTrailerAdvancing) findTrailerAndPlay();
     }
   }, 1000);
@@ -840,14 +842,11 @@ document.getElementById("genre-button").onclick = () => {
   });
 };
 document.getElementById("next-button").onclick = () => {
-  if (fetchTimer) {
-    clearTimeout(fetchTimer);
-    fetchTimer = null;
-  }
+  if (fetchTimer) clearTimeout(fetchTimer);
 
   trailerLoopFirst = true;
-  window.autoTrailerMode = false; // ✅ play only one trailer first
 
+  // Stop the current trailer if playing
   if (trailerPlayer?.stopVideo) {
     trailerPlayer.stopVideo();
   }
@@ -857,12 +856,14 @@ document.getElementById("next-button").onclick = () => {
     overlay.classList.add("active");
   }
 
+  // ✅ NEW: Only fetch if there's no valid trailer
   if (currentTrailerUrl && currentTrailerUrl.includes("youtube.com")) {
     console.log("▶️ Playing current trailer via next-button");
+    window.autoTrailerMode = false; // 🚫 Do NOT start loop yet
     playTrailer(currentTrailerUrl);
   } else {
     console.warn("🔁 No trailer for current title — fetching next...");
-    window.autoTrailerMode = true; // only trigger autoplay if no trailer available
+    window.autoTrailerMode = true; // ✅ allow it to loop once fetched
     findTrailerAndPlay();
   }
 };
@@ -986,7 +987,18 @@ document.getElementById("movie-poster").onclick = () => {
     fetchTimer = setTimeout(startAutoFetch, 60000);   // 🕑 start new loop
   });
 };
-
+function toggleMute() {
+  if (!trailerPlayer) return;
+  const muted = trailerPlayer.isMuted();
+  if (muted) {
+    trailerPlayer.unMute();
+    console.log("🔊 Unmuted");
+  } else {
+    trailerPlayer.mute();
+    console.log("🔇 Muted");
+  }
+}
+window.toggleMute = toggleMute;
 function startAutoFetch() {
   if (window.autoTrailerMode) {
     console.log("⏹️ Auto trailer mode active — not starting auto fetch loop.");
