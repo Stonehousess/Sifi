@@ -747,8 +747,8 @@ async function findTrailerAndPlay() {
     console.warn("🚦 Trailer advance already in progress — skipping...");
     return;
   }
-  isTrailerAdvancing = true;
 
+  isTrailerAdvancing = true;
   window.autoTrailerMode = true;
 
   if (fetchTimer) {
@@ -762,46 +762,32 @@ async function findTrailerAndPlay() {
     return;
   }
 
-  // Removed the trailerLoopFirst check to always fetch a new trailer
-
   let found = false;
   let attempts = 0;
 
-  while (attempts < 10) {
-  const data = await getRandomTitle(true);
+  while (attempts < 7) {
+    const data = await getRandomTitle(true);
 
-if (
-  data &&
-  data.trailerUrl &&
-  data.trailerUrl.includes("youtube.com")
-) {
-  console.log("🎬 Found trailer — playing", data.trailerUrl);
-  applyFilmToUI(data);           // ✅ now safe to update the UI
-  found = true;
-  break;
-}
-  attempts++;
+    if (
+      data &&
+      data.trailerUrl &&
+      data.trailerUrl.includes("youtube.com")
+    ) {
+      console.log("🎬 Found trailer — playing", data.trailerUrl);
+      applyFilmToUI(data);
+      playTrailer(data.trailerUrl);
+      found = true;
+      break;
+    }
 
-  if (found && currentTrailerUrl && currentTrailerUrl.includes("youtube.com")) {
-    console.log("🎬 Found valid trailer:", currentTrailerUrl);
-    break;
+    attempts++;
+    console.warn(`🔁 Attempt ${attempts}: No trailer found — retrying...`);
   }
 
-  console.warn(`🔁 Attempt ${attempts}: No trailer found yet...`);
-}
-
-  if (
-  currentTrailerUrl &&
-  typeof currentTrailerUrl === "string" &&
-  currentTrailerUrl.includes("youtube.com")
-) {
-  console.log("🎬 Found trailer — playing");
-  console.log("🔁 Trailer loop continues...");
-  playTrailer(currentTrailerUrl);
-} else {
-  console.warn("⛔ No valid trailer URL found. Retrying...");
-  setTimeout(() => findTrailerAndPlay(), 500); // retry immediately
-}
+  if (!found) {
+    console.warn("⛔ No valid trailer found after 7 tries. Retrying in 3 seconds...");
+    setTimeout(() => findTrailerAndPlay(), 3000); // keep trying
+  }
 
   isTrailerAdvancing = false;
 }
