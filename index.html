@@ -601,34 +601,31 @@ function playTrailer(url) {
   }, 10000);
 
   // 🎯 Polling to catch unexpected endings
-  let pollTries = 0;
-  const maxPolls = 180;
+let pollTries = 0;
+const maxPolls = 180;
 
-  currentPollInterval = setInterval(() => {
-    if (!window.autoTrailerMode || !trailerPlayer) {
-      clearInterval(currentPollInterval);
-      return;
-    }
+currentPollInterval = setInterval(() => {
+  if (!window.autoTrailerMode || !trailerPlayer) {
+    clearInterval(currentPollInterval);
+    return;
+  }
 
-    const state = trailerPlayer.getPlayerState?.();
-    const duration = trailerPlayer.getDuration?.();
-    const currentTime = trailerPlayer.getCurrentTime?.();
+  const state = trailerPlayer.getPlayerState?.();
 
-    if (state === YT.PlayerState.ENDED || (!isNaN(duration) && duration - currentTime < 2)) {
-      console.warn("📽️ Poll: trailer ending — playing next...");
-      clearInterval(currentPollInterval);
-      clearTimeout(failSafeTimeout);
-      if (!isTrailerAdvancing) findTrailerAndPlay();
-    }
+  if (state === YT.PlayerState.ENDED) {
+    console.warn("📽️ Poll: trailer has ended — playing next...");
+    clearInterval(currentPollInterval); // ✅ correct now
+    clearTimeout(failSafeTimeout);
+    if (!isTrailerAdvancing) findTrailerAndPlay();
+  }
 
-    if (++pollTries > maxPolls) {
-      console.warn("⏳ Poll timeout — forcing next trailer.");
-      clearInterval(currentPollInterval);
-      clearTimeout(failSafeTimeout);
-      if (!isTrailerAdvancing) findTrailerAndPlay();
-    }
-  }, 1000);
-}
+  if (++pollTries > maxPolls) {
+    console.warn("⏳ Poll timeout — forcing next trailer.");
+    clearInterval(currentPollInterval);
+    clearTimeout(failSafeTimeout);
+    if (!isTrailerAdvancing) findTrailerAndPlay();
+  }
+}, 1000);
 
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
