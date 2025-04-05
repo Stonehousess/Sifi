@@ -468,23 +468,31 @@ function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.PLAYING) {
     trailerPaused = false;
     clearTimeout(failSafeTimeout);
+
+    // ✅ Cancel polling loop if active
+    if (typeof trailerPollInterval !== "undefined") {
+      clearInterval(trailerPollInterval);
+      trailerPollInterval = null;
+    }
+
     console.log("✅ Trailer is now playing");
   }
 
   if (event.data === YT.PlayerState.ENDED) {
-    clearTimeout(failSafeTimeout); // ✅ Extra layer 
+    clearTimeout(failSafeTimeout);
     trailerPlaying = false;
     trailerPaused = false;
     console.log("🔚 Trailer ended");
 
-    if (window.autoTrailerMode) {
-      setTimeout(() => {
-        console.log("🔁 Trailer ended — finding next...");
-        findTrailerAndPlay(); // ✅ no click simulation
-      }, 1000);
-    } else {
-      closeTrailer();
+    if (!window.autoTrailerMode) {
+      console.log("🔁 Enabling autoplay after first trailer ends");
+      window.autoTrailerMode = true;
     }
+
+    setTimeout(() => {
+      console.log("🔁 Trailer ended — finding next...");
+      findTrailerAndPlay();
+    }, 1000);
   }
 
   if (event.data === YT.PlayerState.PAUSED) {
@@ -508,6 +516,12 @@ function playTrailer(url) {
   const videoId = extractYouTubeId(url);
   if (!videoId) return;
 
+  // ✅ Kill background fetch loop if running
+  if (fetchTimer) {
+    clearTimeout(fetchTimer);
+    fetchTimer = null;
+  }
+
   const playerVideoUrl = trailerPlayer.getVideoUrl?.();
   const isSameVideo = playerVideoUrl?.includes(videoId);
 
@@ -515,6 +529,7 @@ function playTrailer(url) {
     console.log("⏭️ Same trailer already loaded — skip replay");
     return;
   }
+
 
   // ✅ Update global trailer references
   currentTrailerUrl = url;
@@ -556,7 +571,7 @@ function playTrailer(url) {
 }, 6000);
 
   let pollTries = 0;
-  const maxPolls = 30;
+  const maxPolls = 180;
   const trailerPollInterval = setInterval(() => {
     if (!window.autoTrailerMode || !trailerPlayer) {
       clearInterval(trailerPollInterval);
@@ -815,30 +830,30 @@ document.getElementById("genre-button").onclick = () => {
     fetchTimer = setTimeout(startAutoFetch, 60000); // ✅ Restart loop
   });
 };
-
 document.getElementById("next-button").onclick = () => {
-  if (fetchTimer) clearTimeout(fetchTimer);
+  if (fetchTimer) {
+    clearTimeout(fetchTimer);
+    fetchTimer = null;
+  }
 
-  window.autoTrailerMode = true;
   trailerLoopFirst = true;
+  window.autoTrailerMode = false; // ✅ play only one trailer first
 
-  // Stop current video
-  if (trailerPlayer && typeof trailerPlayer.stopVideo === "function") {
+  if (trailerPlayer?.stopVideo) {
     trailerPlayer.stopVideo();
   }
 
-  // Show overlay
   const overlay = document.getElementById("trailer-overlay");
   if (!overlay.classList.contains("active")) {
     overlay.classList.add("active");
   }
 
-  // ✅ NEW: Only fetch if trailer is missing
   if (currentTrailerUrl && currentTrailerUrl.includes("youtube.com")) {
     console.log("▶️ Playing current trailer via next-button");
     playTrailer(currentTrailerUrl);
   } else {
     console.warn("🔁 No trailer for current title — fetching next...");
+    window.autoTrailerMode = true; // only trigger autoplay if no trailer available
     findTrailerAndPlay();
   }
 };
@@ -969,17 +984,27 @@ function startAutoFetch() {
     return;
   }
 
-  if (fetchTimer) clearTimeout(fetchTimer);
+  if (fetchTimer) {
+    clearTimeout(fetchTimer);
+    fetchTimer = null;
+  }
 
   fetchWithCountdown(false).then(() => {
+    // ✅ Re-check in case autoplay mode was activated during the fetch
     if (!window.autoTrailerMode) {
       fetchTimer = setTimeout(startAutoFetch, 60000);
+    } else {
+      console.log("🛑 Skipped auto fetch loop restart — autoplay is now active.");
     }
   });
 }
-
 function fetchWithCountdown(requireTrailer = false) {
-  if (isFetching) return false; // ✅ Prevent overlap
+  if (window.autoTrailerMode) {
+    console.log("⏹️ Autoplay mode active — skipping fetchWithCountdown.");
+    return Promise.resolve(false);
+  }
+
+  if (isFetching) return false;
   isFetching = true;
   console.log("🎲 Fetching new title at", new Date().toLocaleTimeString());
 
