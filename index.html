@@ -874,15 +874,11 @@ trailerBtn.addEventListener("mouseup", () => clearTimeout(longPressTimer));
 trailerBtn.addEventListener("mouseleave", () => clearTimeout(longPressTimer));
 
 trailerBtn.addEventListener("click", () => {
-  if (!window.autoTrailerMode) {
-    if (currentTrailerUrl) {
-      playTrailer(currentTrailerUrl);
-    } else {
-      console.warn("No trailer for this title — entering autoplay to find one...");
-      window.autoTrailerMode = true;
-      trailerLoopFirst = true;
-      findTrailerAndPlay();
-    }
+  if (currentTrailerUrl && currentTrailerUrl.includes("youtube.com")) {
+    window.autoTrailerMode = false; // single play only
+    playTrailer(currentTrailerUrl);
+  } else {
+    console.warn("❌ No trailer available for this title.");
   }
 });
 function popoutTrailer() {
@@ -1057,13 +1053,9 @@ wrapper.addEventListener("click", (e) => {
 
 window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
-  if (window.autoTrailerMode) {
-  findTrailerAndPlay();
-} else {
-  startAutoFetch();
-}
 
-  // Initial visibility timers
+  startAutoFetch(); // ✅ keep this if you still want posters & info to rotate every 60s
+
   fadeTimer = setTimeout(() => {
     document.querySelector(".floating-buttons").classList.add("hidden");
   }, 5000);
