@@ -599,14 +599,19 @@ function playTrailer(url) {
       failSafeSkips = 0;
     }
   }, 10000);
+// Clean up previous poller
+if (currentPollInterval) {
+  clearInterval(currentPollInterval);
+  currentPollInterval = null;
+}
 
-  // 🎯 Polling to catch unexpected endings
 let pollTries = 0;
 const maxPolls = 180;
 
 currentPollInterval = setInterval(() => {
   if (!window.autoTrailerMode || !trailerPlayer) {
     clearInterval(currentPollInterval);
+    currentPollInterval = null;
     return;
   }
 
@@ -614,15 +619,21 @@ currentPollInterval = setInterval(() => {
 
   if (state === YT.PlayerState.ENDED) {
     console.warn("📽️ Poll: trailer has ended — playing next...");
-    clearInterval(currentPollInterval); // ✅ correct now
-    clearTimeout(failSafeTimeout);
+    clearInterval(currentPollInterval);
+    currentPollInterval = null;
+    if (failSafeTimeout) clearTimeout(failSafeTimeout);
+    failSafeTimeout = null;
+
     if (!isTrailerAdvancing) findTrailerAndPlay();
   }
 
   if (++pollTries > maxPolls) {
     console.warn("⏳ Poll timeout — forcing next trailer.");
     clearInterval(currentPollInterval);
-    clearTimeout(failSafeTimeout);
+    currentPollInterval = null;
+    if (failSafeTimeout) clearTimeout(failSafeTimeout);
+    failSafeTimeout = null;
+
     if (!isTrailerAdvancing) findTrailerAndPlay();
   }
 }, 1000);
