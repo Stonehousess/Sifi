@@ -1095,7 +1095,7 @@ function convertToCSV(dataArray) {
 }
 
 async function exportFirestoreAsCSV() {
-  const snapshot = await getDocs(collection(db, "saved")); // replace "saved" if needed
+  const snapshot = await getDocs(collection(db, "films")); // replace "saved" if needed
   const data = snapshot.docs.map(doc => ({
     id: doc.id,
     ...doc.data()
