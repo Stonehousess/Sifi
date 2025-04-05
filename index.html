@@ -647,16 +647,15 @@ function closeTrailer() {
   document.getElementById('trailer-overlay').classList.remove('active');
   failSafeSkips = 0;
 
-  // Always restart fetch timer after closing trailer manually
   if (fetchTimer) clearTimeout(fetchTimer);
 
-  // ✅ Set 20s wait before fetching next poster
+  // 🕑 Delay the next auto-fetch and ring for 20s
   fetchTimer = setTimeout(() => {
     startAutoFetch();
-    startFetchCountdown(60000); // 🎯 When real fetch loop starts, reset ring to 60s
+    startFetchCountdown(60000); // Restart 60s countdown
   }, 20000);
 
-  // ✅ Immediately show a countdown ring for the 20s delay
+  // 🎯 Show 20s ring immediately
   startFetchCountdown(20000);
 }
 
