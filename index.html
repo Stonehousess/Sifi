@@ -1142,6 +1142,16 @@ window.onload = () => {
       console.log("⏭️ Skipping to next trailer");
       document.getElementById("next-button")?.click();
     }
+      if (key === "f") {
+    const el = document.getElementById("trailer-overlay");
+    if (!document.fullscreenElement) {
+      el?.requestFullscreen().catch(err => {
+        console.warn("❌ Failed to enter fullscreen:", err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  }
   });
 
   // ✅ Restore focus when overlay clicked (helps re-enable key events)
