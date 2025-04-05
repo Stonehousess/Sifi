@@ -1057,7 +1057,7 @@ wrapper.addEventListener("click", (e) => {
 window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
 
-  startAutoFetch(); // ✅ keep this if you still want posters & info to rotate every 60s
+  startAutoFetch(); // keep poster loop if not autoplaying
 
   fadeTimer = setTimeout(() => {
     document.querySelector(".floating-buttons").classList.add("hidden");
@@ -1066,12 +1066,34 @@ window.onload = () => {
   panelFadeTimer = setTimeout(() => {
     document.getElementById("info-panel").classList.add("hidden");
   }, 10000);
+
+  // ✅ KEYBOARD SHORTCUTS
+  document.addEventListener("keydown", (e) => {
+    const key = e.key.toLowerCase();
+
+    if (key === "e") {
+      console.log("📤 Exporting to CSV");
+      exportFirestoreAsCSV?.();
+    }
+
+    if (key === "m") {
+      console.log("🔇 Toggling mute");
+      toggleMute?.();
+    }
+
+    if (key === "arrowright") {
+      console.log("⏭️ Skipping to next trailer");
+      document.getElementById("next-button")?.click();
+    }
+  });
+
+  // ✅ Restore focus when overlay clicked (helps re-enable key events)
+  document.getElementById("trailer-overlay")?.addEventListener("click", () => {
+    setTimeout(() => window.focus(), 500);
+  });
 };
-window.addEventListener("keydown", (e) => {
-  if (e.key.toLowerCase() === "e") {
-    exportFirestoreAsCSV();
-  }
-});
+
+// ✅ Expose methods globally if needed
 window.closeTrailer = closeTrailer;
 window.togglePanel = togglePanel;
 window.playTrailer = playTrailer;
