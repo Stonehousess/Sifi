@@ -759,6 +759,7 @@ async function findTrailerAndPlay() {
       console.log("🎬 Found trailer — playing", data.trailerUrl);
       applyFilmToUI(data);
       playTrailer(data.trailerUrl);
+      isTrailerAdvancing = false; // ✅ Reset after success!
       found = true;
       break;
     }
