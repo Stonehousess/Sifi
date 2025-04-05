@@ -510,11 +510,12 @@ function playTrailer(url) {
   const videoId = extractYouTubeId(url);
   if (!videoId || !trailerPlayer || !youtubeReady) return;
 
-  // ✅ Prevent replaying the same trailer
-  if (currentTrailerUrl === url && trailerPlaying) {
-    console.log("⏭️ Same trailer already playing — skip replay");
-    return;
-  }
+  const currentId = extractYouTubeId(currentTrailerUrl);
+
+if (videoId === currentId && trailerPlaying) {
+  console.log("⏭️ Same trailer already playing — skip replay");
+  return;
+}
 
   currentTrailerUrl = url; // ✅ Refresh the value to track curren
 
