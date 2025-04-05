@@ -1119,54 +1119,70 @@ wrapper.addEventListener("click", (e) => {
   document.getElementById("save-button").click(); // Now guarded
 });
 
-document.addEventListener("keydown", (e) => {
-  const key = e.key.toLowerCase();
+window.onload = () => {
+  overlayInfo = document.getElementById("overlay-info");
 
-  if (key === "e") {
-    console.log("📤 Exporting to CSV");
-    exportFirestoreAsCSV?.();
-  }
+  startFetchCountdown(60000); // ⏳ Show timer immediately
+  startAutoFetch();           // 🟢 Start regular loop
 
-  if (key === "m") {
-    console.log("🔇 Toggling mute");
-    toggleMute?.();
-  }
+  fadeTimer = setTimeout(() => {
+    document.querySelector(".floating-buttons").classList.add("hidden");
+  }, 5000);
 
-  if (key === "n") {
-    console.log("⏭️ [n] Key pressed — activating next trailer");
-    document.getElementById("next-button")?.click();
-  }
+  panelFadeTimer = setTimeout(() => {
+    document.getElementById("info-panel").classList.add("hidden");
+  }, 10000);
 
-  if (key === "arrowright") {
-    console.log("⏭️ Skipping to next trailer");
-    document.getElementById("next-button")?.click();
-  }
+  // ✅ KEYBOARD SHORTCUTS
+  document.addEventListener("keydown", (e) => {
+    const key = e.key.toLowerCase();
 
-  if (key === "f") {
-    const iframe = document.querySelector("#player iframe");
-    const wrapper = document.getElementById("player");
-
-    if (!document.fullscreenElement) {
-      (iframe?.requestFullscreen?.() || wrapper?.requestFullscreen?.()).catch(err => {
-        console.warn("❌ Failed to enter fullscreen:", err);
-      });
-    } else {
-      document.exitFullscreen?.();
+    if (key === "e") {
+      console.log("📤 Exporting to CSV");
+      exportFirestoreAsCSV?.();
     }
-  }
-}); // ✅ This is the key — closes the addEventListener
+
+    if (key === "m") {
+      console.log("🔇 Toggling mute");
+      toggleMute?.();
+    }
+
+    if (key === "n") {
+      console.log("⏭️ [n] Key pressed — activating next trailer");
+      document.getElementById("next-button")?.click();
+    }
+
+    if (key === "arrowright") {
+      console.log("⏭️ Skipping to next trailer");
+      document.getElementById("next-button")?.click();
+    }
+
+    if (key === "f") {
+      const iframe = document.querySelector("#player iframe");
+      const wrapper = document.getElementById("player");
+
+      if (!document.fullscreenElement) {
+        (iframe?.requestFullscreen?.() || wrapper?.requestFullscreen?.()).catch(err => {
+          console.warn("❌ Failed to enter fullscreen:", err);
+        });
+      } else {
+        document.exitFullscreen?.();
+      }
+    }
+  });
 
   // ✅ Restore focus when overlay clicked (helps re-enable key events)
   document.getElementById("trailer-overlay")?.addEventListener("click", () => {
     setTimeout(() => window.focus(), 300);
   });
+
   // ✅ Also restore focus when video iframe is clicked
   document.getElementById("player")?.addEventListener("click", () => {
-  setTimeout(() => window.focus(), 300);
- });
-};
+    setTimeout(() => window.focus(), 300);
+  });
+}; // ✅ CLOSES window.onload properly
 
-// ✅ Expose methods globally if needed
+// ✅ Expose methods globally (MUST be outside onload!)
 window.closeTrailer = closeTrailer;
 window.togglePanel = togglePanel;
 window.playTrailer = playTrailer;
