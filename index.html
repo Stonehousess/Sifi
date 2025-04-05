@@ -577,18 +577,7 @@ function playTrailer(url) {
     failSafeSkips = 0;
   }
 }, 10000); // ✅ make sure no comma sneaks in here
-  const state = trailerPlayer?.getPlayerState?.();
-  if (
-    state !== YT.PlayerState.PLAYING &&
-    state !== YT.PlayerState.ENDED &&
-    window.autoTrailerMode
-  ) {
-    console.warn("⛔ Trailer failed to play — skipping...");
-    findTrailerAndPlay();
-  } else {
-    console.log("✅ FailSafe check passed — trailer is playing or ended.");
-  }
-}, 6000);
+
 
   let pollTries = 0;
   const maxPolls = 180;
