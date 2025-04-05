@@ -430,6 +430,7 @@
   let lastTrailerId = null;
   let failSafeSkips = 0;
   let backupStateTimeout = null;
+  let currentPollInterval = null;
 
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
@@ -510,6 +511,8 @@ function extractYouTubeId(url) {
   } catch {
     return null;
   }
+
+
 function playTrailer(url) {
   if (!url || !trailerPlayer || !youtubeReady) return;
 
@@ -538,7 +541,7 @@ function playTrailer(url) {
   if (fetchTimer) clearTimeout(fetchTimer);
   if (fadeTimer) clearTimeout(fadeTimer);
   if (overlayFadeTimer) clearTimeout(overlayFadeTimer);
-  if (currentPollInterval) clearInterval(currentPollInterval); // ✅ Stop previous poll
+  if (currentPollInterval) clearInterval(currentPollInterval);
 
   const overlay = document.getElementById('trailer-overlay');
   if (!overlay.classList.contains('active')) {
@@ -556,7 +559,7 @@ function playTrailer(url) {
     overlayInfo.style.opacity = "0";
   }, 3000);
 
-  // 🧯 Backup check in case state change doesn't fire
+  // 🧯 Backup: in case state never changes
   setTimeout(() => {
     const state = trailerPlayer?.getPlayerState?.();
     if (
@@ -570,7 +573,7 @@ function playTrailer(url) {
     }
   }, 15000);
 
-  // ⏱️ FailSafe timeout
+  // ⏱️ FailSafe
   failSafeTimeout = setTimeout(() => {
     const state = trailerPlayer?.getPlayerState?.();
     if (
@@ -597,9 +600,10 @@ function playTrailer(url) {
     }
   }, 10000);
 
-  // 🔁 Poll to detect trailer end
+  // 🎯 Polling to catch unexpected endings
   let pollTries = 0;
   const maxPolls = 180;
+
   currentPollInterval = setInterval(() => {
     if (!window.autoTrailerMode || !trailerPlayer) {
       clearInterval(currentPollInterval);
@@ -625,6 +629,7 @@ function playTrailer(url) {
     }
   }, 1000);
 }
+
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
   window.autoTrailerMode = false;
