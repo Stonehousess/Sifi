@@ -508,16 +508,16 @@ function playTrailer(url) {
   }
 
   const videoId = extractYouTubeId(url);
-  if (!videoId || !trailerPlayer || !youtubeReady) return;
+if (!videoId || !trailerPlayer || !youtubeReady) return;
 
-  const currentId = extractYouTubeId(currentTrailerUrl);
+currentTrailerUrl = url; // ✅ Move this up BEFORE the comparison
+
+const currentId = extractYouTubeId(currentTrailerUrl);
 
 if (videoId === currentId && trailerPlaying) {
   console.log("⏭️ Same trailer already playing — skip replay");
   return;
 }
-
-  currentTrailerUrl = url; // ✅ Refresh the value to track curren
 
   const overlay = document.getElementById('trailer-overlay');
 
