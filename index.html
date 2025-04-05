@@ -574,9 +574,9 @@ function playTrailer(url) {
     }
   } else {
     console.log("✅ FailSafe check passed — trailer is playing or ended.");
-    failSafeSkips = 0; // ✅ reset counter on success
+    failSafeSkips = 0;
   }
-}, 10000); // ⏳ give trailer time to buffer
+}, 10000); // ✅ make sure no comma sneaks in here
   const state = trailerPlayer?.getPlayerState?.();
   if (
     state !== YT.PlayerState.PLAYING &&
