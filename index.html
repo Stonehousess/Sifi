@@ -330,11 +330,15 @@
   opacity: 0.6;
 }
 #save-button-wrapper {
+  position: relative;       /* ✅ anchor for absolutely positioned SVG */
+  width: 80px;              /* or whatever size you're using */
+  height: 80px;
   transition: transform 0.2s ease;
+  transform-origin: center center;
 }
 
 #save-button-wrapper:hover {
-  transform: scale(1.03);
+  transform: scale(1.03);   /* ✅ will now scale both */
 }
 #save-button {
   width: 100%;
