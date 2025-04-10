@@ -532,9 +532,7 @@ function playTrailer(url) {
   const isSameVideo = playerVideoUrl?.includes(videoId);
 
   if (isSameVideo) {
-  console.log("🔁 Forcing replay of same trailer");
-  trailerPlayer.seekTo(0);
-  trailerPlayer.playVideo();
+  console.log("⏭️ Same trailer already loaded — skip replay");
   return;
 }
 
