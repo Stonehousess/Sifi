@@ -27,24 +27,23 @@
   #poster-wrapper {
   position: relative;
   width: 100vw;
+  height: 100vh;                  /* 👈 this is key */
   background-color: black;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;           /* 👈 center poster vertically */
   overflow: hidden;
   padding: 0;
   margin: 0;
-  height: auto;           /* 👈 allow height to shrink */
-  min-height: 100vh;      /* 👈 only force full screen if needed */
 }
 
 #movie-poster {
-  width: auto;
-  height: 100vh;
-  max-width: 100vw;
+  width: 100vw;
+  height: auto;
+  max-height: 100vh;
+  object-fit: contain;
   display: block;
   margin: 0 auto;
-  object-fit: cover;
   border-left: 1px outset rgba(255, 0, 0, 0.6);
   border-right: 1px outset rgba(255, 0, 0, 0.6);
   animation: glowing-border 5s infinite ease-in-out;
