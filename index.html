@@ -47,7 +47,7 @@
   display: block;
   margin: 0 auto;
   user-select: none;
-  animation: glowing-sies 5s infinite ease-in-out;
+  animation: glowing-tides 5s infinite ease-in-out;
 }
 #movie-poster.loaded {
   opacity: 1;
@@ -177,6 +177,23 @@
     box-shadow:
       -10px 0 10px 0 red,
        10px 0 10px 0 red;
+  }
+}
+@keyframes glowing-tides {
+  0% {
+    box-shadow: -10px 0 10px red, 10px 0 10px red;
+  }
+  25% {
+    box-shadow: -12px 0 12px orange, 12px 0 12px orange;
+  }
+  50% {
+    box-shadow: -14px 0 14px yellow, 14px 0 14px yellow;
+  }
+  75% {
+    box-shadow: -12px 0 12px orange, 12px 0 12px orange;
+  }
+  100% {
+    box-shadow: -10px 0 10px red, 10px 0 10px red;
   }
 }
 @keyframes glowing-sies {
