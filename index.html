@@ -118,25 +118,25 @@
       100% { box-shadow: 0 0 10px 2px red; border-color: red; }
     }
 
-    #info-panel {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100vw;
-      height: 30px;
-      background: rgba(20, 20, 20, 0.9);
-      //margin-left: 1px;
-      //margin-right: 1px;
-      color: white;
-      padding: 10px 20px;
-      border-top-left-radius: 16px;
-      border-top-right-radius: 16px;
-      transition: all 0.4s ease-in-out; /* 👈 Add this */
-      z-index: 1500;
-      opacity: 0.5;
-      overflow: hidden;
-      cursor: pointer;
-    }
+  #info-panel {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 780px; /* match your poster max width */
+  height: 30px;
+  background: rgba(20, 20, 20, 0.9);
+  color: white;
+  padding: 10px 20px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  transition: all 0.4s ease-in-out;
+  z-index: 1500;
+  opacity: 0.5;
+  overflow: hidden;
+  cursor: pointer;
+}
 
     #info-panel.hidden {
       opacity: 0;
