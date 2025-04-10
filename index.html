@@ -45,9 +45,9 @@
   object-fit: contain;          /* contain image within box without cropping */
   display: block;
   margin: 0 auto;
-  //border-left: 1px outset rgba(255, 0, 0, 0.6);
-  //border-right: 1px outset rgba(255, 0, 0, 0.6);
-  //animation: glowing-border 5s infinite ease-in-out;
+  /*border-left: 1px outset rgba(255, 0, 0, 0.6);*/
+  /*border-right: 1px outset rgba(255, 0, 0, 0.6);*/
+  /*animation: glowing-border 5s infinite ease-in-out;*/
   background: #222;
   user-select: none;
 }
@@ -146,11 +146,12 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  max-width: 100%;
+  width: calc(100vw - 16px);  /* 👈 give room for shadow to show */
   margin: 0 auto;
+  padding: 0;
   background: none;
-  padding: 0;               /* ✅ No spacing between glow and poster */
   animation: glowing-sides 5s infinite ease-in-out;
+  z-index: 1;
 }
 
 @keyframes glowing-border {
