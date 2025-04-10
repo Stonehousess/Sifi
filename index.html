@@ -15,11 +15,11 @@
       height: 100vh;
     }
 
-    #movie-container {
+   #movie-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;  /* ⬅️ Anchor to top */
+  justify-content: flex-start;
   height: 100vh;
   overflow: hidden;
 }
@@ -38,9 +38,10 @@
 }
 
 #movie-poster {
-  width: 100%;
-  max-width: 780px;
-  height: auto;                  /* Always adjust based on width */
+  max-height: 100vh;        /* ⛔ Never taller than screen */
+  height: auto;
+  width: auto;
+  max-width: 100%;
   display: block;
   margin: 0 auto;
   border-left: 2px solid red;
@@ -50,6 +51,7 @@
   animation: glowing-sides 5s infinite ease-in-out;
   background: #222;
   user-select: none;
+  object-fit: contain;       /* Just in case */
 }
  .floating-buttons {
   position: absolute;
