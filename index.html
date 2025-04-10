@@ -31,26 +31,21 @@
   background-color: black;
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* top-anchored */
+  align-items: flex-start; /* anchor to top */
   overflow: hidden;
 }
 
 #movie-poster {
-  width: 100vw;            /* ✅ Fill full screen width */
-  height: auto;            /* ✅ Keep natural height */
-  max-height: 100vh;       /* ✅ Don't overflow vertically */
+  width: 100%;
+  max-width: 780px;          /* Match TMDB poster resolution */
+  height: auto;
   display: block;
   margin: 0 auto;
-  border-left: 2px solid red;   /* ✅ Keep only left/right borders */
-  border-right: 2px solid red;
-  border-top: none;             /* ✅ Remove top border */
-  border-bottom: none;          /* ✅ Remove bottom border */
-  object-fit: contain;
+  border: 2px solid red;     /* Full border around actual image */
   animation: glowing-border 5s infinite ease-in-out;
   background: #222;
   user-select: none;
 }
-
  .floating-buttons {
   position: absolute;
   bottom: 32px;
