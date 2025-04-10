@@ -150,6 +150,8 @@
   margin: 0 auto;
   background: none;
   padding: 0;               /* ✅ No spacing between glow and poster */
+  --beam-color: rgba(255, 0, 0, 0.5); /* default fallback */
+  animation: beam-color-cycle 5s infinite ease-in-out;
 }
 
 #poster-border::before,
@@ -166,11 +168,11 @@
 }
 
 #poster-border::before {
-  left: -16px;  /* Offset it completely outside the poster */
+  left: -16px;
   background: linear-gradient(
     to left,
-    rgba(255, 0, 0, 0.5),   /* at poster edge */
-    rgba(255, 0, 0, 0)      /* fades out */
+    var(--beam-color, rgba(255, 0, 0, 0.5)),
+    rgba(255, 0, 0, 0)
   );
 }
 
@@ -178,7 +180,7 @@
   right: -16px;
   background: linear-gradient(
     to right,
-    rgba(255, 0, 0, 0.5),
+    var(--beam-color, rgba(255, 0, 0, 0.5)),
     rgba(255, 0, 0, 0)
   );
 }
@@ -222,7 +224,13 @@
     background-color: rgba(255, 0, 0, 0.5);   /* red */
   }
 }
-
+@keyframes beam-color-cycle {
+  0%   { --beam-color: rgba(255, 0, 0, 0.5); }     /* Red */
+  25%  { --beam-color: rgba(255, 165, 0, 0.5); }   /* Orange */
+  50%  { --beam-color: rgba(255, 255, 0, 0.5); }   /* Yellow */
+  75%  { --beam-color: rgba(255, 165, 0, 0.5); }
+  100% { --beam-color: rgba(255, 0, 0, 0.5); }
+}
   #info-panel {
   position: absolute;
   bottom: 0;
