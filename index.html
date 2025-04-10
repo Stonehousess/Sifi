@@ -143,13 +143,13 @@
 }
 #poster-border {
   position: relative;
-  display: flex;              /* changed from inline-block */
+  display: flex;
   justify-content: center;
   align-items: flex-start;
   max-width: 100%;
-  padding: 0;             /* for glow room on left/right only */
   margin: 0 auto;
-  background: none;           /* make sure no background shows */
+  background: none;
+  padding: 0;               /* ✅ No spacing between glow and poster */
 }
 
 #poster-border::before,
@@ -157,22 +157,36 @@
   content: "";
   position: absolute;
   top: 0;
-  width: 2px;
+  width: 8px;                         /* wider for fade space */
   height: 100%;
-  z-index: 0;                     /* Ensure it stays behind the image */
-  background: red;
-  animation: side-glow 5s infinite ease-in-out;
+  background: radial-gradient(
+    circle at center left,
+    rgba(255, 0, 0, 0.6) 0%,
+    rgba(255, 0, 0, 0.3) 40%,
+    rgba(255, 0, 0, 0) 100%
+  );
+  z-index: 0;
   pointer-events: none;
 }
 
 #poster-border::before {
-  left: 0;
-  transform: translateX(-6px);    /* Move glow outside the left edge */
+  left: -8px;                         /* snug against left edge */
+  transform: none;
+  background: linear-gradient(
+    to left,
+    rgba(255, 0, 0, 0.5),
+    rgba(255, 0, 0, 0)
+  );
 }
 
 #poster-border::after {
-  right: 0;
-  transform: translateX(6px);     /* Move glow outside the right edge */
+  right: -8px;                        /* snug against right edge */
+  transform: none;
+  background: linear-gradient(
+    to right,
+    rgba(255, 0, 0, 0.5),
+    rgba(255, 0, 0, 0)
+  );
 }
 
 @keyframes side-glow {
