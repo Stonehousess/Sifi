@@ -31,12 +31,13 @@
   background-color: black;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: flex-start; /* Anchors poster to the top */
   overflow: hidden;
 }
 
 #movie-poster {
-  width: 100vw;
+  width: 100%;
+  max-width: 780px;        /* Poster’s natural max width from TMDB */
   height: auto;
   max-height: 100vh;
   object-fit: contain;
