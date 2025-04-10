@@ -157,21 +157,15 @@
   content: "";
   position: absolute;
   top: 0;
-  width: 8px;                         /* wider for fade space */
+  width: 8px;
   height: 100%;
-  background: radial-gradient(
-    circle at center left,
-    rgba(255, 0, 0, 0.6) 0%,
-    rgba(255, 0, 0, 0.3) 40%,
-    rgba(255, 0, 0, 0) 100%
-  );
   z-index: 0;
   pointer-events: none;
+  animation: glow-beam 5s infinite ease-in-out;
 }
 
 #poster-border::before {
-  left: -8px;                         /* snug against left edge */
-  transform: none;
+  left: -8px;
   background: linear-gradient(
     to left,
     rgba(255, 0, 0, 0.5),
@@ -180,8 +174,7 @@
 }
 
 #poster-border::after {
-  right: -8px;                        /* snug against right edge */
-  transform: none;
+  right: -8px;
   background: linear-gradient(
     to right,
     rgba(255, 0, 0, 0.5),
@@ -209,6 +202,23 @@
   100% {
     box-shadow: 0 0 10px red;
     background-color: red;
+  }
+}
+@keyframes glow-beam {
+  0% {
+    background-color: rgba(255, 0, 0, 0.5);   /* red */
+  }
+  25% {
+    background-color: rgba(255, 165, 0, 0.5); /* orange */
+  }
+  50% {
+    background-color: rgba(255, 255, 0, 0.5); /* yellow */
+  }
+  75% {
+    background-color: rgba(255, 165, 0, 0.5); /* orange */
+  }
+  100% {
+    background-color: rgba(255, 0, 0, 0.5);   /* red */
   }
 }
 
