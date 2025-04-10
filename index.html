@@ -39,17 +39,16 @@
 
 #movie-poster {
   width: 100%;
-  max-width: 780px;                /* Or larger if you want */
-  height: auto;
-  max-height: 100vh;               /* 🔒 Prevents overflow below screen */
+  max-width: 780px;
+  height: auto;                  /* Always adjust based on width */
   display: block;
   margin: 0 auto;
-  border-left: 2px solid red;      /* ✅ Only left + right borders */
+  border-left: 2px solid red;
   border-right: 2px solid red;
   border-top: none;
   border-bottom: none;
+  animation: glowing-sides 5s infinite ease-in-out;
   background: #222;
-  animation: glowing-sides 5s infinite ease-in-out; /* 👈 Custom animation */
   user-select: none;
 }
  .floating-buttons {
