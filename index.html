@@ -38,17 +38,21 @@
 }
 
 #movie-poster {
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+  display: block;
   max-height: 100vh;
+  max-width: 100%;
   height: auto;
   width: auto;
-  max-width: 100%;
-  display: block;
   margin: 0 auto;
-  object-fit: contain;
-  background: #222;
   user-select: none;
-  border: none;              /* remove old red border */
-  animation: none;           /* remove animation */
+  background: none;
+  border: none;
+  animation: none;
+}
+#movie-poster.loaded {
+  opacity: 1;
 }
  .floating-buttons {
   position: absolute;
@@ -1303,6 +1307,17 @@ window.failSafeTimeout = null;
   
   console.log("✅ YouTube Player ready");
 };
+</script>
+<script>
+  const poster = document.getElementById('movie-poster');
+  if (poster.complete) {
+    // In case the image is already cached
+    poster.classList.add('loaded');
+  } else {
+    poster.addEventListener('load', () => {
+      poster.classList.add('loaded');
+    });
+  }
 </script>
 </body>
 </html>
