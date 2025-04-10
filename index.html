@@ -31,19 +31,25 @@
   background-color: black;
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* anchor to top */
+  align-items: flex-start;   /* Top aligned */
   overflow: hidden;
+  padding: 0;
+  margin: 0;
 }
 
 #movie-poster {
   width: 100%;
-  max-width: 780px;          /* Match TMDB poster resolution */
+  max-width: 780px;                /* Or larger if you want */
   height: auto;
+  max-height: 100vh;               /* 🔒 Prevents overflow below screen */
   display: block;
   margin: 0 auto;
-  border: 2px solid red;     /* Full border around actual image */
-  animation: glowing-border 5s infinite ease-in-out;
+  border-left: 2px solid red;      /* ✅ Only left + right borders */
+  border-right: 2px solid red;
+  border-top: none;
+  border-bottom: none;
   background: #222;
+  animation: glowing-sides 5s infinite ease-in-out; /* 👈 Custom animation */
   user-select: none;
 }
  .floating-buttons {
@@ -111,13 +117,28 @@
       display: none;
     }
 
-    @keyframes glowing-border {
-      0% { box-shadow: 0 0 10px 2px red; border-color: red; }
-      25% { box-shadow: 0 0 20px 4px orange; border-color: orange; }
-      50% { box-shadow: 0 0 25px 6px yellow; border-color: yellow; }
-      75% { box-shadow: 0 0 20px 4px orange; border-color: orange; }
-      100% { box-shadow: 0 0 10px 2px red; border-color: red; }
-    }
+    @keyframes glowing-sides {
+  0% {
+    box-shadow: -5px 0 10px red, 5px 0 10px red;
+    border-color: red;
+  }
+  25% {
+    box-shadow: -8px 0 14px orange, 8px 0 14px orange;
+    border-color: orange;
+  }
+  50% {
+    box-shadow: -10px 0 18px yellow, 10px 0 18px yellow;
+    border-color: yellow;
+  }
+  75% {
+    box-shadow: -8px 0 14px orange, 8px 0 14px orange;
+    border-color: orange;
+  }
+  100% {
+    box-shadow: -5px 0 10px red, 5px 0 10px red;
+    border-color: red;
+  }
+}
 
   #info-panel {
   position: absolute;
