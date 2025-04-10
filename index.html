@@ -47,7 +47,7 @@
   display: block;
   margin: 0 auto;
   user-select: none;
-  animation: glowing-sides 5s infinite ease-in-out;
+  animation: glowing-slides 5s infinite ease-in-out;
 }
 #movie-poster.loaded {
   opacity: 1;
@@ -63,6 +63,7 @@
   background: none;
   animation: none;
   z-index: 1;
+  overflow: visible;
 }
  .floating-buttons {
   position: absolute;
@@ -151,7 +152,33 @@
     border-color: red;
   }
 }
-
+@keyframes glowing-slides {
+  0% {
+    box-shadow:
+      -10px 0 10px 0 red,
+       10px 0 10px 0 red;
+  }
+  25% {
+    box-shadow:
+      -12px 0 12px 0 orange,
+       12px 0 12px 0 orange;
+  }
+  50% {
+    box-shadow:
+      -14px 0 14px 0 yellow,
+       14px 0 14px 0 yellow;
+  }
+  75% {
+    box-shadow:
+      -12px 0 12px 0 orange,
+       12px 0 12px 0 orange;
+  }
+  100% {
+    box-shadow:
+      -10px 0 10px 0 red,
+       10px 0 10px 0 red;
+  }
+}
 @keyframes glowing-border {
   0%   { box-shadow: 0 0 10px 2px red; border-color: red; }
   25%  { box-shadow: 0 0 20px 4px orange; border-color: orange; }
