@@ -54,18 +54,15 @@
 #movie-poster.loaded {
   opacity: 1;
 }
- .floating-buttons {
+.floating-buttons {
   position: absolute;
   bottom: 32px;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);   /* ✅ center horizontally */
   display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 0;
-  max-width: 100%;
-  box-sizing: border-box;
-  transition: opacity 1s ease;
+  justify-content: center;       /* ✅ center items together */
+  align-items: center;
+  gap: 24px;                     /* space between TMDB and save button */
   z-index: 1000;
 }
 .floating-buttons > button,
@@ -330,11 +327,11 @@
   opacity: 0.6;
 }
 #save-button-wrapper {
-  position: relative;       /* ✅ anchor for absolutely positioned SVG */
-  width: 80px;              /* or whatever size you're using */
-  height: 80px;
-  transition: transform 0.2s ease;
+  position: relative;       /* keep it relative inside flex row */
+  width: 100px;
+  height: 100px;
   transform-origin: center center;
+  transition: transform 0.2s ease;
 }
 
 #save-button-wrapper:hover {
@@ -342,10 +339,9 @@
 }
 #save-button {
   width: 100%;
-  height: auto;
-  display: block;
-  z-index: 1;
+  height: 100%;
   object-fit: contain;
+  display: block;
 }
 
 #save-timer-ring {
