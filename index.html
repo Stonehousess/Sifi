@@ -45,8 +45,8 @@
   object-fit: contain;          /* contain image within box without cropping */
   display: block;
   margin: 0 auto;
-  border-left: 1px outset rgba(255, 0, 0, 0.6);
-  border-right: 1px outset rgba(255, 0, 0, 0.6);
+  //border-left: 1px outset rgba(255, 0, 0, 0.6);
+  //border-right: 1px outset rgba(255, 0, 0, 0.6);
   animation: glowing-border 5s infinite ease-in-out;
   background: #222;
   user-select: none;
@@ -150,8 +150,7 @@
   margin: 0 auto;
   background: none;
   padding: 0;               /* ✅ No spacing between glow and poster */
-  --beam-color: rgba(255, 0, 0, 0.5); /* default fallback */
-  animation: beam-color-cycle 5s infinite ease-in-out;
+  animation: glowing-sides 5s infinite ease-in-out;
 }
 
 @keyframes glowing-border {
