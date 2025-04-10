@@ -39,17 +39,14 @@
 }
 
 #movie-poster {
-  width: 100vw;                 /* fill screen width */
-  height: auto;                 /* auto height to preserve aspect ratio */
-  max-height: 100vh;            /* don't go taller than the viewport */
-  object-fit: contain;          /* contain image within box without cropping */
+  width: 100%;
+  height: auto;
+  max-height: 100vh;
+  object-fit: contain;
   display: block;
   margin: 0 auto;
-  /*border-left: 1px outset rgba(255, 0, 0, 0.6);*/
-  /*border-right: 1px outset rgba(255, 0, 0, 0.6);*/
-  /*animation: glowing-border 5s infinite ease-in-out;*/
-  background: #222;
   user-select: none;
+  animation: glowing-sides 5s infinite ease-in-out;
 }
 #movie-poster.loaded {
   opacity: 1;
