@@ -142,7 +142,9 @@
   display: inline-block;
   max-height: 100vh;
   max-width: 100%;
+  padding: 0 6px;                /* Add spacing for glow to sit outside */
   margin: 0 auto;
+  z-index: 1;
 }
 
 #poster-border::before,
@@ -152,16 +154,20 @@
   top: 0;
   width: 2px;
   height: 100%;
+  z-index: 0;                     /* Ensure it stays behind the image */
   background: red;
   animation: side-glow 5s infinite ease-in-out;
+  pointer-events: none;
 }
 
 #poster-border::before {
   left: 0;
+  transform: translateX(-6px);    /* Move glow outside the left edge */
 }
 
 #poster-border::after {
   right: 0;
+  transform: translateX(6px);     /* Move glow outside the right edge */
 }
 
 @keyframes side-glow {
