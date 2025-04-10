@@ -16,13 +16,13 @@
     }
 
    #movie-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100vh;
-  overflow: hidden;
-}
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+   height: 100vh;
+   overflow: hidden;
+ }
 
   #poster-wrapper {
   position: relative;
@@ -39,17 +39,30 @@
 }
 
 #movie-poster {
-  width: 100%;
+  width: auto;                 /* ✅ Let width follow natural image ratio */
+  max-width: 100vw;            /* ✅ Don’t exceed screen width */
   height: auto;
   max-height: 100vh;
   object-fit: contain;
   display: block;
   margin: 0 auto;
   user-select: none;
-  animation: glowing-border 5s infinite ease-in-out;
+  animation: glowing-sides 5s infinite ease-in-out;
 }
 #movie-poster.loaded {
   opacity: 1;
+}
+#poster-border {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: calc(100vw - 16px);  /* 👈 give room for shadow to show */
+  margin: 0 auto;
+  padding: 0;
+  background: none;
+  animation: none;
+  z-index: 1;
 }
  .floating-buttons {
   position: absolute;
@@ -137,18 +150,6 @@
     box-shadow: -5px 0 10px red, 5px 0 10px red;
     border-color: red;
   }
-}
-#poster-border {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: calc(100vw - 16px);  /* 👈 give room for shadow to show */
-  margin: 0 auto;
-  padding: 0;
-  background: none;
-  //animation: glowing-sides 5s infinite ease-in-out;
-  z-index: 1;
 }
 
 @keyframes glowing-border {
