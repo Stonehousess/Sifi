@@ -45,8 +45,8 @@
   object-fit: contain;          /* contain image within box without cropping */
   display: block;
   margin: 0 auto;
-  border-left: 1px outset rgba(255, 0, 0, 0.6);
-  border-right: 1px outset rgba(255, 0, 0, 0.6);
+  //border-left: 1px outset rgba(255, 0, 0, 0.6);
+  //border-right: 1px outset rgba(255, 0, 0, 0.6);
   animation: glowing-border 5s infinite ease-in-out;
   background: #222;
   user-select: none;
@@ -154,11 +154,36 @@
 }
 
 @keyframes glowing-border {
-  0%   { box-shadow: 0 0 10px 2px red; border-color: red; }
-  25%  { box-shadow: 0 0 20px 4px orange; border-color: orange; }
-  50%  { box-shadow: 0 0 25px 6px yellow; border-color: yellow; }
-  75%  { box-shadow: 0 0 20px 4px orange; border-color: orange; }
-  100% { box-shadow: 0 0 10px 2px red; border-color: red; }
+  0% {
+    box-shadow:
+      -10px 0 10px 2px red,
+       10px 0 10px 2px red;
+    border-color: red;
+  }
+  25% {
+    box-shadow:
+      -12px 0 20px 4px orange,
+       12px 0 20px 4px orange;
+    border-color: orange;
+  }
+  50% {
+    box-shadow:
+      -14px 0 25px 6px yellow,
+       14px 0 25px 6px yellow;
+    border-color: yellow;
+  }
+  75% {
+    box-shadow:
+      -12px 0 20px 4px orange,
+       12px 0 20px 4px orange;
+    border-color: orange;
+  }
+  100% {
+    box-shadow:
+      -10px 0 10px 2px red,
+       10px 0 10px 2px red;
+    border-color: red;
+  }
 }
   #info-panel {
   position: absolute;
