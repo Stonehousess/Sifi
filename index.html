@@ -38,8 +38,8 @@
   display: block;
   margin: 0 auto;
   object-fit: cover;
-  border-left: 1px outset red;
-  border-right: 1px outset red;
+  //border-left: 1px outset red;
+  //border-right: 1px outset red;
   animation: glowing-border 5s infinite ease-in-out;
   background: #222;
   user-select: none;
@@ -131,7 +131,7 @@
       padding: 10px 20px;
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
-      transition: height 0.4s ease, opacity 1s ease;
+      transition: all 0.4s ease-in-out; /* 👈 Add this */
       z-index: 1500;
       opacity: 0.5;
       overflow: hidden;
@@ -173,6 +173,9 @@
       margin-top: 6px;
       font-size: 22px;
       line-height: 1.4;
+      max-width: 100%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     #info-genre {
@@ -529,9 +532,11 @@ function playTrailer(url) {
   const isSameVideo = playerVideoUrl?.includes(videoId);
 
   if (isSameVideo) {
-    console.log("⏭️ Same trailer already loaded — skip replay");
-    return;
-  }
+  console.log("🔁 Forcing replay of same trailer");
+  trailerPlayer.seekTo(0);
+  trailerPlayer.playVideo();
+  return;
+}
 
   // ✅ Update global trailer references
   currentTrailerUrl = url;
