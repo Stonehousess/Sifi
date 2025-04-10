@@ -329,7 +329,13 @@
   flex: 0 0 auto;
   opacity: 0.6;
 }
+#save-button-wrapper {
+  transition: transform 0.2s ease;
+}
 
+#save-button-wrapper:hover {
+  transform: scale(1.03);
+}
 #save-button {
   width: 100%;
   height: auto;
@@ -357,6 +363,12 @@
   stroke-dasharray: 113.1; /* 2π * 18 */
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 0.1s linear;
+}
+
+#flag {
+  font-size: 1.4em;
+  vertical-align: middle;
+  margin-left: 4px;
 }
 #trailer-container {
   position: relative;
