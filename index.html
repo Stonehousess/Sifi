@@ -122,11 +122,11 @@
       position: absolute;
       bottom: 0;
       left: 0;
-      width: 100%;
+      width: 100vw;
       height: 30px;
       background: rgba(20, 20, 20, 0.9);
-      margin-left: 1px;
-      margin-right: 1px;
+      //margin-left: 1px;
+      //margin-right: 1px;
       color: white;
       padding: 10px 20px;
       border-top-left-radius: 16px;
@@ -152,6 +152,8 @@
       pointer-events: auto;
       opacity: 0.1;
       transition: opacity 0.4s ease 0.3s;
+      max-width: 760px;
+      margin: 0 auto;
     }
 
     #info-panel.expanded #info-content {
