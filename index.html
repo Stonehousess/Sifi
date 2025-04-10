@@ -31,20 +31,21 @@
   background-color: black;
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Anchors poster to the top */
+  align-items: flex-start; /* top-anchored */
   overflow: hidden;
 }
 
 #movie-poster {
-  width: 100%;
-  max-width: 780px;        /* Poster’s natural max width from TMDB */
-  height: auto;
-  max-height: 100vh;
-  object-fit: contain;
+  width: 100vw;            /* ✅ Fill full screen width */
+  height: auto;            /* ✅ Keep natural height */
+  max-height: 100vh;       /* ✅ Don't overflow vertically */
   display: block;
   margin: 0 auto;
-  border-left: 1px outset red;
-  border-right: 1px outset red;
+  border-left: 2px solid red;   /* ✅ Keep only left/right borders */
+  border-right: 2px solid red;
+  border-top: none;             /* ✅ Remove top border */
+  border-bottom: none;          /* ✅ Remove bottom border */
+  object-fit: contain;
   animation: glowing-border 5s infinite ease-in-out;
   background: #222;
   user-select: none;
