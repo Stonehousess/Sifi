@@ -38,18 +38,17 @@
 }
 
 #movie-poster {
-  opacity: 0;
-  transition: opacity 0.4s ease-in-out;
-  display: block;
-  max-height: 100vh;
-  max-width: 100%;
-  height: auto;
-  width: auto;
-  margin: 0 auto;
-  user-select: none;
-  background: none;
+  display: block;             /* avoids inline spacing */
+  margin: 0;
+  padding: 0;
   border: none;
-  animation: none;
+  background: none;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100vh;
+  object-fit: contain;
+  line-height: 0;
 }
 #movie-poster.loaded {
   opacity: 1;
@@ -143,12 +142,14 @@
 }
 #poster-border {
   position: relative;
-  display: inline-block;
+  display: flex;              /* changed from inline-block */
+  justify-content: center;
+  align-items: flex-start;
   max-height: 100vh;
   max-width: 100%;
-  padding: 0 6px;                /* Add spacing for glow to sit outside */
+  padding: 0 6px;             /* for glow room on left/right only */
   margin: 0 auto;
-  z-index: 1;
+  background: none;           /* make sure no background shows */
 }
 
 #poster-border::before,
