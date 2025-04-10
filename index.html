@@ -155,36 +155,40 @@
 }
 
 #poster-border::before,
-#poster-border::after {
+#poster-border::after,
+#poster-border::after::after,
+#poster-border::before::before {
   content: "";
   position: absolute;
   top: 0;
-  width: 16px;                        /* Wider = longer fade */
+  width: 16px;
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  animation: glow-fade 5s infinite ease-in-out;
   filter: blur(2px);
+  transition: opacity 1.5s ease-in-out;
 }
 
 #poster-border::before {
   left: -16px;
-  background: linear-gradient(
-    to left,
-    var(--beam-color, rgba(255, 0, 0, 0.5)),
-    rgba(255, 0, 0, 0)
-  );
+  background: linear-gradient(to left, rgba(255, 0, 0, 0.6), rgba(255, 0, 0, 0));
+  animation: fadeBeam1 6s infinite ease-in-out;
 }
 
 #poster-border::after {
   right: -16px;
-  background: linear-gradient(
-    to right,
-    var(--beam-color, rgba(255, 0, 0, 0.5)),
-    rgba(255, 0, 0, 0)
-  );
+  background: linear-gradient(to right, rgba(255, 165, 0, 0.6), rgba(255, 165, 0, 0));
+  animation: fadeBeam2 6s infinite ease-in-out;
+}
+@keyframes fadeBeam1 {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
+@keyframes fadeBeam2 {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
 @keyframes side-glow {
   0% {
     box-shadow: 0 0 10px red;
