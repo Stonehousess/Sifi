@@ -39,17 +39,17 @@
 }
 
 #movie-poster {
-  display: block;             /* avoids inline spacing */
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
   width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100vh;
-  object-fit: contain;
-  line-height: 0;
+  height: 100vh;
+  max-width: 100vw;
+  display: block;
+  margin: 0 auto;
+  object-fit: cover;
+  border-left: 1px outset red;
+  border-right: 1px outset red;
+  animation: glowing-border 5s infinite ease-in-out;
+  background: #222;
+  user-select: none;
 }
 #movie-poster.loaded {
   opacity: 1;
@@ -234,6 +234,13 @@
   50%  { --beam-color: rgba(255, 255, 0, 0.5); }   /* Yellow */
   75%  { --beam-color: rgba(255, 165, 0, 0.5); }
   100% { --beam-color: rgba(255, 0, 0, 0.5); }
+}
+@keyframes glowing-border {
+  0%   { box-shadow: 0 0 10px 2px red; border-color: red; }
+  25%  { box-shadow: 0 0 20px 4px orange; border-color: orange; }
+  50%  { box-shadow: 0 0 25px 6px yellow; border-color: yellow; }
+  75%  { box-shadow: 0 0 20px 4px orange; border-color: orange; }
+  100% { box-shadow: 0 0 10px 2px red; border-color: red; }
 }
   #info-panel {
   position: absolute;
