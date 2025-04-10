@@ -157,25 +157,25 @@
   content: "";
   position: absolute;
   top: 0;
-  width: 10px;
+  width: 16px;                        /* Wider = longer fade */
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  animation: glow-beam 5s infinite ease-in-out;
-  filter: blur(3px);
+  animation: glow-fade 5s infinite ease-in-out;
+  filter: blur(2px);
 }
 
 #poster-border::before {
-  left: -8px;
+  left: -16px;  /* Offset it completely outside the poster */
   background: linear-gradient(
     to left,
-    rgba(255, 0, 0, 0.5),
-    rgba(255, 0, 0, 0)
+    rgba(255, 0, 0, 0.5),   /* at poster edge */
+    rgba(255, 0, 0, 0)      /* fades out */
   );
 }
 
 #poster-border::after {
-  right: -8px;
+  right: -16px;
   background: linear-gradient(
     to right,
     rgba(255, 0, 0, 0.5),
