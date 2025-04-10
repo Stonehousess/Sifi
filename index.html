@@ -27,14 +27,15 @@
   #poster-wrapper {
   position: relative;
   width: 100vw;
-  height: 100vh;
   background-color: black;
   display: flex;
   justify-content: center;
-  align-items: flex-start;   /* Top aligned */
+  align-items: flex-start;
   overflow: hidden;
   padding: 0;
   margin: 0;
+  height: auto;           /* 👈 allow height to shrink */
+  min-height: 100vh;      /* 👈 only force full screen if needed */
 }
 
 #movie-poster {
@@ -145,7 +146,6 @@
   display: flex;              /* changed from inline-block */
   justify-content: center;
   align-items: flex-start;
-  max-height: 100vh;
   max-width: 100%;
   padding: 0 6px;             /* for glow room on left/right only */
   margin: 0 auto;
@@ -204,7 +204,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  max-width: 100hw; /* match your poster max width */
+  max-width: 100vw; /* match your poster max width */
   height: 30px;
   background: rgba(20, 20, 20, 0.9);
   color: white;
