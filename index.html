@@ -892,6 +892,16 @@ function closeTrailer() {
   const selectedType = document.getElementById("type-select")?.value || "movie"; // fallback
   const selectedGenreName = document.getElementById("genre-select")?.value;
   const selectedRating = parseFloat(document.getElementById("rating-range")?.value || 0);
+  const yearFromInput = document.getElementById("year-from");
+  const yearToInput = document.getElementById("year-to");
+
+  const yearFrom = parseInt(yearFromInput.value);
+  const yearTo = parseInt(yearToInput.value);
+
+  const defaultYearFrom = parseInt(yearFromInput.dataset.default || "1900");
+  const defaultYearTo = parseInt(yearToInput.dataset.default || "2025");
+
+  const useYearFilter = yearFrom !== defaultYearFrom || yearTo !== defaultYearTo;
   const genreObj = genres.find(g => g.name === selectedGenreName);
   const selectedGenreId = selectedType === "tv" ? genreObj?.tv : genreObj?.movie;
 
@@ -910,11 +920,16 @@ function closeTrailer() {
   if (selectedRating > 0) {
     url += `&vote_average.gte=${selectedRating}`;
   }
-  if (selectedYear) {
-    url += isMovie
-      ? `&primary_release_year=${selectedYear}`
-      : `&first_air_date_year=${selectedYear}`;
+  if (useYearFilter) {
+  if (isMovie) {
+    url += `&primary_release_date.gte=${yearFrom}-01-01`;
+    url += `&primary_release_date.lte=${yearTo}-12-31`;
+  } else {
+    url += `&first_air_date.gte=${yearFrom}-01-01`;
+    url += `&first_air_date.lte=${yearTo}-12-31`;
   }
+}
+  console.log("🗓️ Year filtering?", useYearFilter, "| From:", yearFrom, "| To:", yearTo);
   if (selectedCountry) {
     url += `&with_origin_country=${selectedCountry}`;
   }
