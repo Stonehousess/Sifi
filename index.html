@@ -1037,6 +1037,7 @@ return {
     }
   }
 function applyFilmToUI(data) {
+  console.log("📦 Current history count:", fetchHistory.length);
   swipeState = "poster"; // 👈 Reset to poster state on new fetch
   // 🕘 Store history (unless we're recalling one)
   if (!window.applyingFromHistory) {
@@ -1569,7 +1570,8 @@ if (deltaY > 20) {
   // ✅ TMDB Button becomes "History Recall"
   document.getElementById("tmdb-button").onclick = (e) => {
   e.stopPropagation();
-
+  console.log("🖱️ TMDB button clicked");
+  console.log("📜 History count:", fetchHistory.length);
   if (fetchHistory.length === 0) return; // still safe guard
 
   historyIndex = (historyIndex + 1) % fetchHistory.length;
