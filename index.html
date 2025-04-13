@@ -646,6 +646,7 @@
   let fetchHistory = [];
   let historyIndex = -1;
   let swipeState = "poster"; // "poster", "info", or "filter"
+  let swipeCooldown = false;
 
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
@@ -1092,6 +1093,11 @@ async function findTrailerAndPlay() {
 window.findTrailerAndPlay = findTrailerAndPlay;
   // 🛠 Replace existing wheel listener
 document.addEventListener("wheel", (e) => {
+  if (swipeCooldown) return;
+
+  swipeCooldown = true;
+  setTimeout(() => swipeCooldown = false, 500); // 500ms lock
+
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
 
@@ -1424,26 +1430,31 @@ document.addEventListener("touchend", e => {
 }, { passive: true });
 
 function handleSwipeGesture() {
+  if (swipeCooldown) return;
+
+  swipeCooldown = true;
+  setTimeout(() => swipeCooldown = false, 500); // 500ms lock
+
   const deltaY = touchEndY - touchStartY;
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
 
   if (deltaY > 50) {
-    // 👇 Swipe down (finger moves down, scrolling up)
+    // 👇 Swipe down
     if (swipeState === "info") {
-      togglePanel(false); // Close info panel
+      togglePanel(false);
       swipeState = "poster";
     } else if (swipeState === "poster") {
-      filterPanel.classList.add("active"); // Open filter panel
+      filterPanel.classList.add("active");
       swipeState = "filter";
     }
   } else if (deltaY < -50) {
-    // 👆 Swipe up (finger moves up, scrolling down)
+    // 👆 Swipe up
     if (swipeState === "filter") {
-      filterPanel.classList.remove("active"); // Close filter panel
+      filterPanel.classList.remove("active");
       swipeState = "poster";
     } else if (swipeState === "poster") {
-      togglePanel(true); // Open info panel
+      togglePanel(true);
       swipeState = "info";
     }
   }
