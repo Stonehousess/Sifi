@@ -1492,25 +1492,34 @@ function handleSwipeGesture() {
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
 
-  if (deltaY > 20) {
-    // 👇 Swipe down
-    if (swipeState === "info") {
-      togglePanel(false);
-      swipeState = "poster";
-    } else if (swipeState === "poster") {
-      filterPanel.classList.add("active");
-      swipeState = "filter";
-    }
-  } else if (deltaY < -20) {
-    // 👆 Swipe up
-    if (swipeState === "filter") {
+ if (deltaY > 20) {
+  // 👇 Swipe down
+  if (swipeState === "info") {
+    togglePanel(false);
+    swipeState = "poster";
+  } else if (swipeState === "poster") {
+    filterPanel.classList.add("active");
+    swipeState = "filter";
+
+    // ⏳ Auto-close after 10s only if filter is opened
+    clearTimeout(window.filterAutoCloseTimer);
+    window.filterAutoCloseTimer = setTimeout(() => {
       filterPanel.classList.remove("active");
       swipeState = "poster";
-    } else if (swipeState === "poster") {
-      togglePanel(true);
-      swipeState = "info";
-    }
+    }, 10000);
   }
+
+} else if (deltaY < -20) {
+  // 👆 Swipe up
+  if (swipeState === "filter") {
+    filterPanel.classList.remove("active");
+    swipeState = "poster";
+    clearTimeout(window.filterAutoCloseTimer); // ✅ Stop auto-close if closing early
+  } else if (swipeState === "poster") {
+    togglePanel(true);
+    swipeState = "info";
+  }
+}
 }
 
   document.addEventListener("keydown", (e) => {
