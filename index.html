@@ -1140,25 +1140,36 @@ document.addEventListener("wheel", (e) => {
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
 
-  if (e.deltaY < -5) {
-    // ⬆️ Scroll up
-    if (swipeState === "info") {
-      togglePanel(false);
-      swipeState = "poster";
-    } else if (swipeState === "poster") {
-      filterPanel.classList.add("active");
-      swipeState = "filter";
-    }
-  } else if (e.deltaY > 5) {
-    // ⬇️ Scroll down
-    if (swipeState === "filter") {
-      filterPanel.classList.remove("active");
-      swipeState = "poster";
-    } else if (swipeState === "poster") {
-      togglePanel(true);
-      swipeState = "info";
-    }
+ if (e.deltaY < -5) {
+  // ⬆️ Scroll up
+  if (swipeState === "info") {
+    togglePanel(false);
+    swipeState = "poster";
+  } else if (swipeState === "poster") {
+    filterPanel.classList.add("active");
+    swipeState = "filter";
+
+    // ⏳ Auto-close after 10s
+    clearTimeout(window.filterAutoCloseTimer);
+    window.filterAutoCloseTimer = setTimeout(() => {
+      if (swipeState === "filter") {
+        filterPanel.classList.remove("active");
+        swipeState = "poster";
+      }
+    }, 10000);
   }
+
+} else if (e.deltaY > 5) {
+  // ⬇️ Scroll down
+  if (swipeState === "filter") {
+    filterPanel.classList.remove("active");
+    swipeState = "poster";
+    clearTimeout(window.filterAutoCloseTimer); // ✅ cancel timer if user closes it manually
+  } else if (swipeState === "poster") {
+    togglePanel(true);
+    swipeState = "info";
+  }
+}
 
   resetPanelFade();
 });
@@ -1189,6 +1200,8 @@ document.getElementById("save-button").onclick = () => {
 
 document.getElementById("genre-button").onclick = () => {
   currentGenre = genres[Math.floor(Math.random() * genres.length)];
+  const genreSelect = document.getElementById("genre-select");
+  genreSelect.value = currentGenre.name; // ✅ Sync dropdown 
   document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
 
   if (fetchTimer) clearTimeout(fetchTimer); // ✅ Stop current loop
@@ -1492,7 +1505,7 @@ function handleSwipeGesture() {
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
 
- if (deltaY > 20) {
+if (deltaY > 20) {
   // 👇 Swipe down
   if (swipeState === "info") {
     togglePanel(false);
@@ -1501,11 +1514,13 @@ function handleSwipeGesture() {
     filterPanel.classList.add("active");
     swipeState = "filter";
 
-    // ⏳ Auto-close after 10s only if filter is opened
+    // ⏳ Auto-close after 10s only if filter is still open
     clearTimeout(window.filterAutoCloseTimer);
     window.filterAutoCloseTimer = setTimeout(() => {
-      filterPanel.classList.remove("active");
-      swipeState = "poster";
+      if (swipeState === "filter") {
+        filterPanel.classList.remove("active");
+        swipeState = "poster";
+      }
     }, 10000);
   }
 
@@ -1519,7 +1534,6 @@ function handleSwipeGesture() {
     togglePanel(true);
     swipeState = "info";
   }
-}
 }
 
   document.addEventListener("keydown", (e) => {
