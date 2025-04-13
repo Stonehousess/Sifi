@@ -541,7 +541,12 @@
   <!-- ✅ Pull-down filter goes here, outside of movie-container -->
   <div id="filter-panel" class="hidden">
     <div id="filter-content">
-      <label>Year: <input type="range" id="year-range" min="1900" max="2025" value="2025"></label>
+      <label>Year From:
+      <input type="range" id="year-from" min="1900" max="2025" value="1900" data-default="1900">
+      </label>
+      <label>Year To:
+      <input type="range" id="year-to" min="1900" max="2025" value="2025" data-default="2025">
+      </label>
       <label>Country: 
         <select id="country-select">
           <option value="">Any</option>
@@ -1423,6 +1428,12 @@ window.onload = () => {
     genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
   // ✅ Set default genre to Animation
   genreSelect.value = "Animation";
+  // Set label on load
+  updateYearLabel();
+
+  // Update label when sliders move
+  document.getElementById("year-from").addEventListener("input", updateYearLabel);
+  document.getElementById("year-to").addEventListener("input", updateYearLabel);
   startFetchCountdown(60000);
   startAutoFetch();
 
@@ -1473,6 +1484,17 @@ function handleSwipeGesture() {
       togglePanel(true);
       swipeState = "info";
     }
+  }
+}
+function updateYearLabel() {
+  const yearLabel = document.getElementById("year-label");
+  const from = parseInt(document.getElementById("year-from").value);
+  const to = parseInt(document.getElementById("year-to").value);
+
+  if (from === 1900 && to === 2025) {
+    yearLabel.textContent = "All Years";
+  } else {
+    yearLabel.textContent = `Years: ${from}–${to}`;
   }
 }
   document.addEventListener("keydown", (e) => {
