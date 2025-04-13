@@ -1129,8 +1129,10 @@ async function findTrailerAndPlay() {
   setTimeout(() => findTrailerAndPlay(), 3000);
 }
 }
+// 🌐 Expose the trailer play function
 window.findTrailerAndPlay = findTrailerAndPlay;
-  // 🛠 Replace existing wheel listener
+
+// 🛠 Replace existing wheel listener
 document.addEventListener("wheel", (e) => {
   if (swipeCooldown) return;
 
@@ -1140,44 +1142,47 @@ document.addEventListener("wheel", (e) => {
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
 
- if (e.deltaY < -5) {
-  // ⬆️ Scroll up
-  if (swipeState === "info") {
-    togglePanel(false);
-    swipeState = "poster";
-  } else if (swipeState === "poster") {
-    filterPanel.classList.add("active");
-    swipeState = "filter";
+  if (e.deltaY < -5) {
+    // ⬆️ Scroll up
+    if (swipeState === "info") {
+      togglePanel(false);
+      swipeState = "poster";
+    } else if (swipeState === "poster") {
+      filterPanel.classList.add("active");
+      swipeState = "filter";
 
-    // ⏳ Auto-close after 10s
-    clearTimeout(window.filterAutoCloseTimer);
-    window.filterAutoCloseTimer = setTimeout(() => {
-      if (swipeState === "filter") {
-        filterPanel.classList.remove("active");
-        swipeState = "poster";
-      }
-    }, 10000);
+      // ⏳ Auto-close after 10s
+      clearTimeout(window.filterAutoCloseTimer);
+      window.filterAutoCloseTimer = setTimeout(() => {
+        if (swipeState === "filter") {
+          filterPanel.classList.remove("active");
+          swipeState = "poster";
+        }
+      }, 10000);
+    }
+
+  } else if (e.deltaY > 5) {
+    // ⬇️ Scroll down
+    if (swipeState === "filter") {
+      filterPanel.classList.remove("active");
+      swipeState = "poster";
+      clearTimeout(window.filterAutoCloseTimer); // ✅ cancel timer if user closes it manually
+    } else if (swipeState === "poster") {
+      togglePanel(true);
+      swipeState = "info";
+    }
   }
 
-} else if (e.deltaY > 5) {
-  // ⬇️ Scroll down
-  if (swipeState === "filter") {
-    filterPanel.classList.remove("active");
-    swipeState = "poster";
-    clearTimeout(window.filterAutoCloseTimer); // ✅ cancel timer if user closes it manually
-  } else if (swipeState === "poster") {
-    togglePanel(true);
-    swipeState = "info";
-  }
-}
-
-  resetPanelFade();
+  resetPanelFade(); // ✅ keeps UI responsive
 });
 
-  document.getElementById("tmdb-button").onclick = () => togglePanel(true);
+// 🎬 Open info panel from TMDB button
+document.getElementById("tmdb-button").onclick = () => togglePanel(true);
+
+// 💾 Save poster image (VCR effect)
 let saving = false;
 document.getElementById("save-button").onclick = () => {
-  if (saving) return;         // ✅ Guard to prevent double call
+  if (saving) return; // ✅ prevent double save
   saving = true;
 
   const posterUrl = document.getElementById('movie-poster').src;
@@ -1194,10 +1199,9 @@ document.getElementById("save-button").onclick = () => {
       URL.revokeObjectURL(url);
     })
     .finally(() => {
-      setTimeout(() => saving = false, 1000); // ✅ Unlock
+      setTimeout(() => saving = false, 1000); // ✅ allow next save
     });
 };
-
 document.getElementById("genre-button").onclick = () => {
   currentGenre = genres[Math.floor(Math.random() * genres.length)];
   const genreSelect = document.getElementById("genre-select");
