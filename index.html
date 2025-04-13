@@ -650,7 +650,7 @@
   let backupStateTimeout = null;
   let currentPollInterval = null;
   let fetchHistory = [];
-  let historyIndex = -1;
+  let historyIndex = 0;
   let swipeState = "poster"; // "poster", "info", or "filter"
   let swipeCooldown = false;
   window.tmdbClickBound = false;
@@ -1044,7 +1044,7 @@ function applyFilmToUI(data) {
   if (!window.applyingFromHistory) {
     fetchHistory.unshift(data);
     if (fetchHistory.length > 5) fetchHistory.pop(); // limit to 5
-    historyIndex = -1;
+    historyIndex = 0;
     document.getElementById("tmdb-button").disabled = fetchHistory.length === 0;
   }
   document.getElementById("movie-poster").src = data.posterPath;
