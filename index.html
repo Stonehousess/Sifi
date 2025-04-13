@@ -879,35 +879,53 @@ function closeTrailer() {
 }
 
   async function getRandomTitle(requireTrailer = false) {
-    isMovie = Math.random() < 0.5;
-    const genreId = isMovie ? currentGenre.movie : currentGenre.tv;
-    const type = isMovie ? "movie" : "tv";
-    const randomPage = Math.floor(Math.random() * 80) + 1;
-    const url = `https://api.themoviedb.org/3/discover/${type}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&sort_by=popularity.desc&with_genres=${genreId}&page=${randomPage}`;
+  // 🎛 Get filter values
+  const selectedYear = parseInt(document.getElementById("year-range")?.value || "2025");
+  const selectedCountry = document.getElementById("country-select")?.value;
+  const selectedType = document.getElementById("type-select")?.value || "movie"; // fallback
+  const selectedGenreName = document.getElementById("genre-select")?.value;
+  const selectedRating = parseFloat(document.getElementById("rating-range")?.value || 0);
+  const genreObj = genres.find(g => g.name === selectedGenreName);
+  const selectedGenreId = selectedType === "tv" ? genreObj?.tv : genreObj?.movie;
 
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      const results = data.results;
-      if (!results || results.length === 0) return false;
+  const type = selectedType === "all"
+    ? (Math.random() < 0.5 ? "movie" : "tv")
+    : selectedType;
 
-      const item = results[Math.floor(Math.random() * results.length)];
-      // 🔎 Firestore check before fetching
-const docRef = doc(db, "films", String(item.id));
-//const cachedDoc = await getDoc(docRef);
+  isMovie = type === "movie";
+  const randomPage = Math.floor(Math.random() * 80) + 1;
 
-//if (cachedDoc.exists()) {
-  //const data = cachedDoc.data();
-  //if (data?.title) {
-    //console.log("✅ Loaded from Firestore:", data.title);
-    //applyFilmToUI(data);
-    //return true;
-  //}
-//}
-if (!item.poster_path) {
-  console.warn("Missing poster — retrying...");
-  return getRandomTitle(requireTrailer); // Retry if no poster
-}
+  let url = `https://api.themoviedb.org/3/discover/${type}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&sort_by=popularity.desc&page=${randomPage}`;
+
+  if (selectedGenreName !== "all" && selectedGenreId) {
+    url += `&with_genres=${selectedGenreId}`;
+  }
+  if (selectedRating > 0) {
+    url += `&vote_average.gte=${selectedRating}`;
+  }
+  if (selectedYear) {
+    url += isMovie
+      ? `&primary_release_year=${selectedYear}`
+      : `&first_air_date_year=${selectedYear}`;
+  }
+  if (selectedCountry) {
+    url += `&with_origin_country=${selectedCountry}`;
+  }
+
+  console.log("🌐 Fetching with URL:", url);
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const results = data.results;
+    if (!results || results.length === 0) return false;
+
+    const item = results[Math.floor(Math.random() * results.length)];
+
+    if (!item.poster_path) {
+      console.warn("Missing poster — retrying...");
+      return getRandomTitle(requireTrailer); // Retry if no poster
+    }
 
       const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w780${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
       const title = item.title || item.name || "Untitled";
