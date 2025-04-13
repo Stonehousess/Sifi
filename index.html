@@ -561,6 +561,7 @@
       </label>
       <label>Genre: 
         <select id="genre-select"></select>
+        <option value="Animation" selected>Animation</option>
       </label>
       <label>Min Rating: 
         <input type="range" id="rating-range" min="0" max="10" step="0.1" value="0">
@@ -1420,7 +1421,8 @@ window.onload = () => {
   const genreSelect = document.getElementById("genre-select");
   genreSelect.innerHTML = `<option value="all">All</option>` + 
     genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
-
+  // ✅ Set default genre to Animation
+  genreSelect.value = "Animation";
   startFetchCountdown(60000);
   startAutoFetch();
 
