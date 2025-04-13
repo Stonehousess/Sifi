@@ -1386,7 +1386,39 @@ window.onload = () => {
   panelFadeTimer = setTimeout(() => {
     document.getElementById("info-panel").classList.add("hidden");
   }, 10000);
+  let touchStartY = 0;
+let touchEndY = 0;
 
+document.addEventListener("touchstart", e => {
+  touchStartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+document.addEventListener("touchend", e => {
+  touchEndY = e.changedTouches[0].screenY;
+  handleSwipeGesture();
+}, { passive: true });
+
+function handleSwipeGesture() {
+  const deltaY = touchEndY - touchStartY;
+  const infoPanel = document.getElementById("info-panel");
+  const filterPanel = document.getElementById("filter-panel");
+  const infoOpen = infoPanel.classList.contains("expanded");
+  const filterOpen = filterPanel.classList.contains("active");
+
+  if (deltaY > 50) {
+    // 👇 Swipe Down
+    if (!infoOpen && !filterOpen) {
+      filterPanel.classList.add("active");
+    }
+  } else if (deltaY < -50) {
+    // 👆 Swipe Up
+    if (filterOpen) {
+      filterPanel.classList.remove("active");
+    } else if (!infoOpen) {
+      togglePanel(true); // Expand info panel
+    }
+  }
+}
   document.addEventListener("keydown", (e) => {
     const key = e.key.toLowerCase();
     if (key === "e") exportFirestoreAsCSV?.();
