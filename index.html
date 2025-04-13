@@ -1176,8 +1176,6 @@ document.addEventListener("wheel", (e) => {
   resetPanelFade(); // ✅ keeps UI responsive
 });
 
-// 🎬 Open info panel from TMDB button
-document.getElementById("tmdb-button").onclick = () => togglePanel(true);
 
 // 💾 Save poster image (VCR effect)
 let saving = false;
@@ -1569,18 +1567,18 @@ if (deltaY > 20) {
 
   // ✅ TMDB Button becomes "History Recall"
   document.getElementById("tmdb-button").onclick = () => {
-    if (fetchHistory.length === 0) return;
+  if (fetchHistory.length === 0) return;
 
-    historyIndex++;
-    if (historyIndex >= fetchHistory.length) historyIndex = 0;
+  historyIndex = (historyIndex + 1) % fetchHistory.length;
 
-    const previous = fetchHistory[historyIndex];
-    if (previous) {
-      window.applyingFromHistory = true;
-      applyFilmToUI(previous);
-      window.applyingFromHistory = false;
-    }
-  };
+  const previous = fetchHistory[historyIndex];
+  if (previous) {
+    togglePanel(true); // ✅ Always open info panel
+    window.applyingFromHistory = true;
+    applyFilmToUI(previous);
+    window.applyingFromHistory = false;
+  }
+};
 }; // ✅ Fully closes window.onload
 
 
