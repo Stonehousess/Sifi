@@ -1087,11 +1087,27 @@ async function findTrailerAndPlay() {
 }
 window.findTrailerAndPlay = findTrailerAndPlay;
   document.addEventListener("wheel", e => {
-    const panel = document.getElementById('info-panel');
-    if (e.deltaY > 0) panel.classList.add("expanded");
-    else if (e.deltaY < 0) panel.classList.remove("expanded");
-    resetPanelFade();
-  });
+  const infoPanel = document.getElementById("info-panel");
+  const filterPanel = document.getElementById("filter-panel");
+  const infoOpen = infoPanel.classList.contains("expanded");
+  const filterOpen = filterPanel.classList.contains("active");
+
+  if (e.deltaY > 20) {
+    // 👇 Scroll down
+    if (!infoOpen && !filterOpen) {
+      filterPanel.classList.add("active");
+    }
+  } else if (e.deltaY < -20) {
+    // 👆 Scroll up
+    if (filterOpen) {
+      filterPanel.classList.remove("active");
+    } else if (!infoOpen) {
+      togglePanel(true);
+    }
+  }
+
+  resetPanelFade();
+});
 
   document.getElementById("tmdb-button").onclick = () => togglePanel(true);
 let saving = false;
