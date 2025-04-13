@@ -1573,7 +1573,6 @@ if (deltaY > 20) {
 
   const previous = fetchHistory[historyIndex];
   if (previous) {
-    togglePanel(true); // ✅ Always open info panel
     window.applyingFromHistory = true;
     applyFilmToUI(previous);
     window.applyingFromHistory = false;
