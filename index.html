@@ -921,7 +921,7 @@ function closeTrailer() {
     if (!results || results.length === 0) return false;
 
     const item = results[Math.floor(Math.random() * results.length)];
-
+    const docRef = doc(db, "films", String (item. id));
     if (!item.poster_path) {
       console.warn("Missing poster — retrying...");
       return getRandomTitle(requireTrailer); // Retry if no poster
