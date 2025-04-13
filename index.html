@@ -1370,12 +1370,13 @@ wrapper.addEventListener("click", (e) => {
 
 window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
-  // ✅ Add this here
+
   const genreSelect = document.getElementById("genre-select");
   genreSelect.innerHTML = `<option value="all">All</option>` + 
     genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
-  startFetchCountdown(60000); // ⏳ Show timer immediately
-  startAutoFetch();           // 🟢 Start regular loop
+
+  startFetchCountdown(60000);
+  startAutoFetch();
 
   fadeTimer = setTimeout(() => {
     document.querySelector(".floating-buttons").classList.add("hidden");
@@ -1385,34 +1386,14 @@ window.onload = () => {
     document.getElementById("info-panel").classList.add("hidden");
   }, 10000);
 
-  // ✅ KEYBOARD SHORTCUTS
   document.addEventListener("keydown", (e) => {
     const key = e.key.toLowerCase();
-
-    if (key === "e") {
-      console.log("📤 Exporting to CSV");
-      exportFirestoreAsCSV?.();
-    }
-
-    if (key === "m") {
-      console.log("🔇 Toggling mute");
-      toggleMute?.();
-    }
-
-    if (key === "n") {
-      console.log("⏭️ [n] Key pressed — activating next trailer");
-      document.getElementById("next-button")?.click();
-    }
-
-    if (key === "arrowright") {
-      console.log("⏭️ Skipping to next trailer");
-      document.getElementById("next-button")?.click();
-    }
-
+    if (key === "e") exportFirestoreAsCSV?.();
+    if (key === "m") toggleMute?.();
+    if (key === "n" || key === "arrowright") document.getElementById("next-button")?.click();
     if (key === "f") {
       const iframe = document.querySelector("#player iframe");
       const wrapper = document.getElementById("player");
-
       if (!document.fullscreenElement) {
         (iframe?.requestFullscreen?.() || wrapper?.requestFullscreen?.()).catch(err => {
           console.warn("❌ Failed to enter fullscreen:", err);
@@ -1423,14 +1404,15 @@ window.onload = () => {
     }
   });
 
-  // ✅ Restore focus when overlay clicked (helps re-enable key events)
   document.getElementById("trailer-overlay")?.addEventListener("click", () => {
     setTimeout(() => window.focus(), 300);
   });
 
-  // ✅ Also restore focus when video iframe is clicked
+  // ❗✅ THIS WAS MISSING: you need to close this arrow function:
   document.getElementById("player")?.addEventListener("click", () => {
     setTimeout(() => window.focus(), 300);
+  }); // ← THIS closing line was missing!
+
   // ✅ TMDB Button becomes "History Recall"
   document.getElementById("tmdb-button").onclick = () => {
     if (fetchHistory.length === 0) return;
@@ -1443,9 +1425,10 @@ window.onload = () => {
       window.applyingFromHistory = true;
       applyFilmToUI(previous);
       window.applyingFromHistory = false;
-   }
-  });
-}; // ✅ CLOSES window.onload properly
+    }
+  };
+}; // ✅ Fully closes window.onload
+
 
 // ✅ Expose methods globally (MUST be outside onload!)
 window.closeTrailer = closeTrailer;
