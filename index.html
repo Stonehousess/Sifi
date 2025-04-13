@@ -653,6 +653,7 @@
   let historyIndex = -1;
   let swipeState = "poster"; // "poster", "info", or "filter"
   let swipeCooldown = false;
+  window.tmdbClickBound = false;
 
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
@@ -1080,6 +1081,33 @@ function applyFilmToUI(data) {
   } else {
     trailerImg.src = "play-disabled.png";
     trailerImg.style.opacity = "0.5";
+  }
+// ✅ Setup TMDB button click handler if not yet bound
+  const tmdbBtn = document.getElementById("tmdb-button");
+  tmdbBtn.disabled = false;
+
+  if (!window.tmdbClickBound) {
+    tmdbBtn.onclick = (e) => {
+      e.stopPropagation();
+      console.log("🖱️ TMDB button clicked");
+      console.log("📜 History count:", fetchHistory.length);
+
+      if (fetchHistory.length === 0) return;
+
+      if (historyIndex === -1) {
+        historyIndex = 0;
+      } else {
+        historyIndex = (historyIndex + 1) % fetchHistory.length;
+      }
+
+      const previous = fetchHistory[historyIndex];
+      if (previous) {
+        window.applyingFromHistory = true;
+        applyFilmToUI(previous);
+        window.applyingFromHistory = false;
+      }
+    };
+    window.tmdbClickBound = true;
   }
 }
 async function findTrailerAndPlay() {
