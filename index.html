@@ -1212,7 +1212,7 @@ document.getElementById("genre-button").onclick = () => {
   fetchWithCountdown().then(() => {
     fetchTimer = setTimeout(startAutoFetch, 60000); // ✅ Restart loop
   });
-};
+});
 document.getElementById("next-button").onclick = () => {
   if (fetchTimer) clearTimeout(fetchTimer);
   trailerLoopFirst = true;
