@@ -1043,6 +1043,7 @@ function applyFilmToUI(data) {
     fetchHistory.unshift(data);
     if (fetchHistory.length > 5) fetchHistory.pop(); // limit to 5
     historyIndex = -1;
+    document.getElementById("tmdb-button").disabled = fetchHistory.length === 0;
   }
   document.getElementById("movie-poster").src = data.posterPath;
   document.getElementById("info-title").textContent = data.title + data.year;
@@ -1463,7 +1464,7 @@ function updateYearLabel() {
 }
 window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
-
+  document.getElementById("tmdb-button").disabled = true;
   const genreSelect = document.getElementById("genre-select");
   genreSelect.innerHTML = `<option value="all">All</option>` + 
     genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
@@ -1486,7 +1487,7 @@ window.onload = () => {
     document.getElementById("info-panel").classList.add("hidden");
   }, 10000);
   let touchStartY = 0;
-let touchEndY = 0;
+  let touchEndY = 0;
 
 document.addEventListener("touchstart", e => {
   touchStartY = e.changedTouches[0].screenY;
@@ -1566,8 +1567,10 @@ if (deltaY > 20) {
   }); // ← THIS closing line was missing!
 
   // ✅ TMDB Button becomes "History Recall"
-  document.getElementById("tmdb-button").onclick = () => {
-  if (fetchHistory.length === 0) return;
+  document.getElementById("tmdb-button").onclick = (e) => {
+  e.stopPropagation();
+
+  if (fetchHistory.length === 0) return; // still safe guard
 
   historyIndex = (historyIndex + 1) % fetchHistory.length;
 
