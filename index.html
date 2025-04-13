@@ -1007,12 +1007,12 @@ function applyFilmToUI(data) {
   document.getElementById("info-crew")?.remove();
   // Add extended info
   let extraHTML = `
-    <div id="info-crew" style="margin-top:10px; font-size:18px; color:#aaa;">
-    🎬 <strong>Director:</strong> ${data.director} <br>
-    🎭 <strong>Cast:</strong> ${data.castList} <br>
-    🏢 <strong>Studio:</strong> ${data.studio} <br>
-    💰 <strong>Budget:</strong> ${data.budget}
-    </div>`;
+  <div id="info-crew" style="margin-top:10px; font-size:18px; color:#aaa;">
+    🎬 <strong>Dir:</strong> ${data.director} &nbsp;|&nbsp; 
+    🏢 <strong>Studio:</strong> ${data.studio} &nbsp;|&nbsp;
+    💰 <strong>:</strong> ${data.budget} <br>
+    🎭 <strong>Cast:</strong> ${data.castList}
+  </div>`;
   document.getElementById("info-genre").insertAdjacentHTML('afterend', extraHTML);
   document.getElementById("genre-name").textContent = data.genre;
 
