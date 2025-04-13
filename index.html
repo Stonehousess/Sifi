@@ -1086,23 +1086,26 @@ async function findTrailerAndPlay() {
 }
 }
 window.findTrailerAndPlay = findTrailerAndPlay;
-  document.addEventListener("wheel", e => {
+  // 🛠 Replace existing wheel listener
+document.addEventListener("wheel", (e) => {
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
   const infoOpen = infoPanel.classList.contains("expanded");
   const filterOpen = filterPanel.classList.contains("active");
 
-  if (e.deltaY > 20) {
-    // 👇 Scroll down
-    if (!infoOpen && !filterOpen) {
-      filterPanel.classList.add("active");
-    }
-  } else if (e.deltaY < -20) {
-    // 👆 Scroll up
+  if (e.deltaY < -20) {
+    // ⬆️ Scroll up
     if (filterOpen) {
       filterPanel.classList.remove("active");
     } else if (!infoOpen) {
-      togglePanel(true);
+      togglePanel(true); // open info
+    }
+  } else if (e.deltaY > 20) {
+    // ⬇️ Scroll down
+    if (infoOpen) {
+      togglePanel(false); // close info
+    } else if (!filterOpen) {
+      filterPanel.classList.add("active");
     }
   }
 
@@ -1421,17 +1424,19 @@ function handleSwipeGesture() {
   const infoOpen = infoPanel.classList.contains("expanded");
   const filterOpen = filterPanel.classList.contains("active");
 
-  if (deltaY > 50) {
-    // 👇 Swipe Down
-    if (!infoOpen && !filterOpen) {
-      filterPanel.classList.add("active");
-    }
-  } else if (deltaY < -50) {
-    // 👆 Swipe Up
+  if (deltaY < -50) {
+    // ⬆️ Swipe up
     if (filterOpen) {
       filterPanel.classList.remove("active");
     } else if (!infoOpen) {
-      togglePanel(true); // Expand info panel
+      togglePanel(true); // open info panel
+    }
+  } else if (deltaY > 50) {
+    // ⬇️ Swipe down
+    if (infoOpen) {
+      togglePanel(false); // close info panel
+    } else if (!filterOpen) {
+      filterPanel.classList.add("active"); // open filter panel
     }
   }
 }
