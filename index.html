@@ -1419,7 +1419,17 @@ wrapper.addEventListener("click", (e) => {
   e.stopPropagation();
   document.getElementById("save-button").click(); // Now guarded
 });
+function updateYearLabel() {
+  const yearLabel = document.getElementById("year-label");
+  const from = parseInt(document.getElementById("year-from").value);
+  const to = parseInt(document.getElementById("year-to").value);
 
+  if (from === 1900 && to === 2025) {
+    yearLabel.textContent = "All Years";
+  } else {
+    yearLabel.textContent = `Years: ${from}–${to}`;
+  }
+}
 window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
 
@@ -1486,17 +1496,7 @@ function handleSwipeGesture() {
     }
   }
 }
-function updateYearLabel() {
-  const yearLabel = document.getElementById("year-label");
-  const from = parseInt(document.getElementById("year-from").value);
-  const to = parseInt(document.getElementById("year-to").value);
 
-  if (from === 1900 && to === 2025) {
-    yearLabel.textContent = "All Years";
-  } else {
-    yearLabel.textContent = `Years: ${from}–${to}`;
-  }
-}
   document.addEventListener("keydown", (e) => {
     const key = e.key.toLowerCase();
     if (key === "e") exportFirestoreAsCSV?.();
