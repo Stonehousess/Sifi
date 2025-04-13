@@ -1101,7 +1101,7 @@ document.addEventListener("wheel", (e) => {
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
 
-  if (e.deltaY < -20) {
+  if (e.deltaY < -5) {
     // ⬆️ Scroll up
     if (swipeState === "info") {
       togglePanel(false);
@@ -1110,7 +1110,7 @@ document.addEventListener("wheel", (e) => {
       filterPanel.classList.add("active");
       swipeState = "filter";
     }
-  } else if (e.deltaY > 20) {
+  } else if (e.deltaY > 5) {
     // ⬇️ Scroll down
     if (swipeState === "filter") {
       filterPanel.classList.remove("active");
@@ -1439,7 +1439,7 @@ function handleSwipeGesture() {
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
 
-  if (deltaY > 50) {
+  if (deltaY > 20) {
     // 👇 Swipe down
     if (swipeState === "info") {
       togglePanel(false);
@@ -1448,7 +1448,7 @@ function handleSwipeGesture() {
       filterPanel.classList.add("active");
       swipeState = "filter";
     }
-  } else if (deltaY < -50) {
+  } else if (deltaY < -20) {
     // 👆 Swipe up
     if (swipeState === "filter") {
       filterPanel.classList.remove("active");
