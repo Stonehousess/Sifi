@@ -456,9 +456,60 @@
   padding: 6px 10px;
   font-size: 14px;
 }
+@media (max-width: 780px) {
+  #movie-poster {
+    width: 98vw;
+    max-width: 98vw;
+  }
+
+  #poster-border {
+    width: 98vw;  /* ✅ Override the wider desktop layout */
+  }
+}
+#filter-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(20, 20, 20, 0.5);
+  color: white;
+  padding: 16px 20px;
+  z-index: 2000;
+  transform: translateY(-100%);
+  transition: transform 0.4s ease-in-out;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+#filter-panel.active {
+  transform: translateY(0);
+}
+#filter-content {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+#filter-content label {
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #ffcc00;
+}
+#filter-content input,
+#filter-content select {
+  margin-top: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+}
   </style>
 </head>
 <body>
+  <button id="filter-toggle" style="position:absolute; top:10px; right:10px; z-index:3000;">🔽 Filters</button>
   <div id="movie-container">
   <div id="poster-wrapper">
     <div id="poster-border">
@@ -488,7 +539,36 @@
     </div>
   </div>
   </div>
-
+  <!-- ✅ Pull-down filter goes here, outside of movie-container -->
+  <div id="filter-panel" class="hidden">
+    <div id="filter-content">
+      <label>Year: <input type="range" id="year-range" min="1900" max="2025" value="2025"></label>
+      <label>Country: 
+        <select id="country-select">
+          <option value="">Any</option>
+          <option value="US">🇺🇸 US</option>
+          <option value="GB">🇬🇧 UK</option>
+          <option value="FR">🇫🇷 France</option>
+          <option value="JP">🇯🇵 Japan</option>
+          <option value="KR">🇰🇷 Korea</option>
+        </select>
+      </label>
+      <label>Type: 
+        <select id="type-select">
+          <option value="all">All</option>
+          <option value="movie">Movie</option>
+          <option value="tv">TV</option>
+        </select>
+      </label>
+      <label>Genre: 
+        <select id="genre-select"></select>
+      </label>
+      <label>Min Rating: 
+        <input type="range" id="rating-range" min="0" max="10" step="0.1" value="0">
+      </label>
+    </div>
+  </div>
+</body>
   <div id="trailer-overlay">
   <div class="player-wrapper">
     <div id="player"></div>
@@ -563,6 +643,8 @@
   let failSafeSkips = 0;
   let backupStateTimeout = null;
   let currentPollInterval = null;
+  let fetchHistory = [];
+  let historyIndex = -1;
 
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
@@ -610,24 +692,26 @@ function onPlayerStateChange(event) {
   }
 
   if (event.data === YT.PlayerState.ENDED) {
-    clearTimeout(failSafeTimeout);
-    clearTimeout(backupStateTimeout); // ✅ NEW: cleanup backup timeout
-    trailerPlaying = false;
-    trailerPaused = false;
-    console.log("🔚 Trailer ended");
+  clearTimeout(failSafeTimeout);
+  clearTimeout(backupStateTimeout);
+  trailerPlaying = false;
+  trailerPaused = false;
+  console.log("🔚 Trailer ended");
 
-    if (!window.autoTrailerMode) {
-      console.log("🔁 Enabling autoplay after first trailer ends");
-      window.autoTrailerMode = true;
-    }
-
-    isTrailerAdvancing = false;
-
+  if (!window.autoTrailerMode) {
+    console.log("🎬 Single trailer mode — closing trailer and resetting timer");
     setTimeout(() => {
-      console.log("🔁 Trailer ended — finding next...");
-      findTrailerAndPlay();
+      closeTrailer(); // ✅ Close trailer overlay
+    }, 500); // Slight delay feels more natural
+  } else {
+    console.log("🔁 Autoplay mode — loading next trailer");
+    setTimeout(() => {
+      findTrailerAndPlay(); // ✅ Continue loop
     }, 1000);
   }
+
+  isTrailerAdvancing = false;
+}
 
   if (event.data === YT.PlayerState.PAUSED) {
     trailerPaused = true;
@@ -829,9 +913,13 @@ if (!item.poster_path) {
       const releaseDate = item.release_date || item.first_air_date || "";
       const year = releaseDate ? ` (${releaseDate.substring(0, 4)})` : "";
 
-      const detailUrl = `https://api.themoviedb.org/3/${type}/${item.id}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US`;
+      const detailUrl = `https://api.themoviedb.org/3/${type}/${item.id}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&append_to_response=credits`;
       const detailRes = await fetch(detailUrl);
       const detailData = await detailRes.json();
+      const director = detailData.credits?.crew?.find(c => c.job === "Director")?.name || "Unknown";
+      const castList = detailData.credits?.cast?.slice(0, 5).map(c => c.name).join(", ") || "Unknown";
+      const studio = detailData.production_companies?.[0]?.name || "Unknown";
+      const budget = isMovie && detailData.budget ? `$${(detailData.budget / 1_000_000).toFixed(1)}M` : "--";
       // 🔍 Fetch the trailer video from TMDB
 const videoRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=e8d804d1f104509d3c1c5b1166485ae6`);
 const videoData = await videoRes.json();
@@ -867,6 +955,10 @@ await setDoc(docRef, {
   genre: currentGenre.name,
   type,
   tmdbUrl: currentTMDBUrl,
+  director,
+  castList,
+  studio,
+  budget,
   timestamp: Date.now(),
   timestampReadable: new Date().toISOString(),
   cachedBy: "public"
@@ -881,6 +973,10 @@ return {
   runtime,
   episodeCount,
   originCountry,
+  director,
+  castList,
+  studio,
+  budget,
   metaText,
   trailerUrl: currentTrailerUrl,
   trailerKey: lastTrailerId,
@@ -897,10 +993,27 @@ return {
     }
   }
 function applyFilmToUI(data) {
+  // 🕘 Store history (unless we're recalling one)
+  if (!window.applyingFromHistory) {
+    fetchHistory.unshift(data);
+    if (fetchHistory.length > 5) fetchHistory.pop(); // limit to 5
+    historyIndex = -1;
+  }
   document.getElementById("movie-poster").src = data.posterPath;
   document.getElementById("info-title").textContent = data.title + data.year;
   document.getElementById("info-meta").innerHTML = data.metaText;
   document.getElementById("info-description").textContent = data.overview;
+  // ✅ Clean up old extra info (if any)
+  document.getElementById("info-crew")?.remove();
+  // Add extended info
+  let extraHTML = `
+    <div id="info-crew" style="margin-top:10px; font-size:18px; color:#aaa;">
+    🎬 <strong>Director:</strong> ${data.director} <br>
+    🎭 <strong>Cast:</strong> ${data.castList} <br>
+    🏢 <strong>Studio:</strong> ${data.studio} <br>
+    💰 <strong>Budget:</strong> ${data.budget}
+    </div>`;
+  document.getElementById("info-genre").insertAdjacentHTML('afterend', extraHTML);
   document.getElementById("genre-name").textContent = data.genre;
 
   document.getElementById("overlay-title").textContent = data.title + data.year;
@@ -1067,6 +1180,10 @@ function popoutTrailer() {
     console.warn("🎞️ No trailer URL to pop out.");
   }
 }
+document.getElementById("filter-toggle").onclick = () => {
+  const panel = document.getElementById("filter-panel");
+  panel.classList.toggle("active");
+};
 
 const buttons = document.querySelector(".floating-buttons");
 const infoPanel = document.getElementById("info-panel");
@@ -1253,7 +1370,10 @@ wrapper.addEventListener("click", (e) => {
 
 window.onload = () => {
   overlayInfo = document.getElementById("overlay-info");
-
+  // ✅ Add this here
+  const genreSelect = document.getElementById("genre-select");
+  genreSelect.innerHTML = `<option value="all">All</option>` + 
+    genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
   startFetchCountdown(60000); // ⏳ Show timer immediately
   startAutoFetch();           // 🟢 Start regular loop
 
@@ -1311,6 +1431,18 @@ window.onload = () => {
   // ✅ Also restore focus when video iframe is clicked
   document.getElementById("player")?.addEventListener("click", () => {
     setTimeout(() => window.focus(), 300);
+  // ✅ TMDB Button becomes "History Recall"
+  document.getElementById("tmdb-button").onclick = () => {
+    if (fetchHistory.length === 0) return;
+
+    historyIndex++;
+    if (historyIndex >= fetchHistory.length) historyIndex = 0;
+
+    const previous = fetchHistory[historyIndex];
+    if (previous) {
+      window.applyingFromHistory = true;
+      applyFilmToUI(previous);
+      window.applyingFromHistory = false;
   });
 }; // ✅ CLOSES window.onload properly
 
