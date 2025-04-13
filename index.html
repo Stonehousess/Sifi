@@ -645,6 +645,7 @@
   let currentPollInterval = null;
   let fetchHistory = [];
   let historyIndex = -1;
+  let swipeState = "poster"; // "poster", "info", or "filter"
 
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
@@ -655,9 +656,11 @@
     panel.classList.add('expanded');
     clearTimeout(panelTimer);
     panelTimer = setTimeout(() => panel.classList.remove('expanded'), 6000);
+    swipeState = "info"; // 👈 update
   } else {
     panel.classList.remove('expanded'); // ✅ collapse
     panel.classList.add('hidden');      // ✅ fade out if needed
+    swipeState = "poster"; // 👈 reset
   }
 
   resetPanelFade();
@@ -994,6 +997,7 @@ return {
     }
   }
 function applyFilmToUI(data) {
+  swipeState = "poster"; // 👈 Reset to poster state on new fetch
   // 🕘 Store history (unless we're recalling one)
   if (!window.applyingFromHistory) {
     fetchHistory.unshift(data);
@@ -1090,22 +1094,24 @@ window.findTrailerAndPlay = findTrailerAndPlay;
 document.addEventListener("wheel", (e) => {
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
-  const infoOpen = infoPanel.classList.contains("expanded");
-  const filterOpen = filterPanel.classList.contains("active");
 
-  if (e.deltaY < -20) {
-    // ⬆️ Scroll up
-    if (filterOpen) {
-      filterPanel.classList.remove("active");
-    } else if (!infoOpen) {
-      togglePanel(true); // open info
-    }
-  } else if (e.deltaY > 20) {
-    // ⬇️ Scroll down
-    if (infoOpen) {
-      togglePanel(false); // close info
-    } else if (!filterOpen) {
+  if (e.deltaY > 20) {
+    // 👇 Scroll down
+    if (swipeState === "info") {
+      togglePanel(false);
+      swipeState = "poster";
+    } else if (swipeState === "poster") {
       filterPanel.classList.add("active");
+      swipeState = "filter";
+    }
+  } else if (e.deltaY < -20) {
+    // 👆 Scroll up
+    if (swipeState === "filter") {
+      filterPanel.classList.remove("active");
+      swipeState = "poster";
+    } else if (swipeState === "poster") {
+      togglePanel(true);
+      swipeState = "info";
     }
   }
 
@@ -1421,22 +1427,24 @@ function handleSwipeGesture() {
   const deltaY = touchEndY - touchStartY;
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
-  const infoOpen = infoPanel.classList.contains("expanded");
-  const filterOpen = filterPanel.classList.contains("active");
 
-  if (deltaY < -50) {
-    // ⬆️ Swipe up
-    if (filterOpen) {
-      filterPanel.classList.remove("active");
-    } else if (!infoOpen) {
-      togglePanel(true); // open info panel
-    }
-  } else if (deltaY > 50) {
-    // ⬇️ Swipe down
-    if (infoOpen) {
+  if (deltaY > 50) {
+    // 👇 Swipe down (finger pulled down)
+    if (swipeState === "info") {
       togglePanel(false); // close info panel
-    } else if (!filterOpen) {
-      filterPanel.classList.add("active"); // open filter panel
+      swipeState = "poster";
+    } else if (swipeState === "poster") {
+      filterPanel.classList.add("active");
+      swipeState = "filter";
+    }
+  } else if (deltaY < -50) {
+    // 👆 Swipe up (finger pushed up)
+    if (swipeState === "filter") {
+      filterPanel.classList.remove("active");
+      swipeState = "poster";
+    } else if (swipeState === "poster") {
+      togglePanel(true); // open info panel
+      swipeState = "info";
     }
   }
 }
