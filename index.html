@@ -529,7 +529,7 @@
       <div id="info-panel" onclick="togglePanel()">
         <div id="info-content">
           <div id="info-title">Loading...</div>
-          <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins <span id="flag"></span></div>
+          <div id="info-meta">⭐️ -- • 🍿/📺 • -- mins <span id="flag"></span></div>
           <div id="info-description">Loading description...</div>
           <div id="info-genre">
             Genre: <span id="genre-name">Loading...</span>
@@ -997,7 +997,7 @@ if (trailer) {
       const episodeCount = detailData.number_of_episodes || "--";
       const originCountry = detailData.origin_country?.[0] || detailData.production_countries?.[0]?.iso_3166_1 || "";
       const metaText = isMovie
-        ? `⭐️ ${rating} • 🎬 • ${runtime} mins • ${getFlagEmoji(originCountry)}`
+        ? `⭐️ ${rating} • 🍿 • ${runtime} mins • ${getFlagEmoji(originCountry)}`
         : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ${runtime} mins • ${getFlagEmoji(originCountry)}`;
 const tmdbUrl = `https://www.themoviedb.org/${type}/${item.id}`; // ✅ Generate correct TMDB link
       
@@ -1072,8 +1072,8 @@ function applyFilmToUI(data) {
   // Add extended info
   let extraHTML = `
   <div id="info-crew" style="margin-top:10px; font-size:20px; color:#aaa;">
-    🎬 <strong>Dir:</strong> ${data.director} &nbsp;|&nbsp; 
-    🏢 <strong>Studio:</strong> ${data.studio} &nbsp;|&nbsp;
+    🎬 <strong>:</strong> ${data.director} &nbsp;|&nbsp; 
+    🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
     💰 <strong>:</strong> ${data.budget} <br>
     🎭 <strong>Cast:</strong> ${data.castList}
   </div>`;
