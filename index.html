@@ -999,7 +999,7 @@ if (trailer) {
       const metaText = isMovie
         ? `⭐️ ${rating} • 🎬 • ${runtime} mins • ${getFlagEmoji(originCountry)}`
         : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ${runtime} mins • ${getFlagEmoji(originCountry)}`;
-
+const tmdbUrl = `https://www.themoviedb.org/${type}/${item.id}`; // ✅ Generate correct TMDB link
       
 // ✅ Save to Firestore if successful
 await setDoc(docRef, {
