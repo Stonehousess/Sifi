@@ -905,33 +905,38 @@ function closeTrailer() {
   startFetchCountdown(20000);
 }
 
-  async function getRandomTitle(requireTrailer = false) {
+async function getRandomTitle(requireTrailer = false, overrideType = null, overrideGenreId = null) {
   // 🎛 Get filter values
-  const selectedYear = parseInt(document.getElementById("year-range")?.value || "2025");
-  const selectedCountry = document.getElementById("country-select")?.value;
-  const selectedType = document.getElementById("type-select")?.value || "movie"; // fallback
-  const selectedGenreName = document.getElementById("genre-select")?.value;
-  const selectedRating = parseFloat(document.getElementById("rating-range")?.value || 0);
-  const yearFromInput = document.getElementById("year-from");
-  const yearToInput = document.getElementById("year-to");
+const selectedGenreName = document.getElementById("genre-select")?.value;
+const selectedCountry = document.getElementById("country-select")?.value;
+const selectedType = document.getElementById("type-select")?.value || "movie";
+const selectedRating = parseFloat(document.getElementById("rating-range")?.value || 0);
 
-  const yearFrom = parseInt(yearFromInput.value);
-  const yearTo = parseInt(yearToInput.value);
+// 🎯 Determine type (movie, tv, or random if 'all')
+const type = selectedType === "all"
+  ? (Math.random() < 0.5 ? "movie" : "tv")
+  : selectedType;
 
-  const defaultYearFrom = parseInt(yearFromInput.dataset.default || "1900");
-  const defaultYearTo = parseInt(yearToInput.dataset.default || "2025");
+isMovie = type === "movie";
 
-  const useYearFilter = yearFrom !== defaultYearFrom || yearTo !== defaultYearTo;
-  const genreObj = genres.find(g => g.name === selectedGenreName);
-  const selectedGenreId = selectedType === "tv" ? genreObj?.tv : genreObj?.movie;
+// 🎞 Get correct genre ID based on type
+const genreObj = genres.find(g => g.name === selectedGenreName);
+const selectedGenreId = type === "tv" ? genreObj?.tv : genreObj?.movie;
 
-  const type = selectedType === "all"
-    ? (Math.random() < 0.5 ? "movie" : "tv")
-    : selectedType;
+// 📅 Year range filter
+const yearFromInput = document.getElementById("year-from");
+const yearToInput = document.getElementById("year-to");
 
-  isMovie = type === "movie";
-  const randomPage = Math.floor(Math.random() * 80) + 1;
+const yearFrom = parseInt(yearFromInput?.value || "1900");
+const yearTo = parseInt(yearToInput?.value || "2025");
 
+const defaultYearFrom = parseInt(yearFromInput?.dataset.default || "1900");
+const defaultYearTo = parseInt(yearToInput?.dataset.default || "2025");
+
+const useYearFilter = yearFrom !== defaultYearFrom || yearTo !== defaultYearTo;
+
+// 🔀 Random page
+const randomPage = Math.floor(Math.random() * 80) + 1;
   let url = `https://api.themoviedb.org/3/discover/${type}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&sort_by=popularity.desc&page=${randomPage}`;
 
   if (selectedGenreName !== "all" && selectedGenreId) {
@@ -1255,8 +1260,17 @@ document.getElementById("genre-button").onclick = () => {
   genreSelect.value = currentGenre.name; // ✅ Sync dropdown 
   document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
 
-  if (fetchTimer) clearTimeout(fetchTimer); // ✅ Stop current loop
-  fetchWithCountdown().then(() => {
+  // ✅ Get selected type from UI
+  const selectedType = document.getElementById("type-select").value;
+
+  // ✅ Update genre ID to match selected type
+  const selectedGenreId = selectedType === "tv" ? currentGenre.tv : currentGenre.movie;
+
+  // ✅ Clear any timer
+  if (fetchTimer) clearTimeout(fetchTimer);
+
+  // ✅ Manually override fetch logic to pass genre id
+  fetchWithCountdown(false, selectedType, selectedGenreId).then(() => {
     fetchTimer = setTimeout(startAutoFetch, 60000); // ✅ Restart loop
   });
 };
@@ -1439,7 +1453,7 @@ function startAutoFetch() {
     }
   });
 }
-function fetchWithCountdown(requireTrailer = false) {
+function fetchWithCountdown(requireTrailer = false, overrideType = null, overrideGenreId = null) {
   if (window.autoTrailerMode) {
     console.log("⏹️ Autoplay mode active — skipping fetchWithCountdown.");
     return Promise.resolve(false);
