@@ -1051,7 +1051,7 @@ function applyFilmToUI(data) {
   document.getElementById("info-crew")?.remove();
   // Add extended info
   let extraHTML = `
-  <div id="info-crew" style="margin-top:10px; font-size:18px; color:#aaa;">
+  <div id="info-crew" style="margin-top:10px; font-size:22px; color:#aaa;">
     🎬 <strong>Dir:</strong> ${data.director} &nbsp;|&nbsp; 
     🏢 <strong>Studio:</strong> ${data.studio} &nbsp;|&nbsp;
     💰 <strong>:</strong> ${data.budget} <br>
@@ -1315,7 +1315,7 @@ function showButtons() {
     buttons.classList.add("hidden");
   }, 5000); // Buttons fade after 5s
 
-  resetPanelFade(); // 🔁 Restart 10s fade for info panel
+  //resetPanelFade(); // 🔁 Restart 10s fade for info panel
 }
 
 
