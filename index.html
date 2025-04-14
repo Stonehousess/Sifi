@@ -457,13 +457,32 @@
   font-size: 14px;
 }
 @media (max-width: 780px) {
-  #movie-poster {
-    width: 98vw;
-    max-width: 98vw;
+  html, body {
+    overflow: hidden;
+    height: 100vh;
+    margin: 0;
   }
 
-  #poster-border {
-    width: 98vw;  /* ✅ Override the wider desktop layout */
+  #poster-wrapper {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #movie-poster {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    max-width: none;
+    max-height: none;
+  }
+
+  #movie-container {
+    overflow: hidden;
+    height: 100vh;
+    max-height: 100vh;
   }
 }
 #filter-panel {
