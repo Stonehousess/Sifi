@@ -39,11 +39,9 @@
 }
 
 #movie-poster {
-  width: auto;                 /* ✅ Let width follow natural image ratio */
-  max-width: 100vw;            /* ✅ Don’t exceed screen width */
-  height: auto;
-  max-height: 100vh;
-  object-fit: contain;
+  width: 100vw;                /* ✅ Always stretch to screen width */
+  height: auto;                /* ✅ Maintain aspect ratio */
+  max-height: 100vh;           /* ✅ Prevent vertical overflow */
   display: block;
   margin: 0 auto;
   user-select: none;
@@ -501,44 +499,58 @@
 </head>
 <body>
   <div id="movie-container">
-  <div id="poster-wrapper">
-    <div id="poster-border">
-    <img alt="" draggable="false" id="movie-poster" />
-    </div>
-    <div class="floating-buttons">
-    <button id="tmdb-button"><img src="tmdb.png" alt="TMDB"/></button>
-   <div id="save-button-wrapper" role="button">
-  <img id="save-button" src="record.png" alt="Record" />
-  <svg id="save-timer-ring" viewBox="0 0 80 80">
-    <circle r="30" cx="40" cy="40" />
-  </svg>
- </div>
+    <div id="poster-wrapper">
+      <div id="poster-border">
+        <img alt="" draggable="false" id="movie-poster" />
+      </div>
 
-    <button id="trailer-button" disabled><img src="play.png" alt="Play"/></button>
-    <button id="genre-button"><img src="shuffle.png" alt="Shuffle"/></button>
-    <button id="next-button"><img src="next.png" alt="Next"/></button>
-  </div>
-    <div id="movie-type"></div>
-    <div id="movie-runtime"></div>
-     <div id="info-panel" onclick="togglePanel()">
-     <div id="info-content">
-      <div id="info-title">Loading...</div>
-      <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins <span id="flag"></span></div>
-      <div id="info-description">Loading description...</div>
-      <div id="info-genre">Genre: <span id="genre-name">Loading...</span> <span id="tmdb-link"></span></div>
+      <!-- 🎯 Floating Buttons -->
+      <div class="floating-buttons">
+        <button id="tmdb-button"><img src="tmdb.png" alt="TMDB"/></button>
+
+        <div id="save-button-wrapper" role="button">
+          <img id="save-button" src="record.png" alt="Record" />
+          <svg id="save-timer-ring" viewBox="0 0 80 80">
+            <circle r="30" cx="40" cy="40" />
+          </svg>
+        </div>
+
+        <button id="trailer-button" disabled><img src="play.png" alt="Play"/></button>
+        <button id="genre-button"><img src="shuffle.png" alt="Shuffle"/></button>
+        <button id="next-button"><img src="next.png" alt="Next"/></button>
+      </div>
+
+      <!-- 📌 Info Panel is now outside floating-buttons -->
+      <div id="info-panel" onclick="togglePanel()">
+        <div id="info-content">
+          <div id="info-title">Loading...</div>
+          <div id="info-meta">⭐️ -- • 🎬/📺 • -- mins <span id="flag"></span></div>
+          <div id="info-description">Loading description...</div>
+          <div id="info-genre">
+            Genre: <span id="genre-name">Loading...</span>
+            <span id="tmdb-link"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="movie-type"></div>
+      <div id="movie-runtime"></div>
     </div>
   </div>
-  </div>
-  <!-- ✅ Pull-down filter goes here, outside of movie-container -->
+
+  <!-- 📥 Pull-down Filter Panel -->
   <div id="filter-panel" class="hidden">
     <div id="filter-content">
       <div id="year-label">All Years</div>
+
       <label>Year From:
-      <input type="range" id="year-from" min="1900" max="2025" value="1900" data-default="1900">
+        <input type="range" id="year-from" min="1900" max="2025" value="1900" data-default="1900">
       </label>
+
       <label>Year To:
-      <input type="range" id="year-to" min="1900" max="2025" value="2025" data-default="2025">
+        <input type="range" id="year-to" min="1900" max="2025" value="2025" data-default="2025">
       </label>
+
       <label>Country: 
         <select id="country-select">
           <option value="">Any</option>
@@ -549,6 +561,7 @@
           <option value="KR">🇰🇷 Korea</option>
         </select>
       </label>
+
       <label>Type: 
         <select id="type-select">
           <option value="all">All</option>
@@ -556,10 +569,12 @@
           <option value="tv">TV</option>
         </select>
       </label>
+
       <label>Genre: 
         <select id="genre-select"></select>
         <option value="Animation" selected>Animation</option>
       </label>
+
       <label>Min Rating: 
         <input type="range" id="rating-range" min="0" max="10" step="0.1" value="0">
       </label>
