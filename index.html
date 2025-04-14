@@ -24,26 +24,26 @@
    overflow: hidden;
  }
 
-  #poster-wrapper {
-  position: relative;
-  width: 100vw;
-  height: 100vh;               /* ✅ Force poster to fill vertical space */
-  background-color: black;
+#poster-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;         /* ✅ Center poster vertically */
+  align-items: center;  /* Center both vertically and horizontally */
+  background-color: black;
+  width: 100vw;
+  height: 100vh;        /* Always fill the viewport height */
   overflow: hidden;
   padding: 0;
   margin: 0;
 }
 
 #movie-poster {
-  max-height: 100vh;          /* ✅ Fit full screen height */
-  height: 100%;               /* ✅ Stretch to height of container */
-  width: auto;                /* ✅ Let width grow naturally */
-  object-fit: contain;        /* ✅ Maintain aspect ratio */
+  max-width: 100vw;       /* Don't overflow horizontally */
+  max-height: 100vh;      /* Don't overflow vertically */
+  width: auto;
+  height: auto;
+  object-fit: contain;
   display: block;
-  margin: 0 auto;
+  margin: auto;
   user-select: none;
   animation: glowing-tides 5s infinite ease-in-out;
 }
@@ -55,23 +55,24 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  width: calc(100vw - 16px);  /* 👈 give room for shadow to show */
+  flex-direction: column;
   margin: 0 auto;
   padding: 0;
   background: none;
   animation: none;
   z-index: 1;
   overflow: visible;
+  width: auto; /* ✅ Let width follow the poster naturally */
 }
  .floating-buttons {
   position: absolute;
   bottom: 32px;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 0;
+  justify-content: center;
+  gap: 10px;
+  padding: 0;
   max-width: 100%;
   box-sizing: border-box;
   transition: opacity 1s ease;
@@ -499,12 +500,11 @@
 </head>
 <body>
   <div id="movie-container">
-    <div id="poster-wrapper">
-      <div id="poster-border">
-        <img alt="" draggable="false" id="movie-poster" />
-      </div>
+  <div id="poster-wrapper">
+    <div id="poster-border">
+      <img alt="" draggable="false" id="movie-poster" />
 
-      <!-- 🎯 Floating Buttons -->
+      <!-- ✅ Floating Buttons now INSIDE the poster-border -->
       <div class="floating-buttons">
         <button id="tmdb-button"><img src="tmdb.png" alt="TMDB"/></button>
 
