@@ -674,7 +674,7 @@
     panel.classList.remove('hidden');
     panel.classList.add('expanded');
     clearTimeout(panelTimer);
-    panelTimer = setTimeout(() => panel.classList.remove('expanded'), 10000);
+    panelTimer = setTimeout(() => panel.classList.remove('expanded'), 15000);
     swipeState = "info"; // 👈 update
   } else {
     panel.classList.remove('expanded'); // ✅ collapse
