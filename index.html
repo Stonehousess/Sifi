@@ -1579,8 +1579,9 @@ if (deltaY > 20) {
   if (swipeState === "filter") {
     filterPanel.classList.remove("active");
     swipeState = "poster";
-    clearTimeout(window.filterAutoCloseTimer); // ✅ Stop auto-close if closing early
-  } else if (swipeState === "poster") {
+    clearTimeout(window.filterAutoCloseTimer);
+  } else {
+    // ✅ Whether from poster or hidden, always open info panel
     togglePanel(true);
     swipeState = "info";
   }
