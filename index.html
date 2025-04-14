@@ -1570,37 +1570,38 @@ function handleSwipeGesture() {
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
 
-if (deltaY > 20) {
-  // 👇 Swipe down
-  if (swipeState === "info") {
-    togglePanel(false);
-    swipeState = "poster";
-  } else if (swipeState === "poster") {
-    filterPanel.classList.add("active");
-    swipeState = "filter";
+  if (deltaY > 20) {
+    // 👇 Swipe down
+    if (swipeState === "info") {
+      togglePanel(false);
+      swipeState = "poster";
+    } else if (swipeState === "poster") {
+      filterPanel.classList.add("active");
+      swipeState = "filter";
 
-    // ⏳ Auto-close after 10s only if filter is still open
-    clearTimeout(window.filterAutoCloseTimer);
-    window.filterAutoCloseTimer = setTimeout(() => {
-      if (swipeState === "filter") {
-        filterPanel.classList.remove("active");
-        swipeState = "poster";
+      // ⏳ Auto-close after 10s only if filter is still open
+      clearTimeout(window.filterAutoCloseTimer);
+      window.filterAutoCloseTimer = setTimeout(() => {
+        if (swipeState === "filter") {
+          filterPanel.classList.remove("active");
+          swipeState = "poster";
+        }
+      }, 10000);
+    }
+  } else if (deltaY < -20) {
+    // 👆 Swipe up
+    if (swipeState === "filter") {
+      filterPanel.classList.remove("active");
+      swipeState = "poster";
+      clearTimeout(window.filterAutoCloseTimer);
+    } else {
+      // 🧠 Open info panel if not expanded
+      if (!infoPanel.classList.contains("expanded")) {
+        togglePanel(true);
+        swipeState = "info";
       }
-    }, 10000);
+    }
   }
-
-} else if (deltaY < -20) {
-  // 👆 Swipe up
-  if (swipeState === "filter") {
-    filterPanel.classList.remove("active");
-    swipeState = "poster";
-    clearTimeout(window.filterAutoCloseTimer);
-  } else {
-    // ✅ Whether from poster or hidden, always open info panel
-    togglePanel(true);
-    swipeState = "info";
-  }
-}
 }
   document.addEventListener("keydown", (e) => {
     const key = e.key.toLowerCase();
