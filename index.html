@@ -1518,6 +1518,19 @@ window.onload = () => {
     genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
   // ✅ Set default genre to Animation
   genreSelect.value = "Animation";
+  // ✅ Add this right below to sync filter dropdown with fetch
+document.getElementById("genre-select").addEventListener("change", (e) => {
+  const selected = e.target.value;
+  currentGenre = genres.find(g => g.name === selected) || { name: "all", movie: "", tv: "" };
+
+  // Sync floating button icon too
+  document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
+
+  if (fetchTimer) clearTimeout(fetchTimer);
+  fetchWithCountdown().then(() => {
+    fetchTimer = setTimeout(startAutoFetch, 60000);
+  });
+});
   // Set label on load
   updateYearLabel();
 
