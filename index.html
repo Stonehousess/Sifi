@@ -66,19 +66,20 @@
 }
  .floating-buttons {
   position: absolute;
-  bottom: 20px;
+  bottom: 32px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding: 0;
   max-width: 100%;
   box-sizing: border-box;
   transition: opacity 1s ease;
   z-index: 1000;
 }
+
 
 .floating-buttons > button,
 .floating-buttons > #save-button-wrapper {
@@ -105,8 +106,8 @@
 }
 
 .floating-buttons button img {
-  width: 100%;
-  height: auto;
+  height: 64px;
+  width: auto;
   opacity: 0.7;
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
