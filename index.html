@@ -472,7 +472,7 @@ function closeAllPanels() {
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
   const shouldExpand = forceExpand !== null ? forceExpand : !panel.classList.contains('expanded');
-
+  console.log("🧪 togglePanel called — shouldExpand:", shouldExpand); // ✅ Add this
   if (shouldExpand) {
     panel.classList.remove('hidden');
     panel.classList.add('expanded');
@@ -492,12 +492,16 @@ function resetPanelFade() {
   const panel = document.getElementById('info-panel');
   clearTimeout(panelFadeTimer);
 
-  panel.classList.remove("hidden");      // Always re-show when interacted
-  panel.classList.remove("expanded");    // Keep it collapsed for this
-
-  panelFadeTimer = setTimeout(() => {
-    panel.classList.add("hidden");       // Hide after 10s if untouched
-  }, 10000);
+  if (panel.classList.contains("expanded")) {
+    panelFadeTimer = setTimeout(() => {
+      panel.classList.remove("expanded");
+      panel.classList.add("hidden");
+    }, 15000);
+  } else {
+    panelFadeTimer = setTimeout(() => {
+      panel.classList.add("hidden");
+    }, 10000);
+  }
 }
   function getFlagEmoji(countryCode) {
     if (!countryCode) return "";
