@@ -777,6 +777,7 @@ function playTrailer(url) {
       window.autoTrailerMode
     ) {
       console.warn("🚨 Backup: no state change — forcing next trailer.");
+      isTrailerAdvancing = false; // ✅ <---- add this line
       if (!isTrailerAdvancing) findTrailerAndPlay();
     }
   }, 15000);
@@ -791,6 +792,7 @@ function playTrailer(url) {
       window.autoTrailerMode
     ) {
       console.warn("⛔ Trailer failed to play — skipping...");
+      isTrailerAdvancing = false; // ✅ Reset flag so next trailer can start
       failSafeSkips++;
 
       if (failSafeSkips >= 5) {
