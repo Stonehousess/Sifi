@@ -1429,6 +1429,11 @@ window.togglePanel = togglePanel;
 window.playTrailer = playTrailer;
 window.showOverlayInfo = showOverlayInfo;
 window.failSafeTimeout = null;
+// ✅ Kick off first fetch only if not in autoplay mode
+if (!window.autoTrailerMode) {
+  console.log("🚀 AutoFetch starting manually...");
+  startAutoFetch();
+}
 </script>
 <script>
   // These must also exist globally for the player to work
