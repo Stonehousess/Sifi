@@ -121,10 +121,11 @@
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   transition: all 0.4s ease-in-out;
-  z-index: 1500;
+  z-index: 2000;
   opacity: 0.7;
   overflow: hidden;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 #info-panel.expanded {
@@ -302,7 +303,7 @@
 
   <!-- ✅ Move this OUTSIDE poster-wrapper -->
      <!-- 📌 Info Panel is now outside floating-buttons -->
-      <div id="info-panel" onclick="togglePanel()">
+      <div id="info-panel">
         <div id="info-content">
           <div class="info-buttons">
   <button id="tmdb-button">
@@ -992,44 +993,36 @@ async function findTrailerAndPlay() {
 // 🌐 Expose the trailer play function
 window.findTrailerAndPlay = findTrailerAndPlay;
 
-// 🛠 Replace existing wheel listener
 document.addEventListener("wheel", (e) => {
-    if (swipeCooldown) return;
+  if (swipeCooldown) return;
   swipeCooldown = true;
   setTimeout(() => swipeCooldown = false, 500);
 
-  const infoPanel = document.getElementById("info-panel");
-  const filterPanel = document.getElementById("filter-panel");
+  const deltaY = e.deltaY;
 
-  if (e.deltaY < -5) {
+  if (deltaY < -10) {
     // ⬆️ Scroll up
     if (swipeState === "filter") {
-      filterPanel.classList.remove("active");
-      swipeState = "poster";
-    } else if (swipeState === "poster") {
       closeAllPanels();
-      togglePanel(true);
-      swipeState = "info";
+    } else {
+      closeAllPanels();
+      togglePanel(true); // info
     }
-  } else if (e.deltaY > 5) {
+  } else if (deltaY > 10) {
     // ⬇️ Scroll down
     if (swipeState === "info") {
       togglePanel(false);
-      swipeState = "poster";
-    } else if (swipeState === "poster") {
+    } else {
       closeAllPanels();
-      filterPanel.classList.add("active");
+      document.getElementById("filter-panel").classList.add("active");
       swipeState = "filter";
+
       clearTimeout(window.filterAutoCloseTimer);
       window.filterAutoCloseTimer = setTimeout(() => {
-        if (swipeState === "filter") {
-          closeAllPanels();
-        }
+        if (swipeState === "filter") closeAllPanels();
       }, 10000);
     }
   }
-
-  resetPanelFade(); // ✅ keeps UI responsive
 });
 
 
@@ -1199,13 +1192,20 @@ function startFetchCountdown(duration = 60000) {
   circle.style.strokeDashoffset = 0;
 
   requestAnimationFrame(animate);
-}
-document.getElementById("movie-poster").onclick = () => {
-  if (fetchTimer) clearTimeout(fetchTimer);           // 🔁 cancel old timer
-  fetchWithCountdown().then(() => {
-    fetchTimer = setTimeout(startAutoFetch, 60000);   // 🕑 start new loop
-  });
-};
+document.getElementById("movie-poster").addEventListener("click", () => {
+  if (swipeState === "poster") {
+    closeAllPanels();
+    togglePanel(true); // open info panel
+
+    // 🔁 Optional: refetch a new title
+    if (fetchTimer) clearTimeout(fetchTimer);
+    fetchWithCountdown().then(() => {
+      fetchTimer = setTimeout(startAutoFetch, 60000); // restart timer
+    });
+  } else {
+    closeAllPanels(); // return to poster state
+  }
+});
 function toggleMute() {
   if (!trailerPlayer) return;
   const muted = trailerPlayer.isMuted();
@@ -1345,16 +1345,16 @@ document.getElementById("genre-select").addEventListener("change", (e) => {
 
   resetPanelFade();
   let touchStartY = 0;
-  let touchEndY = 0;
+let touchEndY = 0;
 
-document.addEventListener("touchstart", e => {
+document.addEventListener("touchstart", (e) => {
   touchStartY = e.changedTouches[0].screenY;
-}, { passive: true });
+});
 
-document.addEventListener("touchend", e => {
+document.addEventListener("touchend", (e) => {
   touchEndY = e.changedTouches[0].screenY;
   handleSwipeGesture();
-}, { passive: true });
+});
 
 function handleSwipeGesture() {
   if (swipeCooldown) return;
