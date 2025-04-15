@@ -1074,7 +1074,7 @@ function applyFilmToUI(data) {
   currentTrailerUrl = data.trailerUrl;
 
   const trailerBtn = document.getElementById("trailer-button");
-const trailerImg = trailerBtn?.querySelector("img");
+  const trailerImg = trailerBtn?.querySelector("img");
 
 if (!data.trailerUrl) {
   trailerBtn.disabled = true;
@@ -1280,12 +1280,13 @@ trailerBtn.addEventListener("mouseup", () => clearTimeout(longPressTimer));
 trailerBtn.addEventListener("mouseleave", () => clearTimeout(longPressTimer));
 
 trailerBtn.addEventListener("click", () => {
-  if (currentTrailerUrl && currentTrailerUrl.includes("youtube.com")) {
-    window.autoTrailerMode = false; // single play only
-    playTrailer(currentTrailerUrl);
-  } else {
-    console.warn("❌ No trailer available for this title.");
-  }
+  if (!currentTrailerUrl || !currentTrailerUrl.includes("youtube.com")) {
+  console.warn("❌ No trailer available — click blocked.");
+  return;
+}
+
+window.autoTrailerMode = false; // Single play only
+playTrailer(currentTrailerUrl);
 });
 function popoutTrailer() {
   if (currentTrailerUrl) {
