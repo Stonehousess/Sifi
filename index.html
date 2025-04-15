@@ -1078,10 +1078,9 @@ document.getElementById("genre-button").onclick = () => {
   // ✅ Clear any timer
   if (fetchTimer) clearTimeout(fetchTimer);
 
-  // ✅ Manually override fetch logic to pass genre id
-  fetchWithCountdown(false, selectedType, selectedGenreId).then(() => {
-    fetchTimer = setTimeout(startAutoFetch, 60000); // ✅ Restart loop
-  });
+  fetchWithCountdown(false, true, selectedType, selectedGenreId).then(() => {
+  fetchTimer = setTimeout(startAutoFetch, 60000); // ✅ Restart loop
+ });
 };
 document.getElementById("next-button").onclick = () => {
   if (fetchTimer) clearTimeout(fetchTimer);
@@ -1153,7 +1152,7 @@ window.addEventListener("keydown", (e) => {
     if (window.autoTrailerMode) {
       findTrailerAndPlay();
     } else {
-      fetchWithCountdown(); // Use the global fetch wrapper
+      fetchWithCountdown(false, true); // ✅ keep swipe state
     }
   }
 
@@ -1223,7 +1222,7 @@ function startAutoFetch() {
     fetchTimer = null;
   }
 
-  fetchWithCountdown(false).then(() => {
+  fetchWithCountdown(false, true).then(() => {
     // ✅ Re-check in case autoplay mode was activated during the fetch
     if (!window.autoTrailerMode) {
       fetchTimer = setTimeout(startAutoFetch, 60000);
@@ -1232,32 +1231,26 @@ function startAutoFetch() {
     }
   });
 }
-function fetchWithCountdown(requireTrailer = false, overrideType = null, overrideGenreId = null) {
-  if (window.autoTrailerMode) {
-    console.log("⏹️ Autoplay mode active — skipping fetchWithCountdown.");
-    return Promise.resolve(false);
-  }
-
+function fetchWithCountdown(requireTrailer = false, preserveSwipeState = true) {
+  if (window.autoTrailerMode) return Promise.resolve(false);
   if (isFetching) return false;
   isFetching = true;
-  console.log("🎲 Fetching new title at", new Date().toLocaleTimeString());
 
   return getRandomTitle(requireTrailer).then((data) => {
     if (data) {
-      applyFilmToUI(data);             // ✅ Safely apply UI updates
-      startFetchCountdown(60000);      // ⏳ Start countdown ring
-      isFetching = false;
-      console.log("🔍 Calling getRandomTitle...");
-      return true;
-    } else {
-      console.warn("⚠️ No valid data returned");
-      isFetching = false;
-      return false;
+      applyFilmToUI(data);
+
+      if (!preserveSwipeState && swipeState === "info") {
+        togglePanel(false);
+        swipeState = "poster";
+      }
+
+      startFetchCountdown(60000);
     }
-  }).catch((err) => {
-    console.error("Error in fetchWithCountdown:", err);
     isFetching = false;
-    return false;
+  }).catch((err) => {
+    console.error("Error in fetch:", err);
+    isFetching = false;
   });
 }
 
@@ -1326,10 +1319,9 @@ window.onload = () => {
     document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
 
     if (fetchTimer) clearTimeout(fetchTimer);
-    fetchWithCountdown().then(() => {
-      fetchTimer = setTimeout(startAutoFetch, 60000);
-    });
-  });
+  fetchWithCountdown(false, true).then(() => {  // 👈 true = preserve swipe state
+  fetchTimer = setTimeout(startAutoFetch, 60000);
+});
 
   // Year range label
   updateYearLabel();
@@ -1424,9 +1416,9 @@ window.onload = () => {
 
   // FIRST LOAD
   console.log("🚀 Starting first fetch...");
-  fetchWithCountdown().then(() => {
-    fetchTimer = setTimeout(startAutoFetch, 60000);
-  });
+  fetchWithCountdown(false, true).then(() => {
+  fetchTimer = setTimeout(startAutoFetch, 60000);
+ });
 };
 
 // ✅ Expose methods globally (MUST be outside onload!)
