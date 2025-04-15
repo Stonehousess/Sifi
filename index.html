@@ -1158,6 +1158,8 @@ if (!data.trailerUrl) {
   }
 }
 async function findTrailerAndPlay() {
+  console.log("🎯 Entered findTrailerAndPlay. isTrailerAdvancing:", isTrailerAdvancing, "| autoTrailerMode:", window.autoTrailerMode);
+
   if (isTrailerAdvancing) {
     console.warn("🚦 Trailer advance already in progress — skipping...");
     return;
@@ -1166,10 +1168,8 @@ async function findTrailerAndPlay() {
   isTrailerAdvancing = true;
   window.autoTrailerMode = true;
 
-  // ✅ Close filter/info panels and any UI debris
   closeAllPanels();
 
-  // ✅ Clear fetch timer
   if (fetchTimer) {
     clearTimeout(fetchTimer);
     fetchTimer = null;
@@ -1204,13 +1204,18 @@ async function findTrailerAndPlay() {
     if (data && data.trailerUrl?.includes("youtube.com")) {
       console.log("🎬 Found trailer — playing", data.trailerUrl);
 
-      // ✅ Apply movie and trailer data to UI
       applyFilmToUI(data);
 
-      // ✅ Delay just slightly to prevent clashing with player load
       setTimeout(() => {
         playTrailer(data.trailerUrl);
-        // ⚠️ Do NOT reset `isTrailerAdvancing` here — let `onPlayerStateChange` handle it
+
+        // 🛟 Backup: unlock if no progress
+        setTimeout(() => {
+          if (isTrailerAdvancing) {
+            console.warn("🕒 Backup: trailer likely didn't start — unlocking advance.");
+            isTrailerAdvancing = false;
+          }
+        }, 8000);
       }, 200);
 
       found = true;
@@ -1219,6 +1224,10 @@ async function findTrailerAndPlay() {
 
     attempts++;
     console.warn(`🔁 Attempt ${attempts}: No trailer found — retrying...`);
+  }
+
+  if (found) {
+    console.log("✅ Leaving findTrailerAndPlay. Found trailer:", true);
   }
 
   if (!found) {
