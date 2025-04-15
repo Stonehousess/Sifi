@@ -861,7 +861,7 @@ function playTrailer(url) {
       failSafeSkips = 0;
     }
   }, 10000);
-
+}; // <- CLOSES the function cleanly
 // Clean up previous poller
 if (currentPollInterval) {
   clearInterval(currentPollInterval);
@@ -900,7 +900,7 @@ currentPollInterval = setInterval(() => {
     if (!isTrailerAdvancing) findTrailerAndPlay();
   }
 }, 1000);
-}; // ✅ closes playTrailer
+
 function closeTrailer() {
   clearTimeout(failSafeTimeout);
   window.autoTrailerMode = false;
