@@ -174,6 +174,7 @@
   margin-top: 10px;
   font-size: 18px;
   color: #aaa;
+  display: block;
 }
 
 /* ---------------- Info Panel Buttons ---------------- */
@@ -632,12 +633,14 @@ function closeAllPanels() {
     // Auto-collapse after 15s
     panelTimer = setTimeout(() => {
       panel.classList.remove("expanded");
-      panel.classList.add("hidden");
+      // Don't hide instantly — allow unexpanded version to linger
+      resetPanelFade(); // ✅ Only fade out after 5s
       swipeState = "poster";
     }, 15000);
   } else {
     panel.classList.remove("expanded");
-    panel.classList.add("hidden");
+    // ⏳ Let the unexpanded panel remain for 5 seconds
+    resetPanelFade(); // ✅ Handle delayed hide
     swipeState = "poster";
   }
 }
@@ -647,14 +650,17 @@ function resetPanelFade() {
   clearTimeout(panelFadeTimer);
 
   if (panel.classList.contains("expanded")) {
+    // If expanded, wait 15s then collapse (but don't hide immediately)
     panelFadeTimer = setTimeout(() => {
       panel.classList.remove("expanded");
-      panel.classList.add("hidden");
+      // Let the collapsed version stay visible for 5s after collapse
+      resetPanelFade(); // 🌀 Call again to start the 5s hide timer
     }, 15000);
   } else {
+    // If not expanded, hide after 5s
     panelFadeTimer = setTimeout(() => {
       panel.classList.add("hidden");
-    }, 10000);
+    }, 5000); // ✅ Was 10s, now 5s for consistency
   }
 }
   function getFlagEmoji(countryCode) {
@@ -724,18 +730,24 @@ function playTrailer(url) {
   const videoId = extractYouTubeId(url);
   if (!videoId) return;
 
-  // ✅ Kill background fetch loop if running
+  // ✅ Kill any existing fetch timer
   if (fetchTimer) {
     clearTimeout(fetchTimer);
     fetchTimer = null;
   }
 
+  // ✅ Force trailer overlay and player visibility
   const overlay = document.getElementById('trailer-overlay');
-  if (!overlay.classList.contains('active')) {
-    overlay.classList.add('active');
-    overlay.style.visibility = 'visible';
-    overlay.style.opacity = '1';
-    overlay.style.pointerEvents = 'auto';
+  const playerWrapper = document.querySelector('.player-wrapper');
+
+  overlay.classList.add('active');
+  overlay.style.visibility = 'visible';
+  overlay.style.opacity = '1';
+  overlay.style.pointerEvents = 'auto';
+  overlay.style.zIndex = '3000'; // Ensure above everything
+
+  if (playerWrapper) {
+    playerWrapper.style.removeProperty("display"); // Unhide if previously hidden
   }
 
   const playerVideoUrl = trailerPlayer.getVideoUrl?.();
@@ -748,27 +760,28 @@ function playTrailer(url) {
     return;
   }
 
-  // ✅ Update global trailer references
+  // ✅ Update trailer state
   currentTrailerUrl = url;
   lastTrailerId = videoId;
+  trailerPlaying = true;
+  trailerPaused = false;
+  isTrailerAdvancing = false;
 
-  // Clean up timers
+  // ✅ Clear timers and polling
   if (fadeTimer) clearTimeout(fadeTimer);
   if (overlayFadeTimer) clearTimeout(overlayFadeTimer);
   if (currentPollInterval) clearInterval(currentPollInterval);
 
-  trailerPlaying = true;
-  trailerPaused = false;
-
   trailerPlayer.loadVideoById(videoId);
   trailerPlayer.playVideo?.();
 
+  // ✅ Show overlay info briefly
   overlayInfo.style.opacity = "1";
   overlayFadeTimer = setTimeout(() => {
     overlayInfo.style.opacity = "0";
   }, 3000);
 
-  // 🧯 Backup: in case state never changes
+  // 🧯 Backup state recovery (15s)
   setTimeout(() => {
     const state = trailerPlayer?.getPlayerState?.();
     if (
@@ -778,12 +791,12 @@ function playTrailer(url) {
       window.autoTrailerMode
     ) {
       console.warn("🚨 Backup: no state change — forcing next trailer.");
-      isTrailerAdvancing = false; // ✅ NEW: release advancing lock
-      if (!isTrailerAdvancing) findTrailerAndPlay();
+      isTrailerAdvancing = false;
+      findTrailerAndPlay();
     }
   }, 15000);
 
-  // ⏱️ FailSafe
+  // ⏱️ FailSafe (10s): recover from broken states
   failSafeTimeout = setTimeout(() => {
     const state = trailerPlayer?.getPlayerState?.();
     if (
@@ -793,7 +806,7 @@ function playTrailer(url) {
       window.autoTrailerMode
     ) {
       console.warn("⛔ Trailer failed to play — skipping...");
-      isTrailerAdvancing = false; // ✅ NEW: ensure next trailer can start
+      isTrailerAdvancing = false;
       failSafeSkips++;
 
       if (failSafeSkips >= 5) {
@@ -851,34 +864,55 @@ currentPollInterval = setInterval(() => {
 }, 1000);
 
 function closeTrailer() {
+  console.log("❎ Closing trailer player...");
+
+  // ✅ Clear recovery timers
   clearTimeout(failSafeTimeout);
+  clearTimeout(backupStateTimeout);
+  if (currentPollInterval) clearInterval(currentPollInterval);
+
+  // ✅ Reset state
   window.autoTrailerMode = false;
   trailerLoopFirst = true;
   trailerPlaying = false;
+  trailerPaused = false;
+  isTrailerAdvancing = false;
+  failSafeSkips = 0;
 
-  if (trailerPlayer && trailerPlayer.stopVideo) {
-    trailerPlayer.stopVideo();
-    trailerPlayer.clearVideo?.();
+  // ✅ Safely stop the trailer if playing
+  if (trailerPlayer?.stopVideo) {
+    try {
+      trailerPlayer.stopVideo();
+      trailerPlayer.clearVideo?.();
+    } catch (err) {
+      console.warn("⚠️ Error stopping video:", err);
+    }
   }
 
+  // ✅ Hide the overlay and player
   const overlay = document.getElementById('trailer-overlay');
+  const playerWrapper = document.querySelector('.player-wrapper');
+
   overlay.classList.remove('active');
   overlay.style.opacity = '0';
   overlay.style.visibility = 'hidden';
   overlay.style.pointerEvents = 'none';
 
-  failSafeSkips = 0;
+  if (playerWrapper) {
+    playerWrapper.style.display = 'none';
+  }
 
+  // ✅ Clear any pending fetch loop
   if (fetchTimer) clearTimeout(fetchTimer);
 
-  // 🕑 Delay next fetch
+  // ✅ Restart fetch after delay (20s) and re-show ring countdown
   fetchTimer = setTimeout(() => {
+    console.log("🔁 Restarting auto fetch after trailer close...");
     startAutoFetch();
-    startFetchCountdown(60000);
+    startFetchCountdown(60000); // standard loop
   }, 20000);
 
-  // Show ring
-  startFetchCountdown(20000);
+  startFetchCountdown(20000); // shorter visual indicator
 }
 
 async function getRandomTitle(requireTrailer = false, overrideType = null, overrideGenreId = null) {
@@ -1122,7 +1156,6 @@ if (!data.trailerUrl) {
     };
     window.tmdbClickBound = true;
   }
-}
 async function findTrailerAndPlay() {
   if (isTrailerAdvancing) {
     console.warn("🚦 Trailer advance already in progress — skipping...");
@@ -1132,6 +1165,10 @@ async function findTrailerAndPlay() {
   isTrailerAdvancing = true;
   window.autoTrailerMode = true;
 
+  // ✅ Close filter/info panels and any UI debris
+  closeAllPanels();
+
+  // ✅ Clear fetch timer
   if (fetchTimer) {
     clearTimeout(fetchTimer);
     fetchTimer = null;
@@ -1143,24 +1180,36 @@ async function findTrailerAndPlay() {
     return;
   }
 
+  const overlay = document.getElementById("trailer-overlay");
+  const playerWrapper = document.querySelector(".player-wrapper");
+
+  if (overlay) {
+    overlay.classList.add("active");
+    overlay.style.visibility = "visible";
+    overlay.style.opacity = "1";
+    overlay.style.pointerEvents = "auto";
+  }
+
+  if (playerWrapper) {
+    playerWrapper.style.display = "block";
+  }
+
   let found = false;
   let attempts = 0;
 
   while (attempts < 7) {
     const data = await getRandomTitle(true);
 
-    if (
-      data &&
-      data.trailerUrl &&
-      data.trailerUrl.includes("youtube.com")
-    ) {
+    if (data && data.trailerUrl?.includes("youtube.com")) {
       console.log("🎬 Found trailer — playing", data.trailerUrl);
+
+      // ✅ Apply movie and trailer data to UI
       applyFilmToUI(data);
 
-      // ✅ Delay trailer start just slightly
+      // ✅ Delay just slightly to prevent clashing with player load
       setTimeout(() => {
         playTrailer(data.trailerUrl);
-        isTrailerAdvancing = false; // ✅ Reset only after starting trailer
+        // ⚠️ Do NOT reset `isTrailerAdvancing` here — let `onPlayerStateChange` handle it
       }, 200);
 
       found = true;
@@ -1174,23 +1223,33 @@ async function findTrailerAndPlay() {
   if (!found) {
     console.warn("⛔ No valid trailer found after 7 tries. Retrying in 3 seconds...");
     isTrailerAdvancing = false;
-    setTimeout(() => findTrailerAndPlay(), 3000);
+
+    setTimeout(() => {
+      findTrailerAndPlay();
+    }, 3000);
   }
 }
 // 🌐 Expose the trailer play function
 window.findTrailerAndPlay = findTrailerAndPlay;
 
 document.addEventListener("wheel", (e) => {
+  // 🛑 Ignore horizontal scrolls (trackpad swipes)
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+    return;
+  }
+
   if (swipeCooldown) return;
   swipeCooldown = true;
   setTimeout(() => swipeCooldown = false, 500);
 
   const deltaY = e.deltaY;
-  console.log("🎡 Wheel event | deltaY:", deltaY, "| swipeState:", swipeState);
   const filterPanel = document.getElementById("filter-panel");
+  const infoPanel = document.getElementById("info-panel");
 
-  if (deltaY > 5) {
-    // ✅ ⬇️ Scroll down — open info panel
+  console.log("🎡 Wheel event | deltaY:", deltaY, "| swipeState:", swipeState);
+
+  // 🔽 Scroll down — show info panel
+  if (deltaY > 10) {
     if (swipeState === "filter") {
       filterPanel.classList.remove("active");
       swipeState = "poster";
@@ -1198,19 +1257,22 @@ document.addEventListener("wheel", (e) => {
       closeAllPanels();
       togglePanel(true);
     }
-  } else if (deltaY < -5) {
-    // ✅ ⬆️ Scroll up — collapse or show filter
+  }
+
+  // 🔼 Scroll up — toggle filter or collapse info
+  else if (deltaY < -10) {
     if (swipeState === "info") {
       togglePanel(false);
     } else if (swipeState === "poster") {
       closeAllPanels();
-      console.log("🧪 Attempting to activate filterPanel:", filterPanel);
       filterPanel.classList.add("active");
       swipeState = "filter";
 
       clearTimeout(window.filterAutoCloseTimer);
       window.filterAutoCloseTimer = setTimeout(() => {
-        if (swipeState === "filter") closeAllPanels();
+        if (swipeState === "filter") {
+          closeAllPanels();
+        }
       }, 10000);
     }
   }
@@ -1600,24 +1662,20 @@ let panelFadeTimer = null; // Make sure this is declared globally if it's not al
 
 document.addEventListener("mousemove", () => {
   const now = Date.now();
-
-  // Throttle mousemove to avoid firing too often
   if (now - lastMouseMoveTime < 200) return;
   lastMouseMoveTime = now;
 
   const infoPanel = document.getElementById("info-panel");
 
-  // Only show if not expanded
   if (!infoPanel.classList.contains("expanded")) {
-    if (infoPanel.classList.contains("hidden")) {
-      infoPanel.classList.remove("hidden");
-    }
+    infoPanel.classList.remove("hidden");
 
-    // 🕒 Auto-hide after 5s of inactivity
     clearTimeout(panelFadeTimer);
     panelFadeTimer = setTimeout(() => {
-      infoPanel.classList.add("hidden");
-    }, 10000);
+      if (!infoPanel.classList.contains("expanded")) {
+        infoPanel.classList.add("hidden");
+      }
+    }, 5000); // Only re-hide if not expanded
   }
 });
 // ✅ TMDB Button becomes "History Recall"
