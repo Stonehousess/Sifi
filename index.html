@@ -1466,13 +1466,23 @@ window.failSafeTimeout = null;
 <script>
   const poster = document.getElementById('movie-poster');
   if (poster.complete) {
-    // In case the image is already cached
     poster.classList.add('loaded');
   } else {
     poster.addEventListener('load', () => {
       poster.classList.add('loaded');
     });
   }
+</script>
+
+<script>
+  window.addEventListener("load", () => {
+    if (typeof startAutoFetch === "function") {
+      console.log("🚀 Starting initial fetch after load...");
+      startAutoFetch();
+    } else {
+      console.warn("⚠️ startAutoFetch is not defined yet.");
+    }
+  });
 </script>
 </body>
 </html>
