@@ -1294,91 +1294,98 @@ function updateYearLabel() {
   }
 }
 window.onload = () => {
+  console.log("✅ window.onload fired");
+
+  // === Cache DOM references ===
   overlayInfo = document.getElementById("overlay-info");
-  document.getElementById("tmdb-button").disabled = true;
   const genreSelect = document.getElementById("genre-select");
+  const moviePoster = document.getElementById("movie-poster");
+  const floatingButtons = document.querySelector(".floating-buttons");
+
+  // === Init genre dropdown ===
+  document.getElementById("tmdb-button").disabled = true;
   genreSelect.innerHTML = `<option value="all">All</option>` + 
     genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
-  // ✅ Set default genre to Animation
   genreSelect.value = "Animation";
-  // ✅ Add this right below to sync filter dropdown with fetch
-document.getElementById("genre-select").addEventListener("change", (e) => {
-  const selected = e.target.value;
-  currentGenre = genres.find(g => g.name === selected) || { name: "all", movie: "", tv: "" };
+  currentGenre = genres.find(g => g.name === "Animation");
 
-  // Sync floating button icon too
-  document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
+  genreSelect.addEventListener("change", (e) => {
+    const selected = e.target.value;
+    currentGenre = genres.find(g => g.name === selected) || { name: "all", movie: "", tv: "" };
+    document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
 
-  if (fetchTimer) clearTimeout(fetchTimer);
-  fetchWithCountdown().then(() => {
-    fetchTimer = setTimeout(startAutoFetch, 60000);
+    if (fetchTimer) clearTimeout(fetchTimer);
+    fetchWithCountdown().then(() => {
+      fetchTimer = setTimeout(startAutoFetch, 60000);
+    });
   });
-});
-  // Set label on load
-  updateYearLabel();
 
-  // Update label when sliders move
+  // === Init year range label ===
+  updateYearLabel();
   document.getElementById("year-from").addEventListener("input", updateYearLabel);
   document.getElementById("year-to").addEventListener("input", updateYearLabel);
-  startFetchCountdown(60000);
 
+  // === Init floating button fade ===
   fadeTimer = setTimeout(() => {
-    document.querySelector(".floating-buttons").classList.add("hidden");
+    floatingButtons.classList.add("hidden");
   }, 5000);
 
   resetPanelFade();
+
+  // === Swipe gesture handling ===
   let touchStartY = 0;
-let touchEndY = 0;
+  let touchEndY = 0;
 
-document.addEventListener("touchstart", (e) => {
-  touchStartY = e.changedTouches[0].screenY;
-});
+  document.addEventListener("touchstart", (e) => {
+    touchStartY = e.changedTouches[0].screenY;
+  });
 
-document.addEventListener("touchend", (e) => {
-  touchEndY = e.changedTouches[0].screenY;
-  handleSwipeGesture();
-});
+  document.addEventListener("touchend", (e) => {
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipeGesture();
+  });
 
-function handleSwipeGesture() {
-  if (swipeCooldown) return;
-  swipeCooldown = true;
-  setTimeout(() => swipeCooldown = false, 500);
+  function handleSwipeGesture() {
+    if (swipeCooldown) return;
+    swipeCooldown = true;
+    setTimeout(() => swipeCooldown = false, 500);
 
-  const deltaY = touchEndY - touchStartY;
-  const infoPanel = document.getElementById("info-panel");
-  const filterPanel = document.getElementById("filter-panel");
+    const deltaY = touchEndY - touchStartY;
+    const infoPanel = document.getElementById("info-panel");
+    const filterPanel = document.getElementById("filter-panel");
 
-  if (deltaY > 20) {
-    // 👇 Swipe down
-    if (swipeState === "info") {
-      togglePanel(false);
-      swipeState = "poster";
-    } else if (swipeState === "poster") {
-      togglePanel(false); // ensure info is closed
-      filterPanel.classList.add("active");
-      swipeState = "filter";
+    if (deltaY > 20) {
+      // 👇 Swipe down
+      if (swipeState === "info") {
+        togglePanel(false);
+        swipeState = "poster";
+      } else if (swipeState === "poster") {
+        togglePanel(false);
+        filterPanel.classList.add("active");
+        swipeState = "filter";
 
-      clearTimeout(window.filterAutoCloseTimer);
-      window.filterAutoCloseTimer = setTimeout(() => {
-        if (swipeState === "filter") {
-          filterPanel.classList.remove("active");
-          swipeState = "poster";
-        }
-      }, 10000);
-    }
-  } else if (deltaY < -20) {
-    // 👆 Swipe up
-    if (swipeState === "filter") {
-      filterPanel.classList.remove("active");
-      swipeState = "poster";
-    } else if (swipeState === "poster") {
-      filterPanel.classList.remove("active");
-      togglePanel(true);
-      swipeState = "info";
+        clearTimeout(window.filterAutoCloseTimer);
+        window.filterAutoCloseTimer = setTimeout(() => {
+          if (swipeState === "filter") {
+            filterPanel.classList.remove("active");
+            swipeState = "poster";
+          }
+        }, 10000);
+      }
+    } else if (deltaY < -20) {
+      // 👆 Swipe up
+      if (swipeState === "filter") {
+        filterPanel.classList.remove("active");
+        swipeState = "poster";
+      } else if (swipeState === "poster") {
+        filterPanel.classList.remove("active");
+        togglePanel(true);
+        swipeState = "info";
+      }
     }
   }
-}
-}
+
+  // === Keyboard shortcuts ===
   document.addEventListener("keydown", (e) => {
     const key = e.key.toLowerCase();
     if (key === "e") exportFirestoreAsCSV?.();
@@ -1397,34 +1404,35 @@ function handleSwipeGesture() {
     }
   });
 
+  // === Poster click triggers new fetch ===
+  moviePoster.addEventListener("click", () => {
+    if (swipeState === "poster") {
+      closeAllPanels();
+      togglePanel(true);
+      if (fetchTimer) clearTimeout(fetchTimer);
+      fetchWithCountdown().then(() => {
+        fetchTimer = setTimeout(startAutoFetch, 60000);
+      });
+    } else {
+      closeAllPanels();
+    }
+  });
+
+  // === Focus recovery after overlay clicks ===
   document.getElementById("trailer-overlay")?.addEventListener("click", () => {
     setTimeout(() => window.focus(), 300);
   });
 
-  // ❗✅ THIS WAS MISSING: you need to close this arrow function:
   document.getElementById("player")?.addEventListener("click", () => {
     setTimeout(() => window.focus(), 300);
-  }); // ← THIS closing line was missing!
-// ✅ Kick off first fetch only if not in autoplay mode
-  if (!window.autoTrailerMode) {
-    console.log("🚀 AutoFetch starting manually...");
-    startAutoFetch();
-  }
-document.getElementById("movie-poster").addEventListener("click", () => {
-  if (swipeState === "poster") {
-    closeAllPanels();
-    togglePanel(true); // open info panel
+  });
 
-    // 🔁 Optional: refetch a new title
-    if (fetchTimer) clearTimeout(fetchTimer);
-    fetchWithCountdown().then(() => {
-      fetchTimer = setTimeout(startAutoFetch, 60000); // restart timer
-    });
-  } else {
-    closeAllPanels(); // return to poster state
-  }
-});
-}; // ✅ Fully closes window.onload
+  // === FIRST LOAD ===
+  console.log("🚀 Starting first fetch...");
+  fetchWithCountdown().then(() => {
+    fetchTimer = setTimeout(startAutoFetch, 60000);
+  });
+};
 
 // ✅ Expose methods globally (MUST be outside onload!)
 window.closeTrailer = closeTrailer;
