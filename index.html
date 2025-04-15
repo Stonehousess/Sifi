@@ -1472,16 +1472,5 @@ window.failSafeTimeout = null;
     });
   }
 </script>
-
-<script>
-  window.addEventListener("load", () => {
-    if (typeof startAutoFetch === "function") {
-      console.log("🚀 Starting initial fetch after load...");
-      startAutoFetch();
-    } else {
-      console.warn("⚠️ startAutoFetch is not defined yet.");
-    }
-  });
-</script>
 </body>
 </html>
