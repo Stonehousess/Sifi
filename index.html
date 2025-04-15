@@ -520,8 +520,8 @@
 .info-buttons button img,
 .floating-buttons button img,
 #save-button {
-  height: 100%;        /* Fill the button's height */
-  width: auto;         /* Keep image aspect ratio */
+  width: 100%;         /* ✅ Let width fill the button */
+  height: auto;        /* ✅ Let height scale proportionally */
   object-fit: contain;
   opacity: 0.8;
   pointer-events: none;
