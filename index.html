@@ -1170,7 +1170,7 @@ function showOverlayInfo() {
 });
 function startFetchCountdown(duration = 60000) {
   const circle = document.querySelector("#save-timer-ring circle");
-  const totalLength = 2 * Math.PI * 30; // circle length for r=36
+  const totalLength = 2 * Math.PI * 30;
 
   let startTime = performance.now();
 
@@ -1178,17 +1178,14 @@ function startFetchCountdown(duration = 60000) {
     const elapsed = time - startTime;
     const progress = Math.min(elapsed / duration, 1);
     circle.style.strokeDashoffset = totalLength * (1 - progress);
-
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    }
+    if (progress < 1) requestAnimationFrame(animate);
   }
 
-  // Reset before starting
   circle.style.strokeDasharray = totalLength;
   circle.style.strokeDashoffset = 0;
 
   requestAnimationFrame(animate);
+} // ✅ <- THIS was missing
 function toggleMute() {
   if (!trailerPlayer) return;
   const muted = trailerPlayer.isMuted();
@@ -1296,13 +1293,13 @@ function updateYearLabel() {
 window.onload = () => {
   console.log("✅ window.onload fired");
 
-  // === Cache DOM references ===
+  // DOM References
   overlayInfo = document.getElementById("overlay-info");
   const genreSelect = document.getElementById("genre-select");
   const moviePoster = document.getElementById("movie-poster");
   const floatingButtons = document.querySelector(".floating-buttons");
 
-  // === Init genre dropdown ===
+  // Init Genre Dropdown
   document.getElementById("tmdb-button").disabled = true;
   genreSelect.innerHTML = `<option value="all">All</option>` + 
     genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
@@ -1320,27 +1317,21 @@ window.onload = () => {
     });
   });
 
-  // === Init year range label ===
+  // Year range label
   updateYearLabel();
   document.getElementById("year-from").addEventListener("input", updateYearLabel);
   document.getElementById("year-to").addEventListener("input", updateYearLabel);
 
-  // === Init floating button fade ===
-  fadeTimer = setTimeout(() => {
-    floatingButtons.classList.add("hidden");
-  }, 5000);
-
+  // Auto-hide floating buttons
+  fadeTimer = setTimeout(() => floatingButtons.classList.add("hidden"), 5000);
   resetPanelFade();
 
-  // === Swipe gesture handling ===
+  // Swipe Handling
   let touchStartY = 0;
   let touchEndY = 0;
 
-  document.addEventListener("touchstart", (e) => {
-    touchStartY = e.changedTouches[0].screenY;
-  });
-
-  document.addEventListener("touchend", (e) => {
+  document.addEventListener("touchstart", e => touchStartY = e.changedTouches[0].screenY);
+  document.addEventListener("touchend", e => {
     touchEndY = e.changedTouches[0].screenY;
     handleSwipeGesture();
   });
@@ -1351,19 +1342,14 @@ window.onload = () => {
     setTimeout(() => swipeCooldown = false, 500);
 
     const deltaY = touchEndY - touchStartY;
-    const infoPanel = document.getElementById("info-panel");
     const filterPanel = document.getElementById("filter-panel");
 
     if (deltaY > 20) {
-      // 👇 Swipe down
-      if (swipeState === "info") {
-        togglePanel(false);
-        swipeState = "poster";
-      } else if (swipeState === "poster") {
+      if (swipeState === "info") togglePanel(false);
+      else if (swipeState === "poster") {
         togglePanel(false);
         filterPanel.classList.add("active");
         swipeState = "filter";
-
         clearTimeout(window.filterAutoCloseTimer);
         window.filterAutoCloseTimer = setTimeout(() => {
           if (swipeState === "filter") {
@@ -1373,7 +1359,6 @@ window.onload = () => {
         }, 10000);
       }
     } else if (deltaY < -20) {
-      // 👆 Swipe up
       if (swipeState === "filter") {
         filterPanel.classList.remove("active");
         swipeState = "poster";
@@ -1385,7 +1370,7 @@ window.onload = () => {
     }
   }
 
-  // === Keyboard shortcuts ===
+  // Shortcuts
   document.addEventListener("keydown", (e) => {
     const key = e.key.toLowerCase();
     if (key === "e") exportFirestoreAsCSV?.();
@@ -1396,7 +1381,7 @@ window.onload = () => {
       const wrapper = document.getElementById("player");
       if (!document.fullscreenElement) {
         (iframe?.requestFullscreen?.() || wrapper?.requestFullscreen?.()).catch(err => {
-          console.warn("❌ Failed to enter fullscreen:", err);
+          console.warn("❌ Fullscreen failed:", err);
         });
       } else {
         document.exitFullscreen?.();
@@ -1404,7 +1389,7 @@ window.onload = () => {
     }
   });
 
-  // === Poster click triggers new fetch ===
+  // Poster click fetch
   moviePoster.addEventListener("click", () => {
     if (swipeState === "poster") {
       closeAllPanels();
@@ -1418,16 +1403,15 @@ window.onload = () => {
     }
   });
 
-  // === Focus recovery after overlay clicks ===
+  // Focus recovery
   document.getElementById("trailer-overlay")?.addEventListener("click", () => {
     setTimeout(() => window.focus(), 300);
   });
-
   document.getElementById("player")?.addEventListener("click", () => {
     setTimeout(() => window.focus(), 300);
   });
 
-  // === FIRST LOAD ===
+  // FIRST LOAD
   console.log("🚀 Starting first fetch...");
   fetchWithCountdown().then(() => {
     fetchTimer = setTimeout(startAutoFetch, 60000);
