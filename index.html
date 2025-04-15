@@ -126,6 +126,7 @@
   overflow: hidden;
   cursor: pointer;
   pointer-events: none;
+  will-change: opacity;
 }
 
 #info-panel.expanded {
@@ -1592,6 +1593,25 @@ window.onload = () => {
   fetchWithCountdown(false, true).then(() => {
   fetchTimer = setTimeout(startAutoFetch, 60000);
  });
+let mouseMoveTimer = null;
+
+document.addEventListener("mousemove", () => {
+  const panel = document.getElementById("info-panel");
+
+  if (!panel.classList.contains("expanded")) {
+    panel.classList.remove("hidden");
+    panel.style.opacity = "0.7";
+    swipeState = "poster";
+  }
+
+  // Auto-hide again after 10 seconds if not expanded
+  clearTimeout(mouseMoveTimer);
+  mouseMoveTimer = setTimeout(() => {
+    if (!panel.classList.contains("expanded")) {
+      panel.classList.add("hidden");
+    }
+  }, 10000);
+});
 // ✅ TMDB Button becomes "History Recall"
   document.getElementById("tmdb-button").onclick = (e) => {
   e.stopPropagation();
