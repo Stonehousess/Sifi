@@ -1319,13 +1319,14 @@ window.onload = () => {
   currentGenre = genres.find(g => g.name === "Animation");
 
   genreSelect.addEventListener("change", (e) => {
-    const selected = e.target.value;
-    currentGenre = genres.find(g => g.name === selected) || { name: "all", movie: "", tv: "" };
-    document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
+  const selected = e.target.value;
+  currentGenre = genres.find(g => g.name === selected) || { name: "all", movie: "", tv: "" };
+  document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
 
-    if (fetchTimer) clearTimeout(fetchTimer);
-  fetchWithCountdown(false, true).then(() => {  // 👈 true = preserve swipe state
-  fetchTimer = setTimeout(startAutoFetch, 60000);
+  if (fetchTimer) clearTimeout(fetchTimer);
+  fetchWithCountdown(false, true).then(() => {
+    fetchTimer = setTimeout(startAutoFetch, 60000);
+  });
 });
 
   // Year range label
