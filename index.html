@@ -1187,7 +1187,7 @@ document.addEventListener("wheel", (e) => {
   console.log("🎡 Wheel event | deltaY:", deltaY, "| swipeState:", swipeState);
   const filterPanel = document.getElementById("filter-panel");
 
-  if (deltaY > 10) {
+  if (deltaY > 5) {
     // ✅ ⬇️ Scroll down — open info panel
     if (swipeState === "filter") {
       filterPanel.classList.remove("active");
@@ -1196,7 +1196,7 @@ document.addEventListener("wheel", (e) => {
       closeAllPanels();
       togglePanel(true);
     }
-  } else if (deltaY < -10) {
+  } else if (deltaY < -5) {
     // ✅ ⬆️ Scroll up — collapse or show filter
     if (swipeState === "info") {
       togglePanel(false);
@@ -1526,7 +1526,7 @@ window.onload = () => {
     const deltaY = touchEndY - touchStartY;
     const filterPanel = document.getElementById("filter-panel");
 
-    if (deltaY > 10) {
+    if (deltaY > 5) {
       if (swipeState === "info") togglePanel(false);
       else if (swipeState === "poster") {
         togglePanel(false);
@@ -1540,7 +1540,7 @@ window.onload = () => {
           }
         }, 10000);
       }
-    } else if (deltaY < -10) {
+    } else if (deltaY < -5) {
       if (swipeState === "filter") {
         filterPanel.classList.remove("active");
         swipeState = "poster";
