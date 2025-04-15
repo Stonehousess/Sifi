@@ -607,6 +607,7 @@
   let swipeState = "poster"; // "poster", "info", or "filter"
   let swipeCooldown = false;
   window.tmdbClickBound = false;
+  let lastMouseMoveTime = 0;
 
 function closeAllPanels() {
   document.getElementById("filter-panel").classList.remove("active");
@@ -1593,10 +1594,14 @@ window.onload = () => {
   fetchWithCountdown(false, true).then(() => {
   fetchTimer = setTimeout(startAutoFetch, 60000);
  });
-let mouseMoveTimer = null;
+// Initialize lastMouseMoveTime to prevent ReferenceError
+let lastMouseMoveTime = 0;
+let panelFadeTimer = null; // Make sure this is declared globally if it's not already
 
 document.addEventListener("mousemove", () => {
   const now = Date.now();
+
+  // Throttle mousemove to avoid firing too often
   if (now - lastMouseMoveTime < 200) return;
   lastMouseMoveTime = now;
 
@@ -1604,13 +1609,15 @@ document.addEventListener("mousemove", () => {
 
   // Only show if not expanded
   if (!infoPanel.classList.contains("expanded")) {
-    infoPanel.classList.remove("hidden");
+    if (infoPanel.classList.contains("hidden")) {
+      infoPanel.classList.remove("hidden");
+    }
 
-    // 🕒 Reset fade out
+    // 🕒 Auto-hide after 5s of inactivity
     clearTimeout(panelFadeTimer);
     panelFadeTimer = setTimeout(() => {
       infoPanel.classList.add("hidden");
-    }, 5000); // Auto-hide after 5s of inactivity
+    }, 5000);
   }
 });
 // ✅ TMDB Button becomes "History Recall"
