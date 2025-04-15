@@ -471,21 +471,29 @@ function closeAllPanels() {
 
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
-  const shouldExpand = forceExpand !== null ? forceExpand : !panel.classList.contains('expanded');
-  console.log("🧪 togglePanel called — shouldExpand:", shouldExpand); // ✅ Add this
+  const shouldExpand = forceExpand !== null
+    ? forceExpand
+    : !panel.classList.contains('expanded');
+
+  clearTimeout(panelFadeTimer);
+  clearTimeout(panelTimer);
+
   if (shouldExpand) {
     panel.classList.remove('hidden');
     panel.classList.add('expanded');
-    clearTimeout(panelTimer);
-    panelTimer = setTimeout(() => panel.classList.remove('expanded'), 15000);
     swipeState = "info";
-  } else {
-    panel.classList.remove('expanded');
-    swipeState = "poster";
-    // Do not hide — just collapse
-  }
 
-  resetPanelFade(); // ✅ Reinitiate fade countdown
+    // Auto-collapse after 15s
+    panelTimer = setTimeout(() => {
+      panel.classList.remove("expanded");
+      panel.classList.add("hidden");
+      swipeState = "poster";
+    }, 15000);
+  } else {
+    panel.classList.remove("expanded");
+    panel.classList.add("hidden");
+    swipeState = "poster";
+  }
 }
 
 function resetPanelFade() {
