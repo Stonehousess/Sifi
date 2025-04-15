@@ -1334,7 +1334,6 @@ document.getElementById("genre-select").addEventListener("change", (e) => {
   document.getElementById("year-from").addEventListener("input", updateYearLabel);
   document.getElementById("year-to").addEventListener("input", updateYearLabel);
   startFetchCountdown(60000);
-  startAutoFetch();
 
   fadeTimer = setTimeout(() => {
     document.querySelector(".floating-buttons").classList.add("hidden");
