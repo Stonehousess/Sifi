@@ -1447,17 +1447,11 @@ window.onload = () => {
   });
 
   moviePoster.addEventListener("click", () => {
-  // Always close filter panel first
-  closeAllPanels();
-
-  // Fetch a new film (and restart timer)
+  // Always keep info-panel open and fetch a new title
   if (fetchTimer) clearTimeout(fetchTimer);
-  fetchWithCountdown(false, false).then(() => {
+  fetchWithCountdown(false, true).then(() => {
     fetchTimer = setTimeout(startAutoFetch, 60000);
   });
-
-  // Always reset state to poster (whether info was open or not)
-  swipeState = "poster";
 });
 
   // Focus recovery
