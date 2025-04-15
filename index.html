@@ -499,40 +499,20 @@
   padding: 4px 8px;
   border-radius: 4px;
   border: none;
-}
 .info-buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-.info-buttons-row {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-bottom: 10px;
-}
-
-.info-buttons-row button img {
-  height: 80px;
-  opacity: 0.8;
-}
-#info-panel .info-buttons {
   display: flex;
   justify-content: space-between;
   align-items: stretch;
   padding: 6px 12px;
   gap: 0;
+  margin-bottom: 10px;
   background: transparent;
 }
 
-#info-panel .info-buttons button {
+.info-buttons button {
   flex: 1;
-  aspect-ratio: 1 / 1; /* ✅ square: height = width */
-  background: rgba(255, 255, 255, 0.07); /* semi-transparent background */
+  aspect-ratio: 1 / 1; /* square buttons */
+  background: rgba(255, 255, 255, 0.07);
   border: none;
   border-radius: 0;
   margin: 0;
@@ -544,27 +524,35 @@
   transition: background 0.3s ease;
 }
 
-#info-panel .info-buttons button:hover {
+.info-buttons button:hover {
   background: rgba(255, 255, 255, 0.15);
 }
 
-#info-panel .info-buttons button img {
+.info-buttons button img {
   width: 100%;
   height: 100%;
-  object-fit: contain;  /* ✅ Fit image inside square */
+  object-fit: contain;
   opacity: 1;
   pointer-events: none;
   user-select: none;
 }
-.floating-buttons button img,
+
+.info-buttons button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
 .info-buttons button img,
+.floating-buttons button img,
 #save-button {
+  width: 100%;
   height: 100%;
-  width: auto;
   object-fit: contain;
   opacity: 0.8;
   transition: opacity 0.3s ease;
+  pointer-events: none;
+  user-select: none;
 }
+
 .info-buttons button:hover img,
 #save-button-wrapper:hover img {
   opacity: 1;
