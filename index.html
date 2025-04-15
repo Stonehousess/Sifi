@@ -1011,22 +1011,24 @@ document.addEventListener("wheel", (e) => {
   setTimeout(() => swipeCooldown = false, 500);
 
   const deltaY = e.deltaY;
+  const filterPanel = document.getElementById("filter-panel");
 
-  if (deltaY < -10) {
-    // ⬆️ Scroll up
+  if (deltaY > 10) {
+    // ✅ ⬇️ Scroll down — open info panel
     if (swipeState === "filter") {
-      closeAllPanels();
+      filterPanel.classList.remove("active");
+      swipeState = "poster";
     } else {
       closeAllPanels();
-      togglePanel(true); // info
+      togglePanel(true);
     }
-  } else if (deltaY > 10) {
-    // ⬇️ Scroll down
+  } else if (deltaY < -10) {
+    // ✅ ⬆️ Scroll up — collapse or show filter
     if (swipeState === "info") {
       togglePanel(false);
-    } else {
+    } else if (swipeState === "poster") {
       closeAllPanels();
-      document.getElementById("filter-panel").classList.add("active");
+      filterPanel.classList.add("active");
       swipeState = "filter";
 
       clearTimeout(window.filterAutoCloseTimer);
