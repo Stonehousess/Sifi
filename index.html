@@ -1125,10 +1125,7 @@ function popoutTrailer() {
   }
 }
 
-// Register events
-['mousemove', 'click', 'touchstart'].forEach(event =>
-  window.addEventListener(event, resetPanelFade)
-);
+
 window.addEventListener("keydown", (e) => {
   const trailerVisible = document.getElementById("trailer-overlay")?.classList.contains("active");
 
@@ -1423,22 +1420,7 @@ function handleSwipeGesture() {
     setTimeout(() => window.focus(), 300);
   }); // ← THIS closing line was missing!
 
-  // ✅ TMDB Button becomes "History Recall"
-  document.getElementById("tmdb-button").onclick = (e) => {
-  e.stopPropagation();
-  console.log("🖱️ TMDB button clicked");
-  console.log("📜 History count:", fetchHistory.length);
-  if (fetchHistory.length === 0) return; // still safe guard
-
-  historyIndex = (historyIndex + 1) % fetchHistory.length;
-
-  const previous = fetchHistory[historyIndex];
-  if (previous) {
-    window.applyingFromHistory = true;
-    applyFilmToUI(previous);
-    window.applyingFromHistory = false;
-  }
-};
+  
 }; // ✅ Fully closes window.onload
 
 
