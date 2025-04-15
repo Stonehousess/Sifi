@@ -1073,10 +1073,20 @@ function applyFilmToUI(data) {
   currentTMDBUrl = data.tmdbUrl;
   currentTrailerUrl = data.trailerUrl;
 
-  const trailerImg = document.getElementById("trailer-button").querySelector("img");
-  document.getElementById("trailer-button").disabled = !data.trailerUrl;
-  trailerImg.src = data.trailerUrl ? "play.png" : "play-disabled.png";
-  trailerImg.style.opacity = data.trailerUrl ? "0.6" : "0.5";
+  const trailerBtn = document.getElementById("trailer-button");
+const trailerImg = trailerBtn?.querySelector("img");
+
+if (!data.trailerUrl) {
+  trailerBtn.disabled = true;
+  trailerImg.src = "play-disabled.png";
+  trailerImg.style.opacity = "0.3";
+  trailerBtn.style.cursor = "not-allowed";
+} else {
+  trailerBtn.disabled = false;
+  trailerImg.src = "play.png";
+  trailerImg.style.opacity = "0.6";
+  trailerBtn.style.cursor = "pointer";
+}
 
   // ✅ TMDB button history recall
   const tmdbBtn = document.getElementById("tmdb-button");
