@@ -523,7 +523,7 @@
 #info-panel .info-buttons {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   padding: 6px 12px;
   gap: 0;
   background: transparent;
@@ -531,12 +531,15 @@
 
 #info-panel .info-buttons button {
   flex: 1;
-  max-width: none;
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.07); /* semi-transparent */
+  aspect-ratio: 1 / 1; /* ✅ square: height = width */
+  background: rgba(255, 255, 255, 0.07); /* semi-transparent background */
   border: none;
   border-radius: 0;
   margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
   transition: background 0.3s ease;
 }
@@ -546,9 +549,10 @@
 }
 
 #info-panel .info-buttons button img {
-  height: 36px;
-  width: auto;
-  opacity: 1; /* fully visible image */
+  width: 100%;
+  height: 100%;
+  object-fit: contain;  /* ✅ Fit image inside square */
+  opacity: 1;
   pointer-events: none;
   user-select: none;
 }
