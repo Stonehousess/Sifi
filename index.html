@@ -1233,7 +1233,7 @@ function startAutoFetch() {
 }
 function fetchWithCountdown(requireTrailer = false, preserveSwipeState = true) {
   if (window.autoTrailerMode) return Promise.resolve(false);
-  if (isFetching) return false;
+  if (isFetching) return Promise.resolve(false);
   isFetching = true;
 
   return getRandomTitle(requireTrailer).then((data) => {
@@ -1246,11 +1246,16 @@ function fetchWithCountdown(requireTrailer = false, preserveSwipeState = true) {
       }
 
       startFetchCountdown(60000);
+      isFetching = false;
+      return true; // ✅ important for .then chains
+    } else {
+      isFetching = false;
+      return false;
     }
-    isFetching = false;
   }).catch((err) => {
     console.error("Error in fetch:", err);
     isFetching = false;
+    return false;
   });
 }
 
@@ -1395,7 +1400,7 @@ window.onload = () => {
     }
   });
 
-  /moviePoster.addEventListener("click", () => {
+  moviePoster.addEventListener("click", () => {
   if (swipeState === "poster") {
     closeAllPanels();             // close filters if open
     togglePanel(true);            // expand info manually
