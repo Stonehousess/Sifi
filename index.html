@@ -675,6 +675,7 @@ function onPlayerStateChange(event) {
   }
 
   if (event.data === YT.PlayerState.ENDED) {
+  isTrailerAdvancing = false;
   clearTimeout(failSafeTimeout);
   clearTimeout(backupStateTimeout);
   trailerPlaying = false;
@@ -692,8 +693,6 @@ function onPlayerStateChange(event) {
       findTrailerAndPlay(); // ✅ Continue loop
     }, 1000);
   }
-
-  isTrailerAdvancing = false;
 }
 
   if (event.data === YT.PlayerState.PAUSED) {
@@ -1155,8 +1154,13 @@ async function findTrailerAndPlay() {
     ) {
       console.log("🎬 Found trailer — playing", data.trailerUrl);
       applyFilmToUI(data);
-      playTrailer(data.trailerUrl);
-      isTrailerAdvancing = false; // ✅ Reset after success!
+
+      // ✅ Delay trailer start just slightly
+      setTimeout(() => {
+        playTrailer(data.trailerUrl);
+        isTrailerAdvancing = false; // ✅ Reset only after starting trailer
+      }, 200);
+
       found = true;
       break;
     }
@@ -1166,10 +1170,10 @@ async function findTrailerAndPlay() {
   }
 
   if (!found) {
-  console.warn("⛔ No valid trailer found after 7 tries. Retrying in 3 seconds...");
-  isTrailerAdvancing = false; // ✅ release lock before retry
-  setTimeout(() => findTrailerAndPlay(), 3000);
-}
+    console.warn("⛔ No valid trailer found after 7 tries. Retrying in 3 seconds...");
+    isTrailerAdvancing = false;
+    setTimeout(() => findTrailerAndPlay(), 3000);
+  }
 }
 // 🌐 Expose the trailer play function
 window.findTrailerAndPlay = findTrailerAndPlay;
