@@ -386,20 +386,17 @@
 }
 .info-buttons button,
 #save-button-wrapper {
-  border: none;
-  background: rgba(255, 255, 255, 0.07); /* Slight translucent bg */
+  width: 20%;           /* ✅ You can tweak this (e.g., 18–22%) */
+  max-width: 120px;
+  height: auto;
+  aspect-ratio: auto;
   padding: 0;
   margin: 0 4px;
-  cursor: pointer;
-
+  background: rgba(255, 255, 255, 0.07);
   display: flex;
   align-items: center;
   justify-content: center;
-
-  height: 40px;         /* Consistent button height */
-  width: auto;          /* Width adapts to image */
-  flex: 0 0 auto;       /* No stretching */
-  opacity: 1;
+  cursor: pointer;
   transition: background 0.3s ease;
 }
 #save-button-wrapper {
@@ -520,9 +517,8 @@
 .info-buttons button img,
 .floating-buttons button img,
 #save-button {
-  height: 100%;        /* Match the button height */
-  width: auto;         /* Scale width proportionally */
-  max-width: 100%;     /* Don't exceed button width */
+  width: 100%;         /* ✅ Let image fill button width */
+  height: auto;        /* ✅ Let height adjust naturally */
   object-fit: contain;
   opacity: 0.8;
   pointer-events: none;
