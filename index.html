@@ -471,24 +471,23 @@
     panel.classList.add('expanded');
     clearTimeout(panelTimer);
     panelTimer = setTimeout(() => panel.classList.remove('expanded'), 15000);
-    swipeState = "info"; // 👈 update
+    swipeState = "info";
   } else {
-    panel.classList.remove('expanded'); // ✅ collapse
-    panel.classList.add('hidden');      // ✅ fade out if needed
-    swipeState = "poster"; // 👈 reset
+    panel.classList.remove('expanded');
+    swipeState = "poster";
+    // Do not hide — just collapse
   }
 
-  resetPanelFade();
+  resetPanelFade(); // ✅ Reinitiate fade countdown
 }
 
 function resetPanelFade() {
   const panel = document.getElementById('info-panel');
   clearTimeout(panelFadeTimer);
   panelFadeTimer = setTimeout(() => {
-    if (!panel.classList.contains("expanded")) {
-      panel.classList.add("hidden");
-    }
-  }, 10000); // Keep unexpanded panel visible for 10s
+    panel.classList.remove("expanded");    // ✅ collapse only
+    panel.classList.remove("hidden");      // ✅ stay visible
+  }, 10000); // show for 10s
 }
   function getFlagEmoji(countryCode) {
     if (!countryCode) return "";
