@@ -462,6 +462,12 @@
   let swipeCooldown = false;
   window.tmdbClickBound = false;
 
+function closeAllPanels() {
+  document.getElementById("filter-panel").classList.remove("active");
+  document.getElementById("info-panel").classList.remove("expanded");
+  swipeState = "poster";
+}
+
   function togglePanel(forceExpand = null) {
   const panel = document.getElementById('info-panel');
   const shouldExpand = forceExpand !== null ? forceExpand : !panel.classList.contains('expanded');
@@ -988,42 +994,38 @@ window.findTrailerAndPlay = findTrailerAndPlay;
 
 // 🛠 Replace existing wheel listener
 document.addEventListener("wheel", (e) => {
-  if (swipeCooldown) return;
-
+    if (swipeCooldown) return;
   swipeCooldown = true;
-  setTimeout(() => swipeCooldown = false, 500); // 500ms lock
+  setTimeout(() => swipeCooldown = false, 500);
 
   const infoPanel = document.getElementById("info-panel");
   const filterPanel = document.getElementById("filter-panel");
 
   if (e.deltaY < -5) {
     // ⬆️ Scroll up
+    if (swipeState === "filter") {
+      filterPanel.classList.remove("active");
+      swipeState = "poster";
+    } else if (swipeState === "poster") {
+      closeAllPanels();
+      togglePanel(true);
+      swipeState = "info";
+    }
+  } else if (e.deltaY > 5) {
+    // ⬇️ Scroll down
     if (swipeState === "info") {
       togglePanel(false);
       swipeState = "poster";
     } else if (swipeState === "poster") {
+      closeAllPanels();
       filterPanel.classList.add("active");
       swipeState = "filter";
-
-      // ⏳ Auto-close after 10s
       clearTimeout(window.filterAutoCloseTimer);
       window.filterAutoCloseTimer = setTimeout(() => {
         if (swipeState === "filter") {
-          filterPanel.classList.remove("active");
-          swipeState = "poster";
+          closeAllPanels();
         }
       }, 10000);
-    }
-
-  } else if (e.deltaY > 5) {
-    // ⬇️ Scroll down
-    if (swipeState === "filter") {
-      filterPanel.classList.remove("active");
-      swipeState = "poster";
-      clearTimeout(window.filterAutoCloseTimer); // ✅ cancel timer if user closes it manually
-    } else if (swipeState === "poster") {
-      togglePanel(true);
-      swipeState = "info";
     }
   }
 
@@ -1356,9 +1358,8 @@ document.addEventListener("touchend", e => {
 
 function handleSwipeGesture() {
   if (swipeCooldown) return;
-
   swipeCooldown = true;
-  setTimeout(() => swipeCooldown = false, 500); // 500ms lock
+  setTimeout(() => swipeCooldown = false, 500);
 
   const deltaY = touchEndY - touchStartY;
   const infoPanel = document.getElementById("info-panel");
@@ -1370,10 +1371,10 @@ function handleSwipeGesture() {
       togglePanel(false);
       swipeState = "poster";
     } else if (swipeState === "poster") {
+      togglePanel(false); // ensure info is closed
       filterPanel.classList.add("active");
       swipeState = "filter";
 
-      // ⏳ Auto-close after 10s only if filter is still open
       clearTimeout(window.filterAutoCloseTimer);
       window.filterAutoCloseTimer = setTimeout(() => {
         if (swipeState === "filter") {
@@ -1387,13 +1388,10 @@ function handleSwipeGesture() {
     if (swipeState === "filter") {
       filterPanel.classList.remove("active");
       swipeState = "poster";
-      clearTimeout(window.filterAutoCloseTimer);
-    } else {
-      // 🧠 Open info panel if not expanded
-      if (!infoPanel.classList.contains("expanded")) {
-        togglePanel(true);
-        swipeState = "info";
-      }
+    } else if (swipeState === "poster") {
+      filterPanel.classList.remove("active");
+      togglePanel(true);
+      swipeState = "info";
     }
   }
 }
