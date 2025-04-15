@@ -114,10 +114,10 @@
   transform: translateX(-50%);
   width: 100%;
   max-width: 700px;
-  height: 30px;
+  height: 42px;
   background: rgba(20, 20, 20, 0.9);
   color: white;
-  padding: 4px 20px;
+  padding: 2px 20px;
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   transition: all 0.4s ease-in-out;
@@ -178,9 +178,10 @@
 
 .info-buttons {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;     /* or space-evenly if you want edge spacing */
   align-items: center;
-  padding: 6px 0;
+  gap: 1px;                    /* ✅ creates the 1px space */
+  padding: 0;
   width: 100%;
   max-width: 700px;
   margin: 0 auto 10px auto;
@@ -189,8 +190,8 @@
 
 .info-buttons button,
 #save-button-wrapper {
-  flex: 1 1 20%;
-  max-width: 20%;
+  flex: 1 1 0;                    /* ✅ Let them share available space equally */
+  max-width: calc(20% - 1px);     /* ✅ Adjust for 1px gap between each */
   height: 40px;
   background: rgba(255, 255, 255, 0.07);
   border: none;
@@ -199,7 +200,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative; /* 🛠 Needed for overlay (like ring) */
+  position: relative;             /* ✅ Needed for overlay ring etc */
   cursor: pointer;
   transition: background 0.3s ease;
 }
