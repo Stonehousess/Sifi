@@ -1403,19 +1403,16 @@ window.onload = () => {
     }
   });
 
-  // Poster click fetch
-  moviePoster.addEventListener("click", () => {
-    if (swipeState === "poster") {
-      closeAllPanels();
-      togglePanel(true);
-      if (fetchTimer) clearTimeout(fetchTimer);
-      fetchWithCountdown().then(() => {
-        fetchTimer = setTimeout(startAutoFetch, 60000);
-      });
-    } else {
-      closeAllPanels();
-    }
-  });
+  /moviePoster.addEventListener("click", () => {
+  if (swipeState === "poster") {
+    closeAllPanels();             // close filters if open
+    togglePanel(true);            // expand info manually
+    swipeState = "info";          // update state
+  } else {
+    closeAllPanels();             // return to poster view
+    swipeState = "poster";        // update state
+  }
+});
 
   // Focus recovery
   document.getElementById("trailer-overlay")?.addEventListener("click", () => {
