@@ -1356,7 +1356,7 @@ window.onload = () => {
     const deltaY = touchEndY - touchStartY;
     const filterPanel = document.getElementById("filter-panel");
 
-    if (deltaY > 20) {
+    if (deltaY > 10) {
       if (swipeState === "info") togglePanel(false);
       else if (swipeState === "poster") {
         togglePanel(false);
@@ -1370,7 +1370,7 @@ window.onload = () => {
           }
         }, 10000);
       }
-    } else if (deltaY < -20) {
+    } else if (deltaY < -10) {
       if (swipeState === "filter") {
         filterPanel.classList.remove("active");
         swipeState = "poster";
