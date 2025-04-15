@@ -1024,69 +1024,70 @@ return {
   }
 function applyFilmToUI(data) {
   console.log("📦 Current history count:", fetchHistory.length);
-  swipeState = "poster"; // 👈 Reset to poster state on new fetch
+  swipeState = "poster";
+
   // 🕘 Store history (unless we're recalling one)
   if (!window.applyingFromHistory) {
     fetchHistory.unshift(data);
-    if (fetchHistory.length > 5) fetchHistory.pop(); // limit to 5
+    if (fetchHistory.length > 5) fetchHistory.pop();
     historyIndex = 0;
     document.getElementById("tmdb-button").disabled = fetchHistory.length === 0;
   }
+
+  // 🔁 Set core UI elements
   document.getElementById("movie-poster").src = data.posterPath;
   document.getElementById("info-title").textContent = data.title + data.year;
   document.getElementById("info-meta").innerHTML = data.metaText;
   document.getElementById("info-description").textContent = data.overview;
-  // ✅ Clean up old extra info (if any)
-  document.getElementById("info-crew")?.remove();
-  // Add extended info
-  let extraHTML = `
-  <div id="info-crew" style="margin-top:10px; font-size:20px; color:#aaa;">
-    🎬 <strong>:</strong> ${data.director} &nbsp;|&nbsp; 
-    🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
-    💰 <strong>:</strong> ${data.budget} <br>
-    🎭 <strong>:</strong> ${data.castList}
-    <span style="margin-left: 12px; color:#aaa">Genre: ${data.genre}</span> 
-    <span id="tmdb-link">| <a href="${data.tmdbUrl}" target="_blank" style="color:#00ccff;">TMDB</a></span>
-  </div>`;
-  document.getElementById("info-genre").insertAdjacentHTML('afterend', extraHTML);
-  document.getElementById("genre-name").textContent = data.genre;
-
   document.getElementById("overlay-title").textContent = data.title + data.year;
   document.getElementById("overlay-meta").textContent = data.metaText;
   document.getElementById("overlay-description").textContent = data.overview;
 
-  currentTMDBUrl = data.tmdbUrl;
-  currentTrailerUrl = data.trailerUrl; // ✅ used for manual button play
+  // ✅ Genre name (single clean place)
+  const genreNameEl = document.getElementById("genre-name");
+  if (genreNameEl) genreNameEl.textContent = data.genre;
 
-  document.getElementById("tmdb-link").outerHTML = `<span id="tmdb-link">| <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a></span>`;
+  // ✅ TMDB link (replace content, not element)
+  const tmdbLink = document.getElementById("tmdb-link");
+  if (tmdbLink) {
+    tmdbLink.innerHTML = `| <a href="${data.tmdbUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
+  }
+
+  // ✅ Clean up old crew panel
+  document.getElementById("info-crew")?.remove();
+
+  // ✅ Add new crew panel
+  const genreAnchor = document.getElementById("info-genre");
+  if (genreAnchor) {
+    const extraHTML = `
+      <div id="info-crew" style="margin-top:10px; font-size:20px; color:#aaa;">
+        🎬 <strong>:</strong> ${data.director} &nbsp;|&nbsp; 
+        🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
+        💰 <strong>:</strong> ${data.budget} <br>
+        🎭 <strong>:</strong> ${data.castList}
+      </div>`;
+    genreAnchor.insertAdjacentHTML('afterend', extraHTML);
+  }
+
+  // ✅ Trailer setup
+  currentTMDBUrl = data.tmdbUrl;
+  currentTrailerUrl = data.trailerUrl;
 
   const trailerImg = document.getElementById("trailer-button").querySelector("img");
   document.getElementById("trailer-button").disabled = !data.trailerUrl;
-  if (data.trailerUrl) {
-    trailerImg.src = "play.png";
-    trailerImg.style.opacity = "0.6";
-  } else {
-    trailerImg.src = "play-disabled.png";
-    trailerImg.style.opacity = "0.5";
-  }
-// ✅ Setup TMDB button click handler if not yet bound
+  trailerImg.src = data.trailerUrl ? "play.png" : "play-disabled.png";
+  trailerImg.style.opacity = data.trailerUrl ? "0.6" : "0.5";
+
+  // ✅ TMDB button history recall
   const tmdbBtn = document.getElementById("tmdb-button");
   tmdbBtn.disabled = false;
-
   if (!window.tmdbClickBound) {
     tmdbBtn.onclick = (e) => {
       e.stopPropagation();
       console.log("🖱️ TMDB button clicked");
-      console.log("📜 History count:", fetchHistory.length);
-
       if (fetchHistory.length === 0) return;
 
-      if (historyIndex === -1) {
-        historyIndex = 0;
-      } else {
-        historyIndex = (historyIndex + 1) % fetchHistory.length;
-      }
-
+      historyIndex = (historyIndex + 1) % fetchHistory.length;
       const previous = fetchHistory[historyIndex];
       if (previous) {
         window.applyingFromHistory = true;
