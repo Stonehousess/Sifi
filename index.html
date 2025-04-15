@@ -4,67 +4,71 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <title>📼VCR📼 🎭</title>
   <style>
-    html, body {
-      background-color: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 0;
-      margin: 0;
-      overflow: hidden;
-      height: 100vh;
-    }
+  html, body {
+  background-color: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
 
-   #movie-container {
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: flex-start;
-   height: 100vh;
-   overflow: hidden;
- }
+#movie-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---------------- Poster ---------------- */
 
 #poster-wrapper {
   display: flex;
   justify-content: center;
-  align-items: flex-start;  /* Center both vertically and horizontally */
-  background-color: black;
+  align-items: flex-start;
   width: 100vw;
-  height: 100vh;        /* Always fill the viewport height */
+  height: 100vh;
+  background-color: black;
   overflow: hidden;
-  padding: 0;
-  margin: 0;
 }
 
-#movie-poster {
-  max-width: 100vw;       /* Don't overflow horizontally */
-  max-height: 100vh;      /* Don't overflow vertically */
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  margin: auto;
-  user-select: none;
-  animation: glowing-tides 5s infinite ease-in-out;
-}
-#movie-poster.loaded {
-  opacity: 1;
-}
 #poster-border {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   flex-direction: column;
+  background: none;
   margin: 0 auto;
   padding: 0;
-  background: none;
-  animation: none;
   z-index: 1;
   overflow: visible;
-  width: auto; /* ✅ Let width follow the poster naturally */
+  width: auto;
 }
- .floating-buttons {
+
+#movie-poster {
+  max-width: 100vw;
+  max-height: 100vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: auto;
+  display: block;
+  user-select: none;
+  animation: glowing-tides 5s infinite ease-in-out;
+}
+
+#movie-poster.loaded {
+  opacity: 1;
+}
+
+/* ---------------- Floating Buttons ---------------- */
+
+.floating-buttons {
   position: absolute;
   bottom: 32px;
   left: 50%;
@@ -73,17 +77,8 @@
   justify-content: center;
   align-items: center;
   gap: 14px;
-  padding: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-  transition: opacity 1s ease;
   z-index: 1000;
-}
-
-
-.floating-buttons > button,
-.floating-buttons > #save-button-wrapper {
-  flex: 0 0 auto;
+  transition: opacity 1s ease;
 }
 
 .floating-buttons.hidden {
@@ -91,157 +86,34 @@
   pointer-events: none;
 }
 
-.floating-buttons button {
+.floating-buttons button,
+.floating-buttons > #save-button-wrapper {
   height: 40px;
-  width: auto;
+  width: 40px;
   background: rgba(255, 255, 255, 0.07);
   border: none;
-  margin: 0 4px;
   padding: 0;
+  margin: 0 4px;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   cursor: pointer;
-  flex: 0 0 auto;
 }
 
-.floating-buttons button img {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  user-select: none;
+.floating-buttons button:hover,
+#save-button-wrapper:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.floating-buttons button:hover img {
-  opacity: 1;
-}
+/* ---------------- Info Panel ---------------- */
 
-    #loading-spinner {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #111;
-      color: #ffcc00;
-      padding: 20px 40px;
-      font-size: 20px;
-      border: 2px solid #ffcc00;
-      border-radius: 10px;
-      z-index: 2000;
-      display: none;
-    }
-
-    @keyframes glowing-sides {
-  0% {
-    box-shadow: -5px 0 10px red, 5px 0 10px red;
-    border-color: red;
-  }
-  25% {
-    box-shadow: -8px 0 14px orange, 8px 0 14px orange;
-    border-color: orange;
-  }
-  50% {
-    box-shadow: -10px 0 18px yellow, 10px 0 18px yellow;
-    border-color: yellow;
-  }
-  75% {
-    box-shadow: -8px 0 14px orange, 8px 0 14px orange;
-    border-color: orange;
-  }
-  100% {
-    box-shadow: -5px 0 10px red, 5px 0 10px red;
-    border-color: red;
-  }
-}
-@keyframes glowing-slides {
-  0% {
-    box-shadow:
-      -10px 0 10px 0 red,
-       10px 0 10px 0 red;
-  }
-  25% {
-    box-shadow:
-      -12px 0 12px 0 orange,
-       12px 0 12px 0 orange;
-  }
-  50% {
-    box-shadow:
-      -14px 0 14px 0 yellow,
-       14px 0 14px 0 yellow;
-  }
-  75% {
-    box-shadow:
-      -12px 0 12px 0 orange,
-       12px 0 12px 0 orange;
-  }
-  100% {
-    box-shadow:
-      -10px 0 10px 0 red,
-       10px 0 10px 0 red;
-  }
-}
-@keyframes glowing-tides {
-  0% {
-    box-shadow: -10px 0 10px red, 10px 0 10px red;
-  }
-  25% {
-    box-shadow: -12px 0 12px orange, 12px 0 12px orange;
-  }
-  50% {
-    box-shadow: -14px 0 14px yellow, 14px 0 14px yellow;
-  }
-  75% {
-    box-shadow: -12px 0 12px orange, 12px 0 12px orange;
-  }
-  100% {
-    box-shadow: -10px 0 10px red, 10px 0 10px red;
-  }
-}
-@keyframes glowing-sies {
-  0% {
-    box-shadow:
-      inset -10px 0 10px red,
-      inset 10px 0 10px red;
-  }
-  25% {
-    box-shadow:
-      inset -12px 0 12px orange,
-      inset 12px 0 12px orange;
-  }
-  50% {
-    box-shadow:
-      inset -14px 0 14px yellow,
-      inset 14px 0 14px yellow;
-  }
-  75% {
-    box-shadow:
-      inset -12px 0 12px orange,
-      inset 12px 0 12px orange;
-  }
-  100% {
-    box-shadow:
-      inset -10px 0 10px red,
-      inset 10px 0 10px red;
-  }
-}
-@keyframes glowing-border {
-  0%   { box-shadow: 0 0 10px 2px red; border-color: red; }
-  25%  { box-shadow: 0 0 20px 4px orange; border-color: orange; }
-  50%  { box-shadow: 0 0 25px 6px yellow; border-color: yellow; }
-  75%  { box-shadow: 0 0 20px 4px orange; border-color: orange; }
-  100% { box-shadow: 0 0 10px 2px red; border-color: red; }
-}
-  #info-panel {
+#info-panel {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  max-width: 700px; /* match your poster max width */
+  max-width: 700px;
   height: 30px;
   background: rgba(20, 20, 20, 0.9);
   color: white;
@@ -255,166 +127,106 @@
   cursor: pointer;
 }
 
-    #info-panel.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    #info-panel.expanded {
-      height: auto;
-      opacity: 0.9;
-    }
-
-    #info-content {
-      pointer-events: auto;
-      opacity: 0.7;
-      transition: opacity 0.4s ease 0.3s;
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    #info-panel.expanded #info-content {
-      opacity: 0.65;
-    }
-
-    #info-title {
-      font-size: 32px;
-      font-weight: bold;
-    }
-
-    #info-meta {
-      font-size: 25px;
-      margin-top: 5px;
-      color: #ffcc00;
-    }
-
-    #info-description {
-      margin-top: 6px;
-      font-size: 22px;
-      line-height: 1.4;
-      max-width: 100%;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
-
-    #info-genre {
-      margin-top: 10px;
-      font-size: 18px;
-      color: #aaa;
-    }
-.overlay-buttons {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
+#info-panel.expanded {
+  height: auto;
+  opacity: 0.9;
 }
 
-.overlay-btn {
-  padding: 10px 16px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  border: 1px solid white;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-}
-#overlay-info {
-  opacity: 0;
-  transition: opacity 2s;
-  text-align: center;
-  margin-top: 20px;
-  color: white;
-  max-width: 80%;
-}
-
-#overlay-title {
-  font-size: 30px;
-  font-weight: bold;
-}
-#overlay-meta {
-  color: #ffcc00;
-  font-size: 25px;
-}
-#overlay-description {
-  font-size: 20px;
-  margin-top: 8px;
-}
-#trailer-overlay {
-  visibility: hidden;
+#info-panel.hidden {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.4s ease;
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.95);
-  z-index: 3000;
+}
+
+#info-content {
+  pointer-events: auto;
+  opacity: 0.7;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 20px;
+  transition: opacity 0.4s ease 0.3s;
+}
+
+#info-panel.expanded #info-content {
+  opacity: 0.65;
+}
+
+#info-title {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+#info-meta {
+  font-size: 25px;
+  margin-top: 5px;
+  color: #ffcc00;
+}
+
+#info-description {
+  margin-top: 6px;
+  font-size: 22px;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+#info-genre {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #aaa;
+}
+
+/* ---------------- Info Panel Buttons ---------------- */
+
+.info-buttons {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  padding: 6px 12px;
+  background: transparent;
+  margin-bottom: 10px;
 }
 
-#trailer-overlay.active {
-  visibility: visible;
-  opacity: 1;
-  pointer-events: all;
-}
-
-  .player-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 1280px;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-}
-
-  #player {
-  Z-index: 9999;
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-}
-.close-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
 .info-buttons button,
 #save-button-wrapper {
   height: 40px;
   width: 40px;
   background: rgba(255, 255, 255, 0.07);
   border: none;
-  margin: 0 4px;
   padding: 0;
+  margin: 0 4px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-}
-#save-button-wrapper {
-  transition: transform 0.2s ease;
+  transition: background 0.3s ease;
 }
 
 .info-buttons button:hover,
 #save-button-wrapper:hover {
   background: rgba(255, 255, 255, 0.15);
 }
+
+/* ---------------- Shared Button Images ---------------- */
+
+.info-buttons button img,
+.floating-buttons button img,
 #save-button {
-  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
-  display: block;
-  z-index: 1;
   object-fit: contain;
+  opacity: 0.8;
+  pointer-events: none;
+  user-select: none;
+  display: block;
 }
+
+.info-buttons button:hover img,
+#save-button-wrapper:hover img {
+  opacity: 1;
+}
+
+/* ---------------- Save Timer Ring ---------------- */
 
 #save-timer-ring {
   position: absolute;
@@ -432,9 +244,26 @@
   fill: none;
   stroke: red;
   stroke-width: 4;
-  stroke-dasharray: 113.1; /* 2π * 18 */
+  stroke-dasharray: 113.1;
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 0.1s linear;
+}
+
+/* ---------------- Misc ---------------- */
+
+#loading-spinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #111;
+  color: #ffcc00;
+  padding: 20px 40px;
+  font-size: 20px;
+  border: 2px solid #ffcc00;
+  border-radius: 10px;
+  z-index: 2000;
+  display: none;
 }
 
 #flag {
@@ -442,96 +271,15 @@
   vertical-align: middle;
   margin-left: 4px;
 }
-#trailer-container {
-  position: relative;
-}
 
-#popout-overlay-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 10;
-}
+/* ---------------- Animations ---------------- */
 
-#popout-overlay-button .overlay-btn {
-  padding: 6px 10px;
-  font-size: 14px;
-}
-
-#filter-panel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(20, 20, 20, 0.5);
-  color: white;
-  padding: 16px 20px;
-  z-index: 2000;
-  transform: translateY(-100%);
-  transition: transform 0.4s ease-in-out;
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
-}
-#filter-panel.active {
-  transform: translateY(0);
-}
-#filter-content {
-  max-width: 700px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  align-items: center;
-}
-#filter-content label {
-  font-size: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  color: #ffcc00;
-}
-#filter-content input,
-#filter-content select {
-  margin-top: 4px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: none;
-.info-buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  padding: 6px 12px;
-  gap: 0;
-  margin-bottom: 10px;
-  background: transparent;
-}
-
-
-
-.info-buttons button:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.info-buttons button img,
-.floating-buttons button img,
-#save-button {
-  max-height: 100%;     /* ✅ Never taller than button */
-  max-width: 100%;      /* ✅ Never wider than button */
-  height: auto;         /* ✅ Maintain aspect ratio */
-  width: auto;          /* ✅ Let browser calculate width */
-  object-fit: contain;
-  opacity: 0.8;
-  pointer-events: none;
-  user-select: none;
-  display: block;
-}
-
-.info-buttons button:hover img,
-#save-button-wrapper:hover img {
-  opacity: 1;
+@keyframes glowing-tides {
+  0%   { box-shadow: -10px 0 10px red, 10px 0 10px red; }
+  25%  { box-shadow: -12px 0 12px orange, 12px 0 12px orange; }
+  50%  { box-shadow: -14px 0 14px yellow, 14px 0 14px yellow; }
+  75%  { box-shadow: -12px 0 12px orange, 12px 0 12px orange; }
+  100% { box-shadow: -10px 0 10px red, 10px 0 10px red; }
 }
   </style>
 </head>
