@@ -729,30 +729,32 @@ function playTrailer(url) {
     fetchTimer = null;
   }
 
+  const overlay = document.getElementById('trailer-overlay');
+  if (!overlay.classList.contains('active')) {
+    overlay.classList.add('active');
+    overlay.style.visibility = 'visible';
+    overlay.style.opacity = '1';
+    overlay.style.pointerEvents = 'auto';
+  }
+
   const playerVideoUrl = trailerPlayer.getVideoUrl?.();
   const isSameVideo = playerVideoUrl?.includes(videoId);
 
   if (isSameVideo) {
-  console.log("🔁 Replaying same trailer manually");
-  trailerPlayer.seekTo(0);
-  trailerPlayer.playVideo();
-  return;
-}
+    console.log("🔁 Replaying same trailer manually");
+    trailerPlayer.seekTo(0);
+    trailerPlayer.playVideo();
+    return;
+  }
 
   // ✅ Update global trailer references
   currentTrailerUrl = url;
   lastTrailerId = videoId;
 
   // Clean up timers
-  if (fetchTimer) clearTimeout(fetchTimer);
   if (fadeTimer) clearTimeout(fadeTimer);
   if (overlayFadeTimer) clearTimeout(overlayFadeTimer);
   if (currentPollInterval) clearInterval(currentPollInterval);
-
-  const overlay = document.getElementById('trailer-overlay');
-  if (!overlay.classList.contains('active')) {
-    overlay.classList.add('active');
-  }
 
   trailerPlaying = true;
   trailerPaused = false;
@@ -805,7 +807,7 @@ function playTrailer(url) {
       failSafeSkips = 0;
     }
   }, 10000);
-}; // <- CLOSES the function cleanly
+}
 // Clean up previous poller
 if (currentPollInterval) {
   clearInterval(currentPollInterval);
@@ -850,19 +852,29 @@ function closeTrailer() {
   window.autoTrailerMode = false;
   trailerLoopFirst = true;
   trailerPlaying = false;
-  trailerPlayer.stopVideo();
-  document.getElementById('trailer-overlay').classList.remove('active');
+
+  if (trailerPlayer && trailerPlayer.stopVideo) {
+    trailerPlayer.stopVideo();
+    trailerPlayer.clearVideo?.();
+  }
+
+  const overlay = document.getElementById('trailer-overlay');
+  overlay.classList.remove('active');
+  overlay.style.opacity = '0';
+  overlay.style.visibility = 'hidden';
+  overlay.style.pointerEvents = 'none';
+
   failSafeSkips = 0;
 
   if (fetchTimer) clearTimeout(fetchTimer);
 
-  // 🕑 Delay the next auto-fetch and ring for 20s
+  // 🕑 Delay next fetch
   fetchTimer = setTimeout(() => {
     startAutoFetch();
-    startFetchCountdown(60000); // Restart 60s countdown
+    startFetchCountdown(60000);
   }, 20000);
 
-  // 🎯 Show 20s ring immediately
+  // Show ring
   startFetchCountdown(20000);
 }
 
