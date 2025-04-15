@@ -238,7 +238,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  max-width: 100vw; /* match your poster max width */
+  max-width: 700px; /* match your poster max width */
   height: 30px;
   background: rgba(20, 20, 20, 0.9);
   color: white;
@@ -1100,7 +1100,7 @@ function applyFilmToUI(data) {
     🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
     💰 <strong>:</strong> ${data.budget} <br>
     🎭 <strong>:</strong> ${data.castList}
-    <span style="color:#aaa">Genre: ${data.genre}</span> 
+    <span style="margin-left: 12px; color:#aaa">Genre: ${data.genre}</span> 
     <span id="tmdb-link">| <a href="${data.tmdbUrl}" target="_blank" style="color:#00ccff;">TMDB</a></span>
   </div>`;
   document.getElementById("info-genre").insertAdjacentHTML('afterend', extraHTML);
