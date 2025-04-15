@@ -210,25 +210,28 @@
 
 /* ---------------- Shared Button Images ---------------- */
 
-.info-buttons button img,
-.floating-buttons button img,
-#save-button {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  opacity: 0.8;
-  pointer-events: none;
-  user-select: none;
-  display: block;
-}
-
 .info-buttons button:hover img,
 #save-button-wrapper:hover img {
   opacity: 1;
 }
-
+.info-buttons button img {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  max-width: 100%;
+}
+.floating-buttons button img {
+  height: 100%;
+  width: auto;
+  max-height: 100%;
+  max-width: 100%;
+}
+#save-button {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  max-width: 100%;
+}
 /* ---------------- Save Timer Ring ---------------- */
 
 #save-timer-ring {
