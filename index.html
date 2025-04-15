@@ -1068,34 +1068,23 @@ function applyFilmToUI(data) {
     trailerImg.src = "play-disabled.png";
     trailerImg.style.opacity = "0.5";
   }
-// ✅ Setup TMDB button click handler if not yet bound
-  const tmdbBtn = document.getElementById("tmdb-button");
-  tmdbBtn.disabled = false;
+// ✅ TMDB Button becomes "History Recall"
+document.getElementById("tmdb-button").onclick = (e) => {
+  e.stopPropagation();
+  console.log("🖱️ TMDB button clicked");
+  console.log("📜 History count:", fetchHistory.length);
 
-  if (!window.tmdbClickBound) {
-    tmdbBtn.onclick = (e) => {
-      e.stopPropagation();
-      console.log("🖱️ TMDB button clicked");
-      console.log("📜 History count:", fetchHistory.length);
+  if (fetchHistory.length === 0) return; // safeguard
 
-      if (fetchHistory.length === 0) return;
+  historyIndex = (historyIndex + 1) % fetchHistory.length;
 
-      if (historyIndex === -1) {
-        historyIndex = 0;
-      } else {
-        historyIndex = (historyIndex + 1) % fetchHistory.length;
-      }
-
-      const previous = fetchHistory[historyIndex];
-      if (previous) {
-        window.applyingFromHistory = true;
-        applyFilmToUI(previous);
-        window.applyingFromHistory = false;
-      }
-    };
-    window.tmdbClickBound = true;
+  const previous = fetchHistory[historyIndex];
+  if (previous) {
+    window.applyingFromHistory = true;
+    applyFilmToUI(previous);
+    window.applyingFromHistory = false;
   }
-}
+};
 async function findTrailerAndPlay() {
   if (isTrailerAdvancing) {
     console.warn("🚦 Trailer advance already in progress — skipping...");
