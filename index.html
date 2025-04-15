@@ -1251,6 +1251,7 @@ function fetchWithCountdown(requireTrailer = false, overrideType = null, overrid
       startFetchCountdown(60000);      // ⏳ Start countdown ring
       isFetching = false;
       return true;
+      console.log("🔍 Calling getRandomTitle...");
     } else {
       console.warn("⚠️ No valid data returned");
       isFetching = false;
