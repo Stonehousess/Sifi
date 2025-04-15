@@ -387,7 +387,7 @@
 .info-buttons button,
 #save-button-wrapper {
   border: none;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.07); /* Slight translucent bg */
   padding: 0;
   margin: 0 4px;
   cursor: pointer;
@@ -396,17 +396,19 @@
   align-items: center;
   justify-content: center;
 
-  height: 28px;              /* ✅ Smaller height to show in collapsed panel */
-  width: auto;               /* ✅ Width follows image natural aspect */
-  flex: 0 0 auto;
+  height: 40px;         /* Consistent button height */
+  width: auto;          /* Width adapts to image */
+  flex: 0 0 auto;       /* No stretching */
   opacity: 1;
+  transition: background 0.3s ease;
 }
 #save-button-wrapper {
   transition: transform 0.2s ease;
 }
 
+.info-buttons button:hover,
 #save-button-wrapper:hover {
-  transform: scale(1.03);
+  background: rgba(255, 255, 255, 0.15);
 }
 #save-button {
   width: 100%;
@@ -509,20 +511,7 @@
   background: transparent;
 }
 
-.info-buttons button {
-  flex: 0 0 auto;                     /* Don't stretch */
-  height: 40px;                      /* Set a small, consistent height */
-  width: auto;                       /* Width adapts to image aspect */
-  background: rgba(255, 255, 255, 0.07);
-  border: none;
-  margin: 0 4px;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
+
 
 .info-buttons button:hover {
   background: rgba(255, 255, 255, 0.15);
@@ -531,13 +520,13 @@
 .info-buttons button img,
 .floating-buttons button img,
 #save-button {
-  width: 100%;
-  height: auto; /* ✅ Let height adjust to width, preserving aspect ratio */
+  height: 100%;        /* Fill the button's height */
+  width: auto;         /* Keep image aspect ratio */
   object-fit: contain;
   opacity: 0.8;
-  transition: opacity 0.3s ease;
   pointer-events: none;
   user-select: none;
+  transition: opacity 0.3s ease;
 }
 
 .info-buttons button:hover img,
