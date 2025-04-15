@@ -266,8 +266,9 @@
       pointer-events: auto;
       opacity: 0.1;
       transition: opacity 0.4s ease 0.3s;
-      max-width: 760px;
+      max-width: 700px;
       margin: 0 auto;
+      padding: 0 20px;
     }
 
     #info-panel.expanded #info-content {
@@ -499,6 +500,18 @@
   border-radius: 4px;
   border: none;
 }
+.info-buttons-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.info-buttons-row button img {
+  height: 80px;
+  opacity: 0.8;
+}
   </style>
 </head>
 <body>
@@ -510,24 +523,21 @@
   </div>
 
   <!-- ✅ Move this OUTSIDE poster-wrapper -->
-  <div class="floating-buttons">
-    <button id="tmdb-button"><img src="tmdb.png" alt="TMDB" /></button>
-
-    <div id="save-button-wrapper" role="button">
-      <img id="save-button" src="record.png" alt="Record" />
-      <svg id="save-timer-ring" viewBox="0 0 80 80">
+     <!-- 📌 Info Panel is now outside floating-buttons -->
+      <div id="info-panel" onclick="togglePanel()">
+        <div id="info-content">
+          <div class="info-buttons">
+            <button id="tmdb-button"><img src="tmdb.png" alt="TMDB" /></button>
+            <div id="save-button-wrapper" role="button">
+            <img id="save-button" src="record.png" alt="Record" />
+            <svg id="save-timer-ring" viewBox="0 0 80 80">
         <circle r="30" cx="40" cy="40" />
       </svg>
     </div>
-
     <button id="trailer-button" disabled><img src="play.png" alt="Play" /></button>
     <button id="genre-button"><img src="shuffle.png" alt="Shuffle" /></button>
     <button id="next-button"><img src="next.png" alt="Next" /></button>
   </div>
-
-      <!-- 📌 Info Panel is now outside floating-buttons -->
-      <div id="info-panel" onclick="togglePanel()">
-        <div id="info-content">
           <div id="info-title">Loading...</div>
           <div id="info-meta">⭐️ -- • 🍿/📺 • -- mins <span id="flag"></span></div>
           <div id="info-description">Loading description...</div>
@@ -736,9 +746,13 @@ function onPlayerStateChange(event) {
 }
 
   if (event.data === YT.PlayerState.PAUSED) {
-    trailerPaused = true;
-    if (overlayInfo) overlayInfo.style.opacity = "1";
-    console.log("⏸️ Trailer paused");
+  trailerPaused = true;
+  if (overlayInfo) overlayInfo.style.opacity = "1";
+  console.log("⏸️ Trailer paused");
+
+  if (fetchTimer) {
+    clearTimeout(fetchTimer); // ✅ Prevent refetch during pause
+    fetchTimer = null;
   }
 }
 window.onPlayerStateChange = onPlayerStateChange;
@@ -767,7 +781,9 @@ function playTrailer(url) {
   const isSameVideo = playerVideoUrl?.includes(videoId);
 
   if (isSameVideo) {
-  console.log("⏭️ Same trailer already loaded — skip replay");
+  console.log("🔁 Replaying same trailer manually");
+  trailerPlayer.seekTo(0);
+  trailerPlayer.playVideo();
   return;
 }
 
@@ -1076,6 +1092,8 @@ function applyFilmToUI(data) {
     🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
     💰 <strong>:</strong> ${data.budget} <br>
     🎭 <strong>:</strong> ${data.castList}
+    <span style="color:#aaa">Genre: ${data.genre}</span> 
+    <span id="tmdb-link">| <a href="${data.tmdbUrl}" target="_blank" style="color:#00ccff;">TMDB</a></span>
   </div>`;
   document.getElementById("info-genre").insertAdjacentHTML('afterend', extraHTML);
   document.getElementById("genre-name").textContent = data.genre;
@@ -1087,7 +1105,7 @@ function applyFilmToUI(data) {
   currentTMDBUrl = data.tmdbUrl;
   currentTrailerUrl = data.trailerUrl; // ✅ used for manual button play
 
-  document.getElementById("tmdb-link").innerHTML = `| <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
+  document.getElementById("tmdb-link").outerHTML = `<span id="tmdb-link">| <a href="${currentTMDBUrl}" target="_blank" style="color:#00ccff;">TMDB</a></span>`;
 
   const trailerImg = document.getElementById("trailer-button").querySelector("img");
   document.getElementById("trailer-button").disabled = !data.trailerUrl;
