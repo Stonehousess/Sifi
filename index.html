@@ -1250,8 +1250,8 @@ function fetchWithCountdown(requireTrailer = false, overrideType = null, overrid
       applyFilmToUI(data);             // ✅ Safely apply UI updates
       startFetchCountdown(60000);      // ⏳ Start countdown ring
       isFetching = false;
-      return true;
       console.log("🔍 Calling getRandomTitle...");
+      return true;
     } else {
       console.warn("⚠️ No valid data returned");
       isFetching = false;
