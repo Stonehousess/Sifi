@@ -777,7 +777,7 @@ function playTrailer(url) {
       window.autoTrailerMode
     ) {
       console.warn("🚨 Backup: no state change — forcing next trailer.");
-      isTrailerAdvancing = false; // ✅ <---- add this line
+      isTrailerAdvancing = false; // ✅ NEW: release advancing lock
       if (!isTrailerAdvancing) findTrailerAndPlay();
     }
   }, 15000);
@@ -792,7 +792,7 @@ function playTrailer(url) {
       window.autoTrailerMode
     ) {
       console.warn("⛔ Trailer failed to play — skipping...");
-      isTrailerAdvancing = false; // ✅ Reset flag so next trailer can start
+      isTrailerAdvancing = false; // ✅ NEW: ensure next trailer can start
       failSafeSkips++;
 
       if (failSafeSkips >= 5) {
@@ -1596,21 +1596,22 @@ window.onload = () => {
 let mouseMoveTimer = null;
 
 document.addEventListener("mousemove", () => {
-  const panel = document.getElementById("info-panel");
+  const now = Date.now();
+  if (now - lastMouseMoveTime < 200) return;
+  lastMouseMoveTime = now;
 
-  if (!panel.classList.contains("expanded")) {
-    panel.classList.remove("hidden");
-    panel.style.opacity = "0.7";
-    swipeState = "poster";
+  const infoPanel = document.getElementById("info-panel");
+
+  // Only show if not expanded
+  if (!infoPanel.classList.contains("expanded")) {
+    infoPanel.classList.remove("hidden");
+
+    // 🕒 Reset fade out
+    clearTimeout(panelFadeTimer);
+    panelFadeTimer = setTimeout(() => {
+      infoPanel.classList.add("hidden");
+    }, 5000); // Auto-hide after 5s of inactivity
   }
-
-  // Auto-hide again after 10 seconds if not expanded
-  clearTimeout(mouseMoveTimer);
-  mouseMoveTimer = setTimeout(() => {
-    if (!panel.classList.contains("expanded")) {
-      panel.classList.add("hidden");
-    }
-  }, 10000);
 });
 // ✅ TMDB Button becomes "History Recall"
   document.getElementById("tmdb-button").onclick = (e) => {
