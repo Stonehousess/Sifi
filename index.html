@@ -532,7 +532,7 @@
 .floating-buttons button img,
 #save-button {
   width: 100%;
-  height: 100%;
+  height: auto; /* ✅ Let height adjust to width, preserving aspect ratio */
   object-fit: contain;
   opacity: 0.8;
   transition: opacity 0.3s ease;
