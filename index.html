@@ -484,10 +484,13 @@
 function resetPanelFade() {
   const panel = document.getElementById('info-panel');
   clearTimeout(panelFadeTimer);
+
+  panel.classList.remove("hidden");      // Always re-show when interacted
+  panel.classList.remove("expanded");    // Keep it collapsed for this
+
   panelFadeTimer = setTimeout(() => {
-    panel.classList.remove("expanded");    // ✅ collapse only
-    panel.classList.remove("hidden");      // ✅ stay visible
-  }, 10000); // show for 10s
+    panel.classList.add("hidden");       // Hide after 10s if untouched
+  }, 10000);
 }
   function getFlagEmoji(countryCode) {
     if (!countryCode) return "";
@@ -1127,26 +1130,9 @@ function popoutTrailer() {
   }
 }
 
-
-const buttons = document.querySelector(".floating-buttons");
-const infoPanel = document.getElementById("info-panel");
-
-function showButtons() {
-  buttons.classList.remove("hidden");
-  infoPanel.classList.remove("hidden");
-
-  clearTimeout(fadeTimer);
-  fadeTimer = setTimeout(() => {
-    buttons.classList.add("hidden");
-  }, 5000); // Buttons fade after 5s
-
-  resetPanelFade(); // 🔁 Restart 10s fade for info panel
-}
-
-
 // Register events
 ['mousemove', 'click', 'touchstart'].forEach(event =>
-  window.addEventListener(event, showButtons)
+  window.addEventListener(event, resetPanelFade)
 );
 window.addEventListener("keydown", (e) => {
   const trailerVisible = document.getElementById("trailer-overlay")?.classList.contains("active");
@@ -1355,9 +1341,7 @@ document.getElementById("genre-select").addEventListener("change", (e) => {
     document.querySelector(".floating-buttons").classList.add("hidden");
   }, 5000);
 
-  panelFadeTimer = setTimeout(() => {
-    document.getElementById("info-panel").classList.add("hidden");
-  }, 10000);
+  resetPanelFade();
   let touchStartY = 0;
   let touchEndY = 0;
 
