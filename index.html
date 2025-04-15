@@ -1269,13 +1269,7 @@ document.getElementById("next-button").onclick = () => {
   // ✅ Always enable autoplay mode
   window.autoTrailerMode = true;
 
-  if (currentTrailerUrl && currentTrailerUrl.includes("youtube.com")) {
-    console.log("▶️ Playing current trailer via next-button");
-    playTrailer(currentTrailerUrl);
-  } else {
-    console.warn("🔁 No trailer for current title — fetching next...");
-    findTrailerAndPlay();
-  }
+  findTrailerAndPlay();
 };
 const trailerBtn = document.getElementById("trailer-button");
 
