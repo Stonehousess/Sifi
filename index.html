@@ -1418,12 +1418,7 @@ function handleSwipeGesture() {
   document.getElementById("player")?.addEventListener("click", () => {
     setTimeout(() => window.focus(), 300);
   }); // ← THIS closing line was missing!
-
-  
-}; // ✅ Fully closes window.onload
-
-
-  // ✅ Kick off first fetch only if not in autoplay mode
+// ✅ Kick off first fetch only if not in autoplay mode
   if (!window.autoTrailerMode) {
     console.log("🚀 AutoFetch starting manually...");
     startAutoFetch();
