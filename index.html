@@ -65,6 +65,14 @@
 #movie-poster.loaded {
   opacity: 1;
 }
+/* ---------------- Fonts ---------------- */
+
+@font-face {
+  font-family: 'BlowBrush';
+  src: url('fonts/blowbrush.regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 /* ---------------- Floating Buttons ---------------- */
 
@@ -154,7 +162,8 @@
 
 #info-title {
   font-size: 32px;
-  font-weight: bold;
+  font-weight: normal; /* BlowBrush doesn’t need bold */
+  font-family: 'BlowBrush', sans-serif;
 }
 
 #info-meta {
