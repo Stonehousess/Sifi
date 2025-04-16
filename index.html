@@ -227,7 +227,7 @@
   max-width: 100%;
   object-fit: contain;
   display: block;
-  opacity: 0.8;
+  opacity: 0.9;
   pointer-events: none;
   user-select: none;
 }
@@ -249,7 +249,7 @@
   transform: rotate(-90deg);
   z-index: 2;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
 #save-timer-ring circle {
@@ -325,7 +325,7 @@
 }
 #overlay-info {
   opacity: 0;
-  transition: opacity 1s;
+  transition: opacity 0.5s;
   text-align: center;
   margin-top: 20px;
   color: white;
@@ -440,9 +440,9 @@
   75%  { box-shadow: -12px 0 12px orange, 12px 0 12px orange; }
   100% { box-shadow: -10px 0 10px red, 10px 0 10px red; }
 }
-  </style>
-</head>
-<body>
+</style>
+ </head>
+  <body>
   <div id="movie-container">
   <div id="poster-wrapper">
     <div id="poster-border">
@@ -473,7 +473,7 @@
   <button id="next-button">
     <img src="next.png" alt="Next" />
   </button>
-</div>
+  </div>
           <div id="info-title">Loading...</div>
           <div id="info-meta">⭐️ -- • 🍿/📺 • -- mins <span id="flag"></span></div>
           <div id="info-description">Loading description...</div>
