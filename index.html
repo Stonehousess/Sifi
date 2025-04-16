@@ -161,7 +161,7 @@
 }
 
 #info-title {
-  font-size: 32px;
+  font-size: 40px;
   font-weight: normal; /* BlowBrush doesn’t need bold */
   font-family: 'BlowBrush', sans-serif;
 }
@@ -1093,7 +1093,7 @@ function applyFilmToUI(data) {
 
   // 🔁 Set core UI elements
   document.getElementById("movie-poster").src = data.posterPath;
-  document.getElementById("info-title").textContent = data.title + data.year;
+  document.getElementById("info-title").textContent = `${data.title} (${data.year})`;
   document.getElementById("info-meta").innerHTML = data.metaText;
   document.getElementById("info-description").textContent = data.overview;
   document.getElementById("overlay-title").textContent = data.title + data.year;
