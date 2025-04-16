@@ -69,7 +69,7 @@
 
 @font-face {
   font-family: 'BlowBrush';
-  src: url('fonts/PermanentMarker-x99j.ttf') format('truetype');
+  src: url('fonts/Portland-0jrd.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -82,6 +82,12 @@
 @font-face {
   font-family: 'SFMovie';
   src: url('fonts/SF Movie Poster.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Details';
+  src: url('fonts/ClassicMarkerDemo-gwDPq.otf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -190,6 +196,8 @@
   font-size: 22px;
   line-height: 1.4;
   word-wrap: break-word;
+  font-weight: normal; /* BlowBrush doesn’t need bold */
+  font-family: 'Details', sans-serif;
 }
 
 #info-genre {
