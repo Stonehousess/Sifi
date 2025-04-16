@@ -117,7 +117,7 @@
   height: 65px;
   background: rgba(20, 20, 20, 0.9);
   color: white;
-  padding: 2px 20px;
+  padding: 2px 12px;
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   transition: all 0.3s ease-in-out;
@@ -198,6 +198,8 @@
   height: 63px;
   background: rgba(255, 255, 255, 0.07);
   border: none;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
   padding: 0;
   margin: 0;
   display: flex;
@@ -1106,15 +1108,17 @@ function applyFilmToUI(data) {
   // ✅ Add new crew panel
   const genreAnchor = document.getElementById("info-genre");
   if (genreAnchor) {
-    const extraHTML = `
-      <div id="info-crew" style="margin-top:10px; font-size:20px; color:#aaa;">
-        🎬 <strong>:</strong> ${data.director} &nbsp;|&nbsp; 
-        🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
-        💰 <strong>:</strong> ${data.budget} <br>
-        🎭 <strong>:</strong> ${data.castList}
-      </div>`;
-    genreAnchor.insertAdjacentHTML('afterend', extraHTML);
-  }
+  const extraHTML = `
+    <div id="info-crew" style="margin-top:10px; font-size:20px; color:#aaa;">
+      🎬 <strong>:</strong> ${data.director} &nbsp;|&nbsp; 
+      🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
+      💰 <strong>:</strong> ${data.budget} <br>
+      🎭 <strong>:</strong> ${data.castList} &nbsp;|&nbsp;
+      📚 <strong>:</strong> ${data.genre} &nbsp;|&nbsp;
+      <a href="${data.tmdbUrl}" target="_blank" style="color:#00ccff;">TMDB</a>
+    </div>`;
+  genreAnchor.insertAdjacentHTML('afterend', extraHTML);
+}
 
   // ✅ Trailer setup
   currentTMDBUrl = data.tmdbUrl;
