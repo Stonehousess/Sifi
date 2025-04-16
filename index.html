@@ -212,6 +212,10 @@
 .crew-font {
   font-family: 'SFMovie', sans-serif;
 }
+.genre-text {
+  font-size: 18px; /* or whatever size you prefer */
+  font-family: sans-serif; /* override other fonts if needed */
+}
 /* ---------------- Info Panel Buttons ---------------- */
 
 .info-buttons {
@@ -1151,9 +1155,9 @@ function applyFilmToUI(data) {
       🎭 <strong>:</strong> ${data.castList}
     </span>
     &nbsp;|&nbsp;
-    📚 <strong>:</strong> ${data.genre}
+    📚 <strong>:</strong> <span class="genre-text">${data.genre}</span>
     &nbsp;|&nbsp;
-    <a href="${data.tmdbUrl}" target="_blank" style="font-size:16px; color:#00ccff;">TMDB</a>
+    <a href="${data.tmdbUrl}" target="_blank" style="font-size:18px; color:#00ccff;">TMDB</a>
   </div>`;
   genreAnchor.insertAdjacentHTML('afterend', extraHTML);
 }
