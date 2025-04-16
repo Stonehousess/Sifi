@@ -118,7 +118,8 @@
   background: rgba(20, 20, 20, 0.9);
   color: white;
   padding: 2px 12px;
-  border-radius: 16px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
   transition: all 0.3s ease-in-out;
   z-index: 2000;
   opacity: 0.8;
@@ -197,8 +198,7 @@
   height: 63px;
   background: rgba(255, 255, 255, 0.07);
   border: none;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
+  border-radius: 1px;
   padding: 0;
   margin: 0;
   display: flex;
@@ -1130,7 +1130,6 @@ if (!data.trailerUrl) {
   trailerBtn.disabled = true;
   trailerImg.src = "play-disabled.png";
   trailerImg.style.opacity = "0.3";
-  trailerBtn.style.cursor = "not-allowed";
 } else {
   trailerBtn.disabled = false;
   trailerImg.src = "play.png";
