@@ -69,13 +69,19 @@
 
 @font-face {
   font-family: 'BlowBrush';
-  src: url('fonts/blowbrush.regular.ttf') format('truetype');
+  src: url('fonts/PermanentMarker-x99j.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'DigitalDisplay';
-  src: url('fonts/PermanentMarker-x99j.ttf') format('truetype');
+  src: url('fonts/Digital7Italic-BW658.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SFMovie';
+  src: url('fonts/SF Movie Poster.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -191,6 +197,8 @@
   font-size: 18px;
   color: #aaa;
   display: block;
+  font-weight: normal; /* BlowBrush doesn’t need bold */
+  font-family: 'SFMovie', sans-serif;
 }
 
 /* ---------------- Info Panel Buttons ---------------- */
