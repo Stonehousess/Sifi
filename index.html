@@ -169,7 +169,7 @@
   opacity: 0.7;
   max-width: 700px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 10px;
   transition: opacity 0.2s ease 0.3s;
 }
 
@@ -209,7 +209,9 @@
   font-weight: normal; /* BlowBrush doesn’t need bold */
   font-family: 'SFMovie', sans-serif;
 }
-
+.crew-font {
+  font-family: 'SFMovie', sans-serif;
+}
 /* ---------------- Info Panel Buttons ---------------- */
 
 .info-buttons {
@@ -1138,17 +1140,19 @@ function applyFilmToUI(data) {
   document.getElementById("info-crew")?.remove();
 
   // ✅ Add new crew panel
-  const genreAnchor = document.getElementById("info-genre");
-  if (genreAnchor) {
   const extraHTML = `
-    <div id="info-crew" style="margin-top:10px; font-size:20px; color:#aaa;">
+  <div id="info-crew" style="margin-top:10px; font-size:20px; color:#aaa;">
+    <span class="crew-font">
       🎬 <strong>:</strong> ${data.director} &nbsp;|&nbsp; 
       🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
       💰 <strong>:</strong> ${data.budget} <br>
-      🎭 <strong>:</strong> ${data.castList} &nbsp;|&nbsp;
-      📚 <strong>:</strong> ${data.genre} &nbsp;|&nbsp;
-      <a href="${data.tmdbUrl}" target="_blank" style="color:#00ccff;">TMDB</a>
-    </div>`;
+      🎭 <strong>:</strong> ${data.castList}
+    </span>
+    &nbsp;|&nbsp;
+    📚 <strong>:</strong> ${data.genre}
+    &nbsp;|&nbsp;
+    <a href="${data.tmdbUrl}" target="_blank" style="color:#00ccff;">TMDB</a>
+  </div>`;
   genreAnchor.insertAdjacentHTML('afterend', extraHTML);
 }
 
