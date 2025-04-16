@@ -120,7 +120,7 @@
   padding: 2px 20px;
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s ease-in-out;
   z-index: 2000;
   opacity: 0.7;
   overflow: hidden;
@@ -273,7 +273,7 @@
   padding: 16px 20px;
   z-index: 2000;
   transform: translateY(-100%);
-  transition: transform 0.2s ease-in-out;
+  transition: transform 0.3s ease-in-out;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
 }
@@ -1257,7 +1257,7 @@ document.addEventListener("wheel", (e) => {
   console.log("🎡 Wheel event | deltaY:", deltaY, "| swipeState:", swipeState);
 
   // 🔽 Scroll down — show info panel
-  if (deltaY > 4) {
+  if (deltaY > 5) {
     if (swipeState === "filter") {
       filterPanel.classList.remove("active");
       swipeState = "poster";
@@ -1268,7 +1268,7 @@ document.addEventListener("wheel", (e) => {
   }
 
   // 🔼 Scroll up — toggle filter or collapse info
-  else if (deltaY < -4) {
+  else if (deltaY < -5) {
     if (swipeState === "info") {
       togglePanel(false);
     } else if (swipeState === "poster") {
@@ -1598,7 +1598,7 @@ window.onload = () => {
     const deltaY = touchEndY - touchStartY;
     const filterPanel = document.getElementById("filter-panel");
 
-    if (deltaY > 3) {
+    if (deltaY > 4) {
       if (swipeState === "info") togglePanel(false);
       else if (swipeState === "poster") {
         togglePanel(false);
@@ -1612,7 +1612,7 @@ window.onload = () => {
           }
         }, 10000);
       }
-    } else if (deltaY < -3) {
+    } else if (deltaY < -4) {
       if (swipeState === "filter") {
         filterPanel.classList.remove("active");
         swipeState = "poster";
