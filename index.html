@@ -1140,6 +1140,8 @@ function applyFilmToUI(data) {
   document.getElementById("info-crew")?.remove();
 
   // ✅ Add new crew panel
+  const genreAnchor = document.getElementById("info-genre");
+  if (genreAnchor) {
   const extraHTML = `
   <div id="info-crew" style="margin-top:10px; font-size:20px; color:#aaa;">
     <span class="crew-font">
