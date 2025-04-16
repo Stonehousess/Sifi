@@ -91,6 +91,12 @@
   font-weight: normal;
   font-style: normal;
 }
+@font-face {
+  font-family: 'Noir';
+  src: url('fonts/FilmNoirAdventure-X3732.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 /* ---------------- Floating Buttons ---------------- */
 
 .floating-buttons {
@@ -213,8 +219,14 @@
   font-family: 'SFMovie', sans-serif;
 }
 .genre-text {
-  font-size: 18px; /* or whatever size you prefer */
-  font-family: sans-serif; /* override other fonts if needed */
+  font-size: 20px; /* or whatever size you prefer */
+  font-family: Noir; /* override other fonts if needed */
+}
+.tmdb-link {
+  font-size: 20px;
+  font-family: Noir;
+  color: #00ccff;
+  text-decoration: none;
 }
 /* ---------------- Info Panel Buttons ---------------- */
 
@@ -1157,7 +1169,7 @@ function applyFilmToUI(data) {
     &nbsp;|&nbsp;
     📚 <strong>:</strong> <span class="genre-text">${data.genre}</span>
     &nbsp;|&nbsp;
-    <a href="${data.tmdbUrl}" target="_blank" style="font-size:18px; color:#00ccff;">TMDB</a>
+    <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link">TMDB</a>
   </div>`;
   genreAnchor.insertAdjacentHTML('afterend', extraHTML);
 }
