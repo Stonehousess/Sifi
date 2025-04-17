@@ -1166,9 +1166,9 @@ function applyFilmToUI(data) {
       💰 <strong>:</strong> ${data.budget} <br>
       🎭 <strong>:</strong> ${data.castList}
     </span>
-    &nbsp;
-    <strong></strong> <span class="genre-text">${data.genre}</span>
     &nbsp;|&nbsp;
+    <strong></strong> <span class="genre-text">${data.genre}</span>
+    &nbsp;
     <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link">TMDB</a>
   </div>`;
   genreAnchor.insertAdjacentHTML('afterend', extraHTML);
