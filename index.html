@@ -188,6 +188,7 @@
   font-weight: normal; /* BlowBrush doesn’t need bold */
   font-family: 'Noir', sans-serif;
   text-transform: uppercase;
+  line-height: 0.9;
 }
 
 #info-meta {
@@ -1159,7 +1160,7 @@ function applyFilmToUI(data) {
   const genreAnchor = document.getElementById("info-genre");
   if (genreAnchor) {
   const extraHTML = `
-  <div id="info-crew" style="margin-top:4px; font-size:40px; text-transform: uppercase; color:#aaa;">
+  <div id="info-crew" style="margin-top:2px; font-size:40px; text-transform: uppercase; color:#aaa;">
     <span class="crew-font">
       🎬 <strong>:</strong> ${data.director} &nbsp;|&nbsp; 
       🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
