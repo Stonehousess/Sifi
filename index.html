@@ -1159,14 +1159,14 @@ function applyFilmToUI(data) {
   const genreAnchor = document.getElementById("info-genre");
   if (genreAnchor) {
   const extraHTML = `
-  <div id="info-crew" style="margin-top:4px; font-size:38px; text-transform: uppercase; color:#aaa;">
+  <div id="info-crew" style="margin-top:4px; font-size:40px; text-transform: uppercase; color:#aaa;">
     <span class="crew-font">
       🎬 <strong>:</strong> ${data.director} &nbsp;|&nbsp; 
       🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
       💰 <strong>:</strong> ${data.budget} <br>
       🎭 <strong>:</strong> ${data.castList}
     </span>
-    &nbsp;|&nbsp;
+    &nbsp;•&nbsp;
     <strong></strong> <span class="genre-text">${data.genre}</span>
     &nbsp;
     <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link">TMDB</a>
