@@ -1642,6 +1642,14 @@ window.onload = () => {
   genreSelect.innerHTML = `<option value="all">All</option>` + 
     genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
   genreSelect.value = "Animation";
+  const themeButton = document.getElementById("theme-button");
+  if (themeButton) {
+    themeButton.onclick = () => {
+      document.body.classList.toggle("red-letter-mode");
+    };
+  } else {
+    console.warn("⚠️ theme-button not found");
+  }
   currentGenre = genres.find(g => g.name === "Animation");
   document.getElementById("theme-button").onclick = () => {
   document.body.classList.toggle("red-letter-mode");
