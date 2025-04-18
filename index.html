@@ -1637,11 +1637,14 @@ window.onload = () => {
   const moviePoster = document.getElementById("movie-poster");
   const floatingButtons = document.querySelector(".floating-buttons");
 
-  // Init Genre Dropdown
+  // ✅ Init Genre Dropdown
   document.getElementById("tmdb-button").disabled = true;
   genreSelect.innerHTML = `<option value="all">All</option>` + 
     genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
   genreSelect.value = "Animation";
+  currentGenre = genres.find(g => g.name === "Animation");
+
+  // ✅ Theme toggle
   const themeButton = document.getElementById("theme-button");
   if (themeButton) {
     themeButton.onclick = () => {
@@ -1650,41 +1653,44 @@ window.onload = () => {
   } else {
     console.warn("⚠️ theme-button not found");
   }
-  currentGenre = genres.find(g => g.name === "Animation");
-  document.getElementById("theme-button").onclick = () => {
-  document.body.classList.toggle("red-letter-mode");
-};
-  document.getElementById("filter-summary-btn").onclick = () => {
-    const genre = document.getElementById("genre-select").value;
-    const country = document.getElementById("country-select").value;
-    const type = document.getElementById("type-select").value;
-    const rating = document.getElementById("rating-range").value;
-    const year = document.getElementById("year-range")?.value || 
-                `${document.getElementById("year-from").value}-${document.getElementById("year-to").value}`;
 
-    alert(`🎛️ Current Filters:\n\nGenre: ${genre}\nCountry: ${country}\nType: ${type}\nRating ≥ ${rating}\nYear(s): ${year}`);
-  };
+  // ✅ Filter summary
+  const filterSummaryBtn = document.getElementById("filter-summary-btn");
+  if (filterSummaryBtn) {
+    filterSummaryBtn.onclick = () => {
+      const genre = genreSelect.value;
+      const country = document.getElementById("country-select").value;
+      const type = document.getElementById("type-select").value;
+      const rating = document.getElementById("rating-range").value;
+      const year = document.getElementById("year-range")?.value || 
+                  `${document.getElementById("year-from").value}-${document.getElementById("year-to").value}`;
+
+      alert(`🎛️ Current Filters:\n\nGenre: ${genre}\nCountry: ${country}\nType: ${type}\nRating ≥ ${rating}\nYear(s): ${year}`);
+    };
+  }
+
+  // ✅ Genre change event
   genreSelect.addEventListener("change", (e) => {
-  const selected = e.target.value;
-  currentGenre = genres.find(g => g.name === selected) || { name: "all", movie: "", tv: "" };
-  document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
+    const selected = e.target.value;
+    currentGenre = genres.find(g => g.name === selected) || { name: "all", movie: "", tv: "" };
+    document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
 
-  if (fetchTimer) clearTimeout(fetchTimer);
-  fetchWithCountdown(false, true).then(() => {
-    fetchTimer = setTimeout(startAutoFetch, 60000);
+    if (fetchTimer) clearTimeout(fetchTimer);
+    fetchWithCountdown(false, true).then(() => {
+      fetchTimer = setTimeout(startAutoFetch, 60000);
+    });
   });
-});
 
-  // Year range label
+  // ✅ Year label
   updateYearLabel();
   document.getElementById("year-from").addEventListener("input", updateYearLabel);
   document.getElementById("year-to").addEventListener("input", updateYearLabel);
 
-  // Auto-hide floating buttons
+  // ✅ Auto-hide floating buttons
   fadeTimer = setTimeout(() => floatingButtons.classList.add("hidden"), 5000);
   resetPanelFade();
 
-  // Swipe Handling
+  // ✅ Swipe handling
   let touchStartY = 0;
   let touchEndY = 0;
 
@@ -1693,7 +1699,7 @@ window.onload = () => {
     touchEndY = e.changedTouches[0].screenY;
     handleSwipeGesture();
   });
-  
+
   function handleSwipeGesture() {
     if (swipeCooldown) return;
     swipeCooldown = true;
@@ -1728,7 +1734,7 @@ window.onload = () => {
     }
   }
 
-  // Shortcuts
+  // ✅ Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
     const key = e.key.toLowerCase();
     if (key === "e") exportFirestoreAsCSV?.();
@@ -1747,14 +1753,28 @@ window.onload = () => {
     }
   });
 
+  // ✅ Poster click for new title
   moviePoster.addEventListener("click", () => {
-  // Always keep info-panel open and fetch a new title
-  if (fetchTimer) clearTimeout(fetchTimer);
+    if (fetchTimer) clearTimeout(fetchTimer);
+    fetchWithCountdown(false, true).then(() => {
+      fetchTimer = setTimeout(startAutoFetch, 60000);
+    });
+  });
+
+  // ✅ Trailer overlay focus recovery
+  document.getElementById("trailer-overlay")?.addEventListener("click", () => {
+    setTimeout(() => window.focus(), 300);
+  });
+  document.getElementById("player")?.addEventListener("click", () => {
+    setTimeout(() => window.focus(), 300);
+  });
+
+  // ✅ First load
+  console.log("🚀 Starting first fetch...");
   fetchWithCountdown(false, true).then(() => {
     fetchTimer = setTimeout(startAutoFetch, 60000);
   });
-});
-
+};
   // Focus recovery
   document.getElementById("trailer-overlay")?.addEventListener("click", () => {
     setTimeout(() => window.focus(), 300);
