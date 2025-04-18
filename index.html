@@ -1627,7 +1627,6 @@ function updateYearLabel() {
   const year = document.getElementById("year-range").value;
   const yearLabel = document.getElementById("year-label");
   yearLabel.textContent = `Year: ${year}`;
-}
 window.onload = () => {
   console.log("✅ window.onload fired");
 
@@ -1683,8 +1682,8 @@ window.onload = () => {
 
   // ✅ Year label
   updateYearLabel();
-  document.getElementById("year-from").addEventListener("input", updateYearLabel);
-  document.getElementById("year-to").addEventListener("input", updateYearLabel);
+  document.getElementById("year-from")?.addEventListener("input", updateYearLabel);
+  document.getElementById("year-to")?.addEventListener("input", updateYearLabel);
 
   // ✅ Auto-hide floating buttons
   fadeTimer = setTimeout(() => floatingButtons.classList.add("hidden"), 5000);
@@ -1769,63 +1768,50 @@ window.onload = () => {
     setTimeout(() => window.focus(), 300);
   });
 
+  // ✅ History Recall (TMDB)
+  document.getElementById("tmdb-button").onclick = (e) => {
+    e.stopPropagation();
+    console.log("🖱️ TMDB button clicked");
+    console.log("📜 History count:", fetchHistory.length);
+    if (fetchHistory.length === 0) return;
+
+    historyIndex = (historyIndex + 1) % fetchHistory.length;
+    const previous = fetchHistory[historyIndex];
+    if (previous) {
+      window.applyingFromHistory = true;
+      applyFilmToUI(previous);
+      window.applyingFromHistory = false;
+    }
+  };
+
+  // ✅ Mousemove reveal info panel
+  document.addEventListener("mousemove", () => {
+    const now = Date.now();
+    if (now - lastMouseMoveTime < 200) return;
+    lastMouseMoveTime = now;
+
+    const infoPanel = document.getElementById("info-panel");
+
+    if (!infoPanel.classList.contains("expanded")) {
+      infoPanel.classList.remove("hidden");
+
+      clearTimeout(panelFadeTimer);
+      panelFadeTimer = setTimeout(() => {
+        if (!infoPanel.classList.contains("expanded")) {
+          infoPanel.classList.add("hidden");
+        }
+      }, 5000);
+    }
+  });
+
   // ✅ First load
   console.log("🚀 Starting first fetch...");
   fetchWithCountdown(false, true).then(() => {
     fetchTimer = setTimeout(startAutoFetch, 60000);
   });
 };
-  // Focus recovery
-  document.getElementById("trailer-overlay")?.addEventListener("click", () => {
-    setTimeout(() => window.focus(), 300);
-  });
-  document.getElementById("player")?.addEventListener("click", () => {
-    setTimeout(() => window.focus(), 300);
-  });
 
-  // FIRST LOAD
-  console.log("🚀 Starting first fetch...");
-  fetchWithCountdown(false, true).then(() => {
-  fetchTimer = setTimeout(startAutoFetch, 60000);
- });
-// Initialize lastMouseMoveTime to prevent ReferenceError
-
-
-document.addEventListener("mousemove", () => {
-  const now = Date.now();
-  if (now - lastMouseMoveTime < 200) return;
-  lastMouseMoveTime = now;
-
-  const infoPanel = document.getElementById("info-panel");
-
-  if (!infoPanel.classList.contains("expanded")) {
-    infoPanel.classList.remove("hidden");
-
-    clearTimeout(panelFadeTimer);
-    panelFadeTimer = setTimeout(() => {
-      if (!infoPanel.classList.contains("expanded")) {
-        infoPanel.classList.add("hidden");
-      }
-    }, 5000); // Only re-hide if not expanded
-  }
-});
-// ✅ TMDB Button becomes "History Recall"
-  document.getElementById("tmdb-button").onclick = (e) => {
-  e.stopPropagation();
-  console.log("🖱️ TMDB button clicked");
-  console.log("📜 History count:", fetchHistory.length);
-  if (fetchHistory.length === 0) return; // still safe guard
-
-  historyIndex = (historyIndex + 1) % fetchHistory.length;
-
-  const previous = fetchHistory[historyIndex];
-  if (previous) {
-    window.applyingFromHistory = true;
-    applyFilmToUI(previous);
-    window.applyingFromHistory = false;
-  }
-};
-};
+  
 
 // ✅ Expose methods globally (MUST be outside onload!)
 window.closeTrailer = closeTrailer;
@@ -1839,33 +1825,31 @@ window.failSafeTimeout = null;
   let trailerPlayer = null;
   let youtubeReady = false;
 
-  // If your playerStateChange logic is in the module, reattach it globally
-  
   window.onYouTubeIframeAPIReady = function () {
-  trailerPlayer = new YT.Player("player", {
-    height: "390",
-    width: "640",
-    videoId: "",
-    playerVars: {
-      enablejsapi: 1,       // ✅ This is the key fix
-      controls: 1,
-      modestbranding: 1,
-      rel: 0,
-      showinfo: 0
-    },
-    events: {
-  onReady: () => {
-    youtubeReady = true;
-    console.log("✅ YouTube Player is fully ready");
-  },
-  onStateChange: window.onPlayerStateChange
-}
-  });
+    trailerPlayer = new YT.Player("player", {
+      height: "390",
+      width: "640",
+      videoId: "",
+      playerVars: {
+        enablejsapi: 1,
+        controls: 1,
+        modestbranding: 1,
+        rel: 0,
+        showinfo: 0
+      },
+      events: {
+        onReady: () => {
+          youtubeReady = true;
+          console.log("✅ YouTube Player is fully ready");
+        },
+        onStateChange: window.onPlayerStateChange
+      }
+    });
 
-  
-  console.log("✅ YouTube Player ready");
-};
+    console.log("✅ YouTube Player ready");
+  };
 </script>
+
 <script>
   const poster = document.getElementById('movie-poster');
   if (poster.complete) {
