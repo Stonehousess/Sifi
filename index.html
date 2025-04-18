@@ -519,6 +519,14 @@
   75%  { box-shadow: -12px 0 12px orange, 12px 0 12px orange; }
   100% { box-shadow: -10px 0 10px red, 10px 0 10px red; }
 }
+body.red-letter-mode {
+  background: #1a0000;
+  color: #ffcc00;
+  font-family: 'SFMovie', sans-serif;
+}
+body.red-letter-mode #info-panel {
+  background: rgba(90, 0, 0, 0.95);
+}
 </style>
  </head>
   <body>
@@ -570,13 +578,10 @@
     <div id="filter-content">
       <div id="year-label">All Years</div>
 
-      <label>Year From:
-        <input type="range" id="year-from" min="1900" max="2025" value="1900" data-default="1900">
-      </label>
-
-      <label>Year To:
-        <input type="range" id="year-to" min="1900" max="2025" value="2025" data-default="2025">
-      </label>
+      <label>Year:
+  <input type="range" id="year-range" min="1900" max="2025" value="2000" step="1">
+  <span id="year-display">2000</span>
+</label>
 
       <label>Country: 
         <select id="country-select">
@@ -605,6 +610,8 @@
       <label>Min Rating: 
         <input type="range" id="rating-range" min="0" max="10" step="0.1" value="0">
       </label>
+      <button id="filter-summary-btn" class="overlay-btn">Show Filters</button>
+      <button id="theme-button" class="overlay-btn">Toggle RLM Theme</button>
     </div>
   </div>
 </body>
@@ -1011,16 +1018,11 @@ const genreObj = genres.find(g => g.name === selectedGenreName);
 const selectedGenreId = type === "tv" ? genreObj?.tv : genreObj?.movie;
 
 // 📅 Year range filter
-const yearFromInput = document.getElementById("year-from");
-const yearToInput = document.getElementById("year-to");
+const yearInput = document.getElementById("year-range");
+const selectedYear = parseInt(yearInput?.value || "2000");
+const defaultYear = parseInt(yearInput?.dataset.default || "2000");
 
-const yearFrom = parseInt(yearFromInput?.value || "1900");
-const yearTo = parseInt(yearToInput?.value || "2025");
-
-const defaultYearFrom = parseInt(yearFromInput?.dataset.default || "1900");
-const defaultYearTo = parseInt(yearToInput?.dataset.default || "2025");
-
-const useYearFilter = yearFrom !== defaultYearFrom || yearTo !== defaultYearTo;
+const useYearFilter = selectedYear !== defaultYear;
 
 // 🔀 Random page
 const randomPage = Math.floor(Math.random() * 80) + 1;
@@ -1034,14 +1036,12 @@ const randomPage = Math.floor(Math.random() * 80) + 1;
   }
   if (useYearFilter) {
   if (isMovie) {
-    url += `&primary_release_date.gte=${yearFrom}-01-01`;
-    url += `&primary_release_date.lte=${yearTo}-12-31`;
+    url += `&primary_release_year=${selectedYear}`;
   } else {
-    url += `&first_air_date.gte=${yearFrom}-01-01`;
-    url += `&first_air_date.lte=${yearTo}-12-31`;
+    url += `&first_air_date_year=${selectedYear}`;
   }
 }
-  console.log("🗓️ Year filtering?", useYearFilter, "| From:", yearFrom, "| To:", yearTo);
+  console.log("🗓️ Year filtering?", useYearFilter, "| Year:", selectedYear);
   if (selectedCountry) {
     url += `&with_origin_country=${selectedCountry}`;
   }
@@ -1248,6 +1248,12 @@ async function findTrailerAndPlay() {
   }
 
   isTrailerAdvancing = true;
+  if (trailerLoopFirst && currentTrailerUrl) {
+  console.log("⏯️ Playing current trailer before looping...");
+  trailerLoopFirst = false;
+  playTrailer(currentTrailerUrl);
+  return;
+}
   window.autoTrailerMode = true;
 
   closeAllPanels();
@@ -1618,15 +1624,9 @@ wrapper.addEventListener("click", (e) => {
   document.getElementById("save-button").click(); // Now guarded
 });
 function updateYearLabel() {
+  const year = document.getElementById("year-range").value;
   const yearLabel = document.getElementById("year-label");
-  const from = parseInt(document.getElementById("year-from").value);
-  const to = parseInt(document.getElementById("year-to").value);
-
-  if (from === 1900 && to === 2025) {
-    yearLabel.textContent = "All Years";
-  } else {
-    yearLabel.textContent = `Years: ${from}–${to}`;
-  }
+  yearLabel.textContent = `Year: ${year}`;
 }
 window.onload = () => {
   console.log("✅ window.onload fired");
@@ -1643,7 +1643,19 @@ window.onload = () => {
     genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
   genreSelect.value = "Animation";
   currentGenre = genres.find(g => g.name === "Animation");
+  document.getElementById("theme-button").onclick = () => {
+  document.body.classList.toggle("red-letter-mode");
+};
+  document.getElementById("filter-summary-btn").onclick = () => {
+    const genre = document.getElementById("genre-select").value;
+    const country = document.getElementById("country-select").value;
+    const type = document.getElementById("type-select").value;
+    const rating = document.getElementById("rating-range").value;
+    const year = document.getElementById("year-range")?.value || 
+                `${document.getElementById("year-from").value}-${document.getElementById("year-to").value}`;
 
+    alert(`🎛️ Current Filters:\n\nGenre: ${genre}\nCountry: ${country}\nType: ${type}\nRating ≥ ${rating}\nYear(s): ${year}`);
+  };
   genreSelect.addEventListener("change", (e) => {
   const selected = e.target.value;
   currentGenre = genres.find(g => g.name === selected) || { name: "all", movie: "", tv: "" };
@@ -1673,7 +1685,7 @@ window.onload = () => {
     touchEndY = e.changedTouches[0].screenY;
     handleSwipeGesture();
   });
-
+  
   function handleSwipeGesture() {
     if (swipeCooldown) return;
     swipeCooldown = true;
