@@ -804,10 +804,13 @@ function onPlayerStateChange(event) {
   }, 500);
 } else {
   console.log("🔁 Autoplay mode — loading next trailer");
-  // 🚫 No need to set isTrailerAdvancing again here
+
+  isTrailerAdvancing = false; // ✅ ADD THIS before calling next
+
   setTimeout(() => {
     findTrailerAndPlay();
   }, 1000);
+}
 
       failSafeTimeout = setTimeout(() => {
         if (isTrailerAdvancing) {
