@@ -1265,30 +1265,30 @@ function applyFilmToUI(data) {
   if (genreAnchor) {
   const extraHTML = `
   <div id="info-crew" style="margin-top:0px; margin-bottom:1px;">
-  <div style="line-height:0.92; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
-  <span style="font-size:70px;">${data.title}</span>
-  <span style="font-size:67px;">(${data.year})</span>
-</div>
-  </div>
+    <div style="line-height:0.92; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
+      <span style="font-size:70px;">${data.title}</span>
+      <span style="font-size:67px;">(${data.year})</span>
+    </div>
 
-  <div style="font-size:40px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase; line-height:0.95;">
-    <span style="text-transform: uppercase;">${data.castList}</span>
-    <div style="line-height:1;">
-    <span style="text-transform:none;">k</span> <span style="text-transform:uppercase;">${data.director}</span>  
-    <span style="text-transform:none;">  j</span> <span style="text-transform:uppercase;">${data.studio}</span> | 
-    ${getFlagEmoji(data.originCountry)} | 
-    <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
-</div>
-  </div>
+    <div style="font-size:40px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase; line-height:0.95;">
+      <span style="text-transform: uppercase;">${data.castList}</span>
+      <div style="line-height:1;">
+        <span style="text-transform:none;">k</span> <span style="text-transform:uppercase;">${data.director}</span>  
+        <span style="text-transform:none;">  j</span> <span style="text-transform:uppercase;">${data.studio}</span> | 
+        ${getFlagEmoji(data.originCountry)} | 
+        <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
+      </div>
+    </div>
 
-  <div id="info-description" style="margin-top:1.5px; font-size:20px; line-height:1; color:#dce4e8; font-family:'Bubble', sans-serif;">
-    ${data.overview}
-  </div>
+    <div id="info-description" style="margin-top:1.5px; font-size:20px; line-height:1; color:#dce4e8; font-family:'Bubble', sans-serif;">
+      ${data.overview}
+    </div>
 
-  <div id="info-meta" style="margin-top:1px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
-    ${data.rating} • ${isMovie ? `${data.runtime} min` : `${data.episodeCount} eps × ${data.runtime} min`} • ${data.genre || "No Genre Info"} • ${data.budget}
+    <div id="info-meta" style="margin-top:1px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
+      ${data.rating} • ${isMovie ? `${data.runtime} min` : `${data.episodeCount} eps × ${data.runtime} min`} • ${data.genre || "No Genre Info"} • ${data.budget}
+    </div>
   </div>
-</div>`;
+`;
   genreAnchor.insertAdjacentHTML('afterend', extraHTML);
 }
 
