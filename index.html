@@ -1311,16 +1311,20 @@ async function findTrailerAndPlay() {
     return;
   }
 
+  // ✅ Move auto mode activation BEFORE anything else
+  window.autoTrailerMode = true;
   isTrailerAdvancing = true;
-  window.autoTrailerMode = true;  // ✅ Move this up so it's active for the first trailer too
+
+  if (!youtubeReady || !trailerPlayer) {
+    console.warn("⏳ YouTube Player not ready — please wait...");
+    isTrailerAdvancing = false;
+    return;
+  }
 
   if (trailerLoopFirst && currentTrailerUrl) {
     console.log("⏯️ Playing current trailer before looping...");
     trailerLoopFirst = false;
-
     playTrailer(currentTrailerUrl);
-
-    // This will now allow continuation because auto mode is already set
     return;
   }
 
@@ -1329,12 +1333,6 @@ async function findTrailerAndPlay() {
   if (fetchTimer) {
     clearTimeout(fetchTimer);
     fetchTimer = null;
-  }
-
-  if (!youtubeReady || !trailerPlayer) {
-    console.warn("⏳ YouTube Player not ready — please wait...");
-    isTrailerAdvancing = false;
-    return;
   }
 
   const overlay = document.getElementById("trailer-overlay");
@@ -1359,13 +1357,12 @@ async function findTrailerAndPlay() {
 
     if (data && data.trailerUrl?.includes("youtube.com")) {
       console.log("🎬 Found trailer — playing", data.trailerUrl);
-
       applyFilmToUI(data);
 
       setTimeout(() => {
         playTrailer(data.trailerUrl);
 
-        // 🛟 Backup: unlock if no progress
+        // 🛟 Backup to unlock if stuck
         setTimeout(() => {
           if (isTrailerAdvancing) {
             console.warn("🕒 Backup: trailer likely didn't start — unlocking advance.");
@@ -1382,16 +1379,13 @@ async function findTrailerAndPlay() {
     console.warn(`🔁 Attempt ${attempts}: No trailer found — retrying...`);
   }
 
-  if (found) {
-    console.log("✅ Leaving findTrailerAndPlay. Found trailer:", true);
-  }
-
   if (!found) {
     console.warn("⛔ No valid trailer found after 7 tries. Retrying in 3 seconds...");
     isTrailerAdvancing = false;
 
+    // 🧠 Important: Add a small delay so the call stack clears
     setTimeout(() => {
-      findTrailerAndPlay();
+      findTrailerAndPlay(); // 🔁 retry cleanly
     }, 3000);
   }
 }
