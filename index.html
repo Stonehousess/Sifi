@@ -869,11 +869,12 @@ function playTrailer(url) {
   const isSameVideo = playerVideoUrl?.includes(videoId);
 
   if (isSameVideo) {
-    console.log("🔁 Replaying same trailer manually");
-    trailerPlayer.seekTo(0);
-    trailerPlayer.playVideo();
-    return;
-  }
+  console.log("🔁 Replaying same trailer manually");
+  trailerPlayer.seekTo(0);
+  trailerPlayer.playVideo();
+  isTrailerAdvancing = true; // ✅ ensure state is correct
+  return;
+}
 
   // 🔄 Set trailer state
   isTrailerAdvancing = true;
