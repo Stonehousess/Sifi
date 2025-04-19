@@ -1147,7 +1147,7 @@ const randomPage = Math.floor(Math.random() * 80) + 1;
       const overview = item.overview || "No description available.";
       const rating = item.vote_average ? `${Math.round(item.vote_average * 10)}%` : "--";
       const releaseDate = item.release_date || item.first_air_date || "";
-      const year = releaseDate ? ` (${releaseDate.substring(0, 4)})` : "";
+      const year = releaseDate ? releaseDate.substring(0, 4) : "";
 
       const detailUrl = `https://api.themoviedb.org/3/${type}/${item.id}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&append_to_response=credits`;
       const detailRes = await fetch(detailUrl);
@@ -1158,9 +1158,9 @@ const randomPage = Math.floor(Math.random() * 80) + 1;
       const budget = isMovie && detailData.budget ? `$${(detailData.budget / 1_000_000).toFixed(1)}M` : "--";
       console.log("💰 Budget:", detailData.budget, "| Formatted:", budget);
       // 🔍 Fetch the trailer video from TMDB
-const videoRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=e8d804d1f104509d3c1c5b1166485ae6`);
-const videoData = await videoRes.json();
-const trailer = videoData.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
+      const videoRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=e8d804d1f104509d3c1c5b1166485ae6`);
+      const videoData = await videoRes.json();
+      const trailer = videoData.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
 
 if (trailer) {
   currentTrailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
@@ -1267,7 +1267,7 @@ function applyFilmToUI(data) {
   <div id="info-crew" style="margin-top:0px; margin-bottom:1px;">
   <div style="line-height:0.92; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
   <span style="font-size:70px;">${data.title}</span>
-  <span style="font-size:67px;">${data.year}</span>
+  <span style="font-size:67px;">(${data.year})</span>
 </div>
   </div>
 
