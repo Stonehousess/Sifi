@@ -645,9 +645,28 @@ body.red-letter-mode #info-panel {
     </div>
   </div>
 <div id="overlay-info">
-  <div id="overlay-title">Title</div>
-  <div id="overlay-meta">Meta</div>
-  <div id="overlay-description">Description</div>
+  <div style="font-size:60px; line-height:0.9; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
+    <span id="overlay-title">TITLE</span>
+    <span style="font-size:55px;">(<span id="overlay-year">YEAR</span>)</span>
+  </div>
+
+  <div style="font-size:34px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase; line-height:1;">
+    <div id="overlay-cast">CAST</div>
+    <div>
+      <span style="text-transform:none;">k</span> <span id="overlay-director">DIRECTOR</span> |
+      <span style="text-transform:none;">j</span> <span id="overlay-studio">STUDIO</span> |
+      <span id="overlay-flag">🌍</span> |
+      <a id="overlay-tmdb" href="#" target="_blank" class="tmdb-link">TMDB</a>
+    </div>
+  </div>
+
+  <div id="overlay-meta" style="font-size:26px; font-family:'DigitalDisplay', monospace; color:#ffcc00; letter-spacing:1px;">
+    META
+  </div>
+
+  <div id="overlay-description" style="font-size:20px; color:#dce4e8; font-family:'Bubble', sans-serif; line-height:1.2; margin-top:4px;">
+    DESCRIPTION
+  </div>
 </div>
   <div class="overlay-buttons">
   <button id="overlay-next" onclick="findTrailerAndPlay()" class="overlay-btn">Next</button>
@@ -1243,9 +1262,17 @@ function applyFilmToUI(data) {
 
   // 🔁 Set core UI elements
   document.getElementById("movie-poster").src = data.posterPath;
-  document.getElementById("overlay-title").textContent = data.title + data.year;
-  document.getElementById("overlay-meta").textContent = data.metaText;
+  document.getElementById("overlay-title").textContent = data.title;
+  document.getElementById("overlay-year").textContent = data.year;
+  document.getElementById("overlay-cast").textContent = data.castList.toUpperCase();
+  document.getElementById("overlay-director").textContent = data.director.toUpperCase();
+  document.getElementById("overlay-studio").textContent = data.studio.toUpperCase();
+  document.getElementById("overlay-flag").textContent = getFlagEmoji(data.originCountry);
+  document.getElementById("overlay-tmdb").href = data.tmdbUrl;
   document.getElementById("overlay-description").textContent = data.overview;
+  document.getElementById("overlay-meta").textContent = isMovie
+  ? `${data.rating} • ${data.runtime} min • ${data.genre} • ${data.budget}`
+  : `${data.rating} • ${data.episodeCount} eps × ${data.runtime} min • ${data.genre} • ${data.budget}`;
 
   // ✅ Genre name (single clean place)
   const genreNameEl = document.getElementById("genre-name");
