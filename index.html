@@ -779,12 +779,15 @@ function onPlayerStateChange(event) {
   console.log("🎬 Player state changed:", event.data);
 
   if (event.data === YT.PlayerState.PLAYING) {
-    trailerPaused = false;
-    clearTimeout(failSafeTimeout);
-    clearTimeout(backupStateTimeout);
-    isTrailerAdvancing = false;
-    console.log("✅ Trailer is now playing");
-  }
+  trailerPaused = false;
+  clearTimeout(failSafeTimeout);
+  clearTimeout(backupStateTimeout);
+
+  // ✅ DO NOT unlock here — let END handle it
+  // isTrailerAdvancing = false;
+
+  console.log("✅ Trailer is now playing");
+}
 
   if (event.data === YT.PlayerState.ENDED) {
     isTrailerAdvancing = false;
@@ -873,7 +876,6 @@ function playTrailer(url) {
     console.log("🔁 Replaying same trailer manually");
     trailerPlayer.seekTo(0);
     trailerPlayer.playVideo();
-    isTrailerAdvancing = true;
     return;
   } else {
   console.log("⏭️ Same trailer detected in autoplay — forcing refetch");
