@@ -1271,12 +1271,12 @@ function applyFilmToUI(data) {
 
   <div style="font-size:30px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase; line-height:1.05;">
     🎭 : <span style="text-transform: uppercase;">${data.castList}</span>
-    <div style="line-height:1.05; text-transform: none;">
-      <span style="text-transform:none;">k</span> ${data.director} | 
-      <span style="text-transform:none;">j</span> ${data.studio} | 
-      ${getFlagEmoji(data.originCountry)} | 
-      <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
-    </div>
+    <div style="line-height:1.05;">
+    <span style="text-transform:none;">k</span> <span style="text-transform:uppercase;">${data.director}</span> | 
+    <span style="text-transform:none;">j</span> <span style="text-transform:uppercase;">${data.studio}</span> | 
+    ${getFlagEmoji(data.originCountry)} | 
+    <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
+</div>
   </div>
 
   <div id="info-description" style="margin-top:1px; font-size:22px; line-height:1; color:#dce4e8; font-family:'Bubble', sans-serif;">
