@@ -869,11 +869,16 @@ function playTrailer(url) {
   const isSameVideo = playerVideoUrl?.includes(videoId);
 
   if (isSameVideo) {
-  console.log("🔁 Replaying same trailer manually");
-  trailerPlayer.seekTo(0);
-  trailerPlayer.playVideo();
-  isTrailerAdvancing = true; // ✅ ensure state is correct
-  return;
+  if (!window.autoTrailerMode) {
+    console.log("🔁 Replaying same trailer manually");
+    trailerPlayer.seekTo(0);
+    trailerPlayer.playVideo();
+    isTrailerAdvancing = true;
+    return;
+  } else {
+    console.log("⏭️ Same trailer detected in autoplay — forcing refetch");
+    lastTrailerId = null; // force it to reassign
+  }
 }
 
   // 🔄 Set trailer state
