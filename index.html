@@ -1044,7 +1044,7 @@ const randomPage = Math.floor(Math.random() * 80) + 1;
     url += `&first_air_date.gte=${yearFrom}-01-01&first_air_date.lte=${yearTo}-12-31`;
   }
 }
-  console.log("🗓️ Year filtering?", useYearFilter, "| Year:", selectedYear);
+  
   if (selectedCountry) {
     url += `&with_origin_country=${selectedCountry}`;
   }
