@@ -797,14 +797,14 @@ function onPlayerStateChange(event) {
     isTrailerAdvancing = false;
 
     if (!window.autoTrailerMode) {
-      console.log("🎬 Single trailer mode — closing trailer and resetting timer");
-      setTimeout(() => {
-        closeTrailer();
-      }, 500);
-    } else {
+  isTrailerAdvancing = false; // ✅ This is fine here
+  console.log("🎬 Single trailer mode — closing trailer and resetting timer");
+  setTimeout(() => {
+    closeTrailer();
+  }, 500);
+} else {
   console.log("🔁 Autoplay mode — loading next trailer");
-  isTrailerAdvancing = true; // ✅ Add this line
-
+  // 🚫 No need to set isTrailerAdvancing again here
   setTimeout(() => {
     findTrailerAndPlay();
   }, 1000);
