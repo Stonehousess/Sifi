@@ -1264,13 +1264,13 @@ function applyFilmToUI(data) {
   const genreAnchor = document.getElementById("info-genre");
   if (genreAnchor) {
   const extraHTML = `
-  <div id="info-crew" style="margin-top:2px; margin-bottom:8px;">
-    <div style="font-size:50px; font-weight:bold; line-height:1.2; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
+  <div id="info-crew" style="margin-top:2px; margin-bottom:2px;">
+    <div style="font-size:55px; line-height:1; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
       ${data.title} ${data.year}
     </div>
 
     <div style="margin-top:4px; font-size:30px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase;">
-  🎭 ${data.castList}<br>
+  🎭: ${data.castList}<br>
   <span style="text-transform:none;">k</span> ${data.director} | 
   <span style="text-transform:none;">j</span> ${data.studio} | 
   ${getFlagEmoji(data.originCountry)} 
