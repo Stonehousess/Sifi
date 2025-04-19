@@ -1277,11 +1277,11 @@ function applyFilmToUI(data) {
   &nbsp; <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">| TMDB</a>
 </div>
 
-    <div id="info-description" style="margin-top:10px; font-size:22px; line-height:1.4; color:#dce4e8; font-family:'Bubble', sans-serif;">
+    <div id="info-description" style="margin-top:2px; font-size:22px; line-height:1.4; color:#dce4e8; font-family:'Bubble', sans-serif;">
       ${data.overview}
     </div>
 
-    <div id="info-meta" style="margin-top:10px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
+    <div id="info-meta" style="margin-top:2px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
       ${isMovie ? `${data.runtime} min` : `${data.episodeCount} eps × ${data.runtime} min`} • ${data.rating} • ${data.genres?.join(" / ") || "No Genre Info"} • 💰 ${data.budget}
     </div>
   </div>`;
