@@ -1510,21 +1510,39 @@ document.addEventListener("wheel", (e) => {
 });
 
 
-// 💾 Save poster image (VCR effect)
 let saving = false;
 document.getElementById("save-button").onclick = () => {
-  if (saving) return; // ✅ prevent double save
+  if (saving) return;
   saving = true;
 
-  const posterUrl = document.getElementById("movie-poster").src;
-  const link = document.createElement("a");
-  link.href = posterUrl;
-  link.download = "vcr.jpg";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const img = new Image();
+  img.crossOrigin = "anonymous"; // 🔑 Try to allow CORS fetch
+  img.src = document.getElementById("movie-poster").src;
 
-  setTimeout(() => saving = false, 1000); // ✅ allow next save
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "vcr.jpg";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setTimeout(() => saving = false, 1000);
+    }, "image/jpeg");
+  };
+
+  img.onerror = () => {
+    alert("❌ Couldn't download image — CORS blocked by host.");
+    saving = false;
+  };
 };
 document.getElementById("genre-button").onclick = () => {
   currentGenre = genres[Math.floor(Math.random() * genres.length)];
