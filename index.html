@@ -1309,16 +1309,17 @@ async function findTrailerAndPlay() {
   }
 
   isTrailerAdvancing = true;
+  window.autoTrailerMode = true;  // ✅ Move this up so it's active for the first trailer too
+
   if (trailerLoopFirst && currentTrailerUrl) {
-  console.log("⏯️ Playing current trailer before looping...");
-  trailerLoopFirst = false;
+    console.log("⏯️ Playing current trailer before looping...");
+    trailerLoopFirst = false;
 
-  playTrailer(currentTrailerUrl);
+    playTrailer(currentTrailerUrl);
 
-  // Allow the rest of the autoplay to proceed via `onPlayerStateChange`
-  return;
-}
-  window.autoTrailerMode = true;
+    // This will now allow continuation because auto mode is already set
+    return;
+  }
 
   closeAllPanels();
 
