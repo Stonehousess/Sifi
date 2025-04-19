@@ -876,9 +876,12 @@ function playTrailer(url) {
     isTrailerAdvancing = true;
     return;
   } else {
-    console.log("⏭️ Same trailer detected in autoplay — forcing refetch");
-    lastTrailerId = null; // force it to reassign
-  }
+  console.log("⏭️ Same trailer detected in autoplay — forcing refetch");
+  lastTrailerId = null;
+  isTrailerAdvancing = false; // ✅ Important: allow next fetch
+  findTrailerAndPlay();       // ✅ Immediately trigger next trailer
+  return;
+}
 }
 
   // 🔄 Set trailer state
