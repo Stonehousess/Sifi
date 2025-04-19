@@ -1282,7 +1282,7 @@ function applyFilmToUI(data) {
     </div>
 
     <div id="info-meta" style="margin-top:1px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
-      ${data.rating} • ${isMovie ? `${data.runtime} min` : `${data.episodeCount} eps × ${data.runtime} min`} • ${data.genre?.join(" / ") || "No Genre Info"} • ${data.budget}
+      ${data.rating} • ${isMovie ? `${data.runtime} min` : `${data.episodeCount} eps × ${data.runtime} min`} • ${data.genres?.join(" / ") || "No Genre Info"} • ${data.budget}
     </div>
   </div>`;
   genreAnchor.insertAdjacentHTML('afterend', extraHTML);
