@@ -1080,59 +1080,41 @@ async function getPageCount(type, country) {
   return Math.min(data.total_pages || 1, 80); // cap at 80 just like before
 }
 async function getRandomTitle(requireTrailer = false, overrideType = null, overrideGenreId = null) {
-  // 🎛 Get filter values
-const selectedGenreName = document.getElementById("genre-select")?.value;
-const selectedCountry = document.getElementById("country-select")?.value;
-const selectedType = document.getElementById("type-select")?.value || "movie";
-const selectedRating = parseFloat(document.getElementById("rating-range")?.value || 0);
+  const selectedGenreName = document.getElementById("genre-select")?.value;
+  const selectedCountry = document.getElementById("country-select")?.value;
+  const selectedType = document.getElementById("type-select")?.value || "movie";
+  const selectedRating = parseFloat(document.getElementById("rating-range")?.value || 0);
 
-// 🎯 Determine type (movie, tv, or random if 'all')
-const type = selectedType === "all"
-  ? (Math.random() < 0.5 ? "movie" : "tv")
-  : selectedType;
+  const type = selectedType === "all" ? (Math.random() < 0.5 ? "movie" : "tv") : selectedType;
+  isMovie = type === "movie";
 
-isMovie = type === "movie";
+  const genreObj = genres.find(g => g.name === selectedGenreName);
+  const selectedGenreId = type === "tv" ? genreObj?.tv : genreObj?.movie;
 
-// 🎞 Get correct genre ID based on type
-const genreObj = genres.find(g => g.name === selectedGenreName);
-const selectedGenreId = type === "tv" ? genreObj?.tv : genreObj?.movie;
+  const yearFromInput = parseInt(document.getElementById("year-from")?.value || "1900");
+  const yearToInput = parseInt(document.getElementById("year-to")?.value || "2025");
+  const defaultYearFrom = 1900;
+  const defaultYearTo = 2025;
+  const useYearFilter = yearFromInput !== defaultYearFrom || yearToInput !== defaultYearTo;
 
-// 📅 Year range filter (default = All Years)
-const yearFromInput = parseInt(document.getElementById("year-from")?.value || "1900");
-const yearToInput = parseInt(document.getElementById("year-to")?.value || "2025");
+  let randomPage = Math.floor(Math.random() * 80) + 1;
+  if (selectedCountry) {
+    const pageCount = await getPageCount(type, selectedCountry);
+    randomPage = Math.floor(Math.random() * pageCount) + 1;
+  }
 
-const defaultYearFrom = 1900;
-const defaultYearTo = 2025;
-
-const useYearFilter = yearFromInput !== defaultYearFrom || yearToInput !== defaultYearTo;
-
-
-// 🔀 Random page
-let randomPage = Math.floor(Math.random() * 80) + 1;
-
-if (selectedCountry) {
-  const pageCount = await getPageCount(type, selectedCountry);
-  randomPage = Math.floor(Math.random() * pageCount) + 1;
-}
   let url = `https://api.themoviedb.org/3/discover/${type}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&sort_by=popularity.desc&page=${randomPage}`;
 
-  if (selectedGenreName !== "all" && selectedGenreId) {
-    url += `&with_genres=${selectedGenreId}`;
-  }
-  if (selectedRating > 0) {
-    url += `&vote_average.gte=${selectedRating}`;
-  }
+  if (selectedGenreName !== "all" && selectedGenreId) url += `&with_genres=${selectedGenreId}`;
+  if (selectedRating > 0) url += `&vote_average.gte=${selectedRating}`;
   if (useYearFilter && yearFromInput <= yearToInput) {
-  if (isMovie) {
-    url += `&primary_release_date.gte=${yearFromInput}-01-01&primary_release_date.lte=${yearToInput}-12-31`;
-  } else {
-    url += `&first_air_date.gte=${yearFromInput}-01-01&first_air_date.lte=${yearToInput}-12-31`;
+    if (isMovie) {
+      url += `&primary_release_date.gte=${yearFromInput}-01-01&primary_release_date.lte=${yearToInput}-12-31`;
+    } else {
+      url += `&first_air_date.gte=${yearFromInput}-01-01&first_air_date.lte=${yearToInput}-12-31`;
+    }
   }
-}
-  
-  if (selectedCountry) {
-    url += `&with_origin_country=${selectedCountry}`;
-  }
+  if (selectedCountry) url += `&with_origin_country=${selectedCountry}`;
 
   console.log("🌐 Fetching with URL:", url);
 
@@ -1141,132 +1123,115 @@ if (selectedCountry) {
     const data = await res.json();
     const results = data.results;
     if (!results || results.length === 0) {
-  failedFetchCount++;
-  console.warn(`❌ No results found (attempt ${failedFetchCount}/${MAX_FAILED_FETCHES})`);
-
-  if (failedFetchCount >= MAX_FAILED_FETCHES) {
-    console.warn("🚨 Max failures reached — resetting filters");
-
-    document.getElementById("genre-select").value = "all";
-    document.getElementById("country-select").value = "";
-    document.getElementById("type-select").value = "all";
-    document.getElementById("rating-range").value = 0;
-    document.getElementById("year-from").value = 1900;
-    document.getElementById("year-to").value = 2025;
-
-    failedFetchCount = 0;
-
-    // Optional: update display labels if needed
-    document.getElementById("year-from-display").textContent = "1900";
-    document.getElementById("year-to-display").textContent = "2025";
-
-    alert("🎛️ Filters reset — no matches found 5 times in a row.");
-  }
-
-  return false;
-}
+      failedFetchCount++;
+      console.warn(`❌ No results found (attempt ${failedFetchCount}/${MAX_FAILED_FETCHES})`);
+      if (failedFetchCount >= MAX_FAILED_FETCHES) {
+        console.warn("🚨 Max failures reached — resetting filters");
+        document.getElementById("genre-select").value = "all";
+        document.getElementById("country-select").value = "";
+        document.getElementById("type-select").value = "all";
+        document.getElementById("rating-range").value = 0;
+        document.getElementById("year-from").value = 1900;
+        document.getElementById("year-to").value = 2025;
+        failedFetchCount = 0;
+        document.getElementById("year-from-display").textContent = "1900";
+        document.getElementById("year-to-display").textContent = "2025";
+        alert("🎛️ Filters reset — no matches found 5 times in a row.");
+      }
+      return false;
+    }
 
     const item = results[Math.floor(Math.random() * results.length)];
     failedFetchCount = 0;
-    const docRef = doc(db, "films", String (item. id));
+    const docRef = doc(db, "films", String(item.id));
     if (!item.poster_path) {
       console.warn("Missing poster — retrying...");
-      return getRandomTitle(requireTrailer); // Retry if no poster
+      return getRandomTitle(requireTrailer);
     }
 
-      const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w780${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
-      const title = item.title || item.name || "Untitled";
-      const overview = item.overview || "No description available.";
-      const rating = item.vote_average ? `${Math.round(item.vote_average * 10)}%` : "--";
-      const releaseDate = item.release_date || item.first_air_date || "";
-      const year = releaseDate ? releaseDate.substring(0, 4) : "";
+    const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w780${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
+    const title = item.title || item.name || "Untitled";
+    const overview = item.overview || "No description available.";
+    const rating = item.vote_average ? `${Math.round(item.vote_average * 10)}%` : "--";
+    const releaseDate = item.release_date || item.first_air_date || "";
+    const year = releaseDate ? releaseDate.substring(0, 4) : "";
 
-      const detailUrl = `https://api.themoviedb.org/3/${type}/${item.id}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&append_to_response=credits`;
-      const detailRes = await fetch(detailUrl);
-      const detailData = await detailRes.json();
-      const director = detailData.credits?.crew?.find(c => c.job === "Director")?.name || "Unknown";
-      const castList = detailData.credits?.cast?.slice(0, 5).map(c => c.name).join(", ") || "Unknown";
-      const studio = detailData.production_companies?.[0]?.name || "Unknown";
-      const budget = isMovie && detailData.budget ? `$${(detailData.budget / 1_000_000).toFixed(1)}M` : "--";
-      console.log("💰 Budget:", detailData.budget, "| Formatted:", budget);
-      // 🔍 Fetch the trailer video from TMDB
-      const videoRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=e8d804d1f104509d3c1c5b1166485ae6`);
-      const videoData = await videoRes.json();
-      const trailer = videoData.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
+    const detailUrl = `https://api.themoviedb.org/3/${type}/${item.id}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&append_to_response=credits,videos`;
+    const detailRes = await fetch(detailUrl);
+    const detailData = await detailRes.json();
 
-if (trailer) {
-  currentTrailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
-  lastTrailerId = trailer.key;
-} else {
-  currentTrailerUrl = null;
-  lastTrailerId = null;
-}
-      const runtime = detailData.runtime || detailData.episode_run_time?.[0] || "--";
-      const episodeCount = detailData.number_of_episodes || "--";
-      const originCountry = detailData.origin_country?.[0] || detailData.production_countries?.[0]?.iso_3166_1 || "";
-      const metaText = isMovie
-        ? `⭐️ ${rating} • 🍿 • ${runtime} mins • ${getFlagEmoji(originCountry)}`
-        : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ${runtime} mins • ${getFlagEmoji(originCountry)}`;
-const tmdbUrl = `https://www.themoviedb.org/${type}/${item.id}`; // ✅ Generate correct TMDB link
-      
-// ✅ Save to Firestore if successful
-await setDoc(docRef, {
-  id: item.id,
-  title,
-  overview,
-  year,
-  releaseDate,
-  runtime,
-  episodeCount,
-  rating,
-  popularity: item.popularity,
-  originCountry,
-  trailerUrl: currentTrailerUrl,
-  trailerKey: lastTrailerId,
-  genre: currentGenre.name,
-  type,
-  tmdbUrl: currentTMDBUrl,
-  director,
-  castList,
-  studio,
-  budget,
-  posterUrl: posterPath,
-  metaText,
-  timestamp: Date.now(),
-  timestampReadable: new Date().toISOString(),
-  cachedBy: "public"
-});
+    const director = detailData.credits?.crew?.find(c => c.job === "Director")?.name || "Unknown";
+    const castList = detailData.credits?.cast?.slice(0, 5).map(c => c.name).join(", ") || "Unknown";
+    const studio = detailData.production_companies?.[0]?.name || "Unknown";
+    const budget = isMovie && detailData.budget ? `$${(detailData.budget / 1_000_000).toFixed(1)}M` : "--";
+    const trailer = detailData.videos?.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
+    currentTrailerUrl = trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
+    lastTrailerId = trailer ? trailer.key : null;
+    const runtime = detailData.runtime || (Array.isArray(detailData.episode_run_time) ? detailData.episode_run_time[0] : "--");
+    const episodeCount = detailData.number_of_episodes ?? "--";
+    const originCountry = detailData.origin_country?.[0] || detailData.production_countries?.[0]?.iso_3166_1 || "";
 
-return {
-  id: item.id,
-  title,
-  overview,
-  year,
-  releaseDate,
-  runtime,
-  episodeCount,
-  rating,
-  popularity: item.popularity,
-  originCountry,
-  trailerUrl: currentTrailerUrl,
-  trailerKey: lastTrailerId,
-  genre: currentGenre.name,
-  type,
-  tmdbUrl: currentTMDBUrl,
-  director,
-  castList,
-  studio,
-  budget,
-  posterPath,
-  metaText
-};
+    const metaText = isMovie
+      ? `⭐️ ${rating} • 🍿 • ${runtime} mins • ${getFlagEmoji(originCountry)}`
+      : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ${runtime} mins • ${getFlagEmoji(originCountry)}`;
 
-       
-    } catch (err) {
-      console.error("Failed to fetch from TMDB:", err);
-      return false;
-    }
+    const tmdbUrl = `https://www.themoviedb.org/${type}/${item.id}`;
+
+    await setDoc(docRef, {
+      id: item.id,
+      title,
+      overview,
+      year,
+      releaseDate,
+      runtime,
+      episodeCount,
+      rating,
+      popularity: item.popularity,
+      originCountry,
+      trailerUrl: currentTrailerUrl,
+      trailerKey: lastTrailerId,
+      genre: currentGenre.name,
+      type,
+      tmdbUrl: currentTMDBUrl,
+      director,
+      castList,
+      studio,
+      budget,
+      posterUrl: posterPath,
+      metaText,
+      timestamp: Date.now(),
+      timestampReadable: new Date().toISOString(),
+      cachedBy: "public"
+    });
+
+    return {
+      id: item.id,
+      title,
+      overview,
+      year,
+      releaseDate,
+      runtime,
+      episodeCount,
+      rating,
+      popularity: item.popularity,
+      originCountry,
+      trailerUrl: currentTrailerUrl,
+      trailerKey: lastTrailerId,
+      genre: currentGenre.name,
+      type,
+      tmdbUrl: currentTMDBUrl,
+      director,
+      castList,
+      studio,
+      budget,
+      posterPath,
+      metaText
+    };
+  } catch (err) {
+    console.error("Failed to fetch from TMDB:", err);
+    return false;
   }
+}
 function applyFilmToUI(data) {
   console.log("📦 Current history count:", fetchHistory.length);
   swipeState = "poster";
@@ -1289,74 +1254,73 @@ function applyFilmToUI(data) {
   document.getElementById("overlay-flag").textContent = getFlagEmoji(data.originCountry);
   document.getElementById("overlay-tmdb").href = data.tmdbUrl;
   document.getElementById("overlay-description").textContent = data.overview;
-  document.getElementById("overlay-meta").textContent = isMovie
-  ? `${data.rating} • ${data.runtime} min • ${data.genre} • ${data.budget}`
-  : `${data.rating} • ${data.episodeCount} eps × ${data.runtime} min • ${data.genre} • ${data.budget}`;
 
-  // ✅ Genre name (single clean place)
+  document.getElementById("overlay-meta").textContent = isMovie
+    ? `${data.rating} • ${data.runtime} min • ${data.genre} • ${data.budget}`
+    : `${data.rating} • ${data.episodeCount ?? "--"} eps × ${data.runtime ?? "--"} min • ${data.genre} • ${data.budget}`;
+
+  // ✅ Update genre name
   const genreNameEl = document.getElementById("genre-name");
   if (genreNameEl) genreNameEl.textContent = data.genre;
 
-  // ✅ TMDB link (replace content, not element)
+  // ✅ Update floating TMDB link
   const tmdbLink = document.getElementById("tmdb-link");
   if (tmdbLink) {
     tmdbLink.innerHTML = `| <a href="${data.tmdbUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
   }
 
-  // ✅ Clean up old crew panel
+  // ✅ Refresh info panel
   document.getElementById("info-crew")?.remove();
-
-  // ✅ Add new crew panel
   const genreAnchor = document.getElementById("info-genre");
   if (genreAnchor) {
-  const extraHTML = `
-  <div id="info-crew" style="margin-top:0px; margin-bottom:1px;">
-    <div style="line-height:0.92; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
-      <span style="font-size:70px;">${data.title}</span>
-      <span style="font-size:67px;">(${data.year})</span>
-    </div>
+    const extraHTML = `
+      <div id="info-crew" style="margin-top:0px; margin-bottom:1px;">
+        <div style="line-height:0.92; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
+          <span style="font-size:70px;">${data.title}</span>
+          <span style="font-size:67px;">(${data.year})</span>
+        </div>
 
-    <div style="font-size:40px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase; line-height:0.95;">
-      <span style="text-transform: uppercase;">${data.castList}</span>
-      <div style="line-height:1;">
-        <span style="text-transform:none;">k</span> <span style="text-transform:uppercase;">${data.director}</span>  
-        <span style="text-transform:none;">  j</span> <span style="text-transform:uppercase;">${data.studio}</span> | 
-        ${getFlagEmoji(data.originCountry)} | 
-        <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
+        <div style="font-size:40px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase; line-height:0.95;">
+          <span>${data.castList}</span>
+          <div style="line-height:1;">
+            <span style="text-transform:none;">k</span> <span style="text-transform:uppercase;">${data.director}</span>  
+            <span style="text-transform:none;">  j</span> <span style="text-transform:uppercase;">${data.studio}</span> | 
+            ${getFlagEmoji(data.originCountry)} | 
+            <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
+          </div>
+        </div>
+
+        <div id="info-description" style="margin-top:1.5px; font-size:20px; line-height:1; color:#dce4e8; font-family:'Bubble', sans-serif;">
+          ${data.overview}
+        </div>
+
+        <div id="info-meta" style="margin-top:1px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
+          ${data.rating} • ${isMovie ? `${data.runtime} min` : `${data.episodeCount ?? "--"} eps × ${data.runtime ?? "--"} min`} • ${data.genre || "No Genre Info"} • ${data.budget}
+        </div>
       </div>
-    </div>
+    `;
+    genreAnchor.insertAdjacentHTML('afterend', extraHTML);
+  }
 
-    <div id="info-description" style="margin-top:1.5px; font-size:20px; line-height:1; color:#dce4e8; font-family:'Bubble', sans-serif;">
-      ${data.overview}
-    </div>
-
-    <div id="info-meta" style="margin-top:1px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
-      ${data.rating} • ${isMovie ? `${data.runtime} min` : `${data.episodeCount} eps × ${data.runtime} min`} • ${data.genre || "No Genre Info"} • ${data.budget}
-    </div>
-  </div>
-`;
-  genreAnchor.insertAdjacentHTML('afterend', extraHTML);
-}
-
-  // ✅ Trailer setup
+  // ✅ Handle trailer button status
   currentTMDBUrl = data.tmdbUrl;
   currentTrailerUrl = data.trailerUrl;
 
   const trailerBtn = document.getElementById("trailer-button");
   const trailerImg = trailerBtn?.querySelector("img");
 
-if (!data.trailerUrl) {
-  trailerBtn.disabled = true;
-  trailerImg.src = "play-disabled.png";
-  trailerImg.style.opacity = "0.3";
-} else {
-  trailerBtn.disabled = false;
-  trailerImg.src = "play.png";
-  trailerImg.style.opacity = "0.6";
-  trailerBtn.style.cursor = "pointer";
-}
+  if (!data.trailerUrl) {
+    trailerBtn.disabled = true;
+    trailerImg.src = "play-disabled.png";
+    trailerImg.style.opacity = "0.3";
+  } else {
+    trailerBtn.disabled = false;
+    trailerImg.src = "play.png";
+    trailerImg.style.opacity = "0.6";
+    trailerBtn.style.cursor = "pointer";
+  }
 
-  // ✅ TMDB button history recall
+  // ✅ Bind TMDB recall button
   const tmdbBtn = document.getElementById("tmdb-button");
   tmdbBtn.disabled = false;
   if (!window.tmdbClickBound) {
