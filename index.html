@@ -1181,7 +1181,8 @@ if (selectedCountry) {
       const releaseDate = item.release_date || item.first_air_date || "";
       const year = releaseDate ? releaseDate.substring(0, 4) : "";
 
-      const detailUrl = `https://api.themoviedb.org/3/${type}/${item.id}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&append_to_response=credits`;
+      // ✅ One combined API call
+      const detailUrl = `https://api.themoviedb.org/3/${type}/${item.id}?api_key=YOUR_KEY&language=en-US&append_to_response=credits,videos,external_ids`;
       const detailRes = await fetch(detailUrl);
       const detailData = await detailRes.json();
       const director = detailData.credits?.crew?.find(c => c.job === "Director")?.name || "Unknown";
@@ -1190,9 +1191,7 @@ if (selectedCountry) {
       const budget = isMovie && detailData.budget ? `$${(detailData.budget / 1_000_000).toFixed(1)}M` : "--";
       console.log("💰 Budget:", detailData.budget, "| Formatted:", budget);
       // 🔍 Fetch the trailer video from TMDB
-      const videoRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=e8d804d1f104509d3c1c5b1166485ae6`);
-      const videoData = await videoRes.json();
-      const trailer = videoData.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
+      const trailer = detailData.videos?.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
 
 if (trailer) {
   currentTrailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
