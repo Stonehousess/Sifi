@@ -1274,13 +1274,13 @@ function applyFilmToUI(data) {
   if (genreAnchor) {
   const extraHTML = `
   <div id="info-crew" style="margin-top:8px; margin-bottom:8px; font-family:'Bubble', sans-serif;">
-    <div id="info-title" style="font-size:42px; font-weight:bold; line-height:1.2; color:#fff;">
+    <div style="font-size:42px; font-weight:bold; line-height:1.2; color:#fff; font-family:'Library', sans-serif;">
       ${data.title} <span style="color:#ffcc00; font-weight:normal;">(${data.year})</span>
     </div>
 
     <div style="margin-top:4px; font-size:26px; color:#ffcc00; font-family:'DigitalDisplay', monospace;">
-      🎭 ${data.castList} • 🎬 ${data.director} • 🏢 ${data.studio} • ${getFlagEmoji(data.originCountry)} 
-      &nbsp; <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#ffcc00; text-decoration:none;">TMDB</a>
+      🎭 ${data.castList} • 🎬 ${data.director} • 🏢 ${data.studio} • ${getFlagEmoji(data.originCountry)}
+      &nbsp; <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
     </div>
 
     <div id="info-description" style="margin-top:10px; font-size:22px; line-height:1.4; color:#dce4e8;">
