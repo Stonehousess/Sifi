@@ -579,7 +579,7 @@ body.red-letter-mode #info-panel {
       <div id="year-label">All Years</div>
 
       <label>Year From:
-  <input type="range" id="year-from" min="1900" max="2025" value="2000" step="1">
+  <input type="range" id="year-from" min="1900" max="2025" value="1900" step="1">
   <span id="year-from-display">2000</span>
 </label>
 
@@ -1632,14 +1632,20 @@ wrapper.addEventListener("click", (e) => {
   document.getElementById("save-button").click(); // Now guarded
 });
 function updateYearLabel() {
-  const from = document.getElementById("year-from").value;
-  const to = document.getElementById("year-to").value;
+  const yearFrom = parseInt(document.getElementById("year-from")?.value || "1900");
+  const yearTo = parseInt(document.getElementById("year-to")?.value || "2025");
 
-  document.getElementById("year-from-display").textContent = from;
-  document.getElementById("year-to-display").textContent = to;
+  document.getElementById("year-from-display").textContent = yearFrom;
+  document.getElementById("year-to-display").textContent = yearTo;
 
-  const label = document.getElementById("year-label");
-  label.textContent = `Years: ${from} – ${to}`;
+  const yearLabel = document.getElementById("year-label");
+  if (yearFrom === 1900 && yearTo === 2025) {
+    yearLabel.textContent = "All Years";
+  } else if (yearFrom === yearTo) {
+    yearLabel.textContent = `${yearFrom}`;
+  } else {
+    yearLabel.textContent = `${yearFrom} – ${yearTo}`;
+  }
 }
 window.onload = () => {
   console.log("✅ window.onload fired");
