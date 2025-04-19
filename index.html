@@ -578,9 +578,14 @@ body.red-letter-mode #info-panel {
     <div id="filter-content">
       <div id="year-label">All Years</div>
 
-      <label>Year:
-  <input type="range" id="year-range" min="1900" max="2025" value="2000" step="1">
-  <span id="year-display">2000</span>
+      <label>Year From:
+  <input type="range" id="year-from" min="1900" max="2025" value="2000" step="1">
+  <span id="year-from-display">2000</span>
+</label>
+
+<label>Year To:
+  <input type="range" id="year-to" min="1900" max="2025" value="2025" step="1">
+  <span id="year-to-display">2025</span>
 </label>
 
       <label>Country: 
@@ -1018,11 +1023,9 @@ const genreObj = genres.find(g => g.name === selectedGenreName);
 const selectedGenreId = type === "tv" ? genreObj?.tv : genreObj?.movie;
 
 // 📅 Year range filter
-const yearInput = document.getElementById("year-range");
-const selectedYear = parseInt(yearInput?.value || "2000");
-const defaultYear = parseInt(yearInput?.dataset.default || "2000");
+const yearFrom = parseInt(document.getElementById("year-from")?.value || "2000");
+const yearTo = parseInt(document.getElementById("year-to")?.value || "2025");
 
-const useYearFilter = selectedYear !== defaultYear;
 
 // 🔀 Random page
 const randomPage = Math.floor(Math.random() * 80) + 1;
@@ -1034,11 +1037,11 @@ const randomPage = Math.floor(Math.random() * 80) + 1;
   if (selectedRating > 0) {
     url += `&vote_average.gte=${selectedRating}`;
   }
-  if (useYearFilter) {
+  if (yearFrom && yearTo && yearFrom <= yearTo) {
   if (isMovie) {
-    url += `&primary_release_year=${selectedYear}`;
+    url += `&primary_release_date.gte=${yearFrom}-01-01&primary_release_date.lte=${yearTo}-12-31`;
   } else {
-    url += `&first_air_date_year=${selectedYear}`;
+    url += `&first_air_date.gte=${yearFrom}-01-01&first_air_date.lte=${yearTo}-12-31`;
   }
 }
   console.log("🗓️ Year filtering?", useYearFilter, "| Year:", selectedYear);
@@ -1624,9 +1627,14 @@ wrapper.addEventListener("click", (e) => {
   document.getElementById("save-button").click(); // Now guarded
 });
 function updateYearLabel() {
-  const year = document.getElementById("year-range").value;
-  const yearLabel = document.getElementById("year-label");
-  yearLabel.textContent = `Year: ${year}`;
+  const from = document.getElementById("year-from").value;
+  const to = document.getElementById("year-to").value;
+
+  document.getElementById("year-from-display").textContent = from;
+  document.getElementById("year-to-display").textContent = to;
+
+  const label = document.getElementById("year-label");
+  label.textContent = `Years: ${from} – ${to}`;
 }
 window.onload = () => {
   console.log("✅ window.onload fired");
