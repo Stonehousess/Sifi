@@ -1516,22 +1516,15 @@ document.getElementById("save-button").onclick = () => {
   if (saving) return; // ✅ prevent double save
   saving = true;
 
-  const posterUrl = document.getElementById('movie-poster').src;
-  fetch(posterUrl)
-    .then(r => r.blob())
-    .then(blob => {
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'vcr.jpg';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    })
-    .finally(() => {
-      setTimeout(() => saving = false, 1000); // ✅ allow next save
-    });
+  const posterUrl = document.getElementById("movie-poster").src;
+  const link = document.createElement("a");
+  link.href = posterUrl;
+  link.download = "vcr.jpg";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  setTimeout(() => saving = false, 1000); // ✅ allow next save
 };
 document.getElementById("genre-button").onclick = () => {
   currentGenre = genres[Math.floor(Math.random() * genres.length)];
