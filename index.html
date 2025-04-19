@@ -893,7 +893,7 @@ function playTrailer(url) {
   console.log("🎥 Playing trailer with ID:", videoId, "| autoMode:", window.autoTrailerMode, "| isAdvancing:", isTrailerAdvancing);
   trailerPlayer.loadVideoById(videoId);
   trailerPlayer.playVideo?.();
-
+  console.log("🎥 Playing trailer with ID:", videoId, "| autoMode:", window.autoTrailerMode, "| isAdvancing:", isTrailerAdvancing);
   // 🔔 Show trailer info overlay briefly
   overlayInfo.style.opacity = "1";
   overlayFadeTimer = setTimeout(() => {
