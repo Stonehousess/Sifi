@@ -1273,17 +1273,23 @@ function applyFilmToUI(data) {
   const genreAnchor = document.getElementById("info-genre");
   if (genreAnchor) {
   const extraHTML = `
-  <div id="info-crew" style="margin-top:3px; margin-bottom:3px; font-size:42px; text-transform: uppercase; line-height: 0.95; color:#aaa;">
-    <span class="crew-font">
-      🎬 <strong>:</strong> ${data.director} &nbsp;|&nbsp; 
-      🏢 <strong>:</strong> ${data.studio} &nbsp;|&nbsp;
-      💰 <strong>:</strong> ${data.budget} <br>
-      🎭 <strong>:</strong> ${data.castList}
-    </span>
-    <br>
-    <strong></strong> <span class="genre-text">${data.genre}</span>
-    &nbsp;
-    <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link">TMDB</a>
+  <div id="info-crew" style="margin-top:8px; margin-bottom:8px; font-family:'Bubble', sans-serif;">
+    <div id="info-title" style="font-size:42px; font-weight:bold; line-height:1.2; color:#fff;">
+      ${data.title} <span style="color:#ffcc00; font-weight:normal;">(${data.year})</span>
+    </div>
+
+    <div style="margin-top:4px; font-size:26px; color:#ffcc00; font-family:'DigitalDisplay', monospace;">
+      🎭 ${data.castList} • 🎬 ${data.director} • 🏢 ${data.studio} • ${getFlagEmoji(data.originCountry)} 
+      &nbsp; <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#ffcc00; text-decoration:none;">TMDB</a>
+    </div>
+
+    <div id="info-description" style="margin-top:10px; font-size:22px; line-height:1.4; color:#dce4e8;">
+      ${data.overview}
+    </div>
+
+    <div id="info-meta" style="margin-top:10px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
+      ${data.runtime} • ${data.rating} • ${data.genres?.join(" / ") || "No Genre Info"} • 💰 ${data.budget}
+    </div>
   </div>`;
   genreAnchor.insertAdjacentHTML('afterend', extraHTML);
 }
