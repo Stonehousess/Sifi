@@ -1073,7 +1073,12 @@ function closeTrailer() {
 
   startFetchCountdown(20000); // shorter visual indicator
 }
-
+async function getPageCount(type, country) {
+  const url = `https://api.themoviedb.org/3/discover/${type}?api_key=e8d804d1f104509d3c1c5b1166485ae6&with_origin_country=${country}&page=1`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return Math.min(data.total_pages || 1, 80); // cap at 80 just like before
+}
 async function getRandomTitle(requireTrailer = false, overrideType = null, overrideGenreId = null) {
   // 🎛 Get filter values
 const selectedGenreName = document.getElementById("genre-select")?.value;
@@ -1103,7 +1108,12 @@ const useYearFilter = yearFromInput !== defaultYearFrom || yearToInput !== defau
 
 
 // 🔀 Random page
-const randomPage = Math.floor(Math.random() * 80) + 1;
+let randomPage = Math.floor(Math.random() * 80) + 1;
+
+if (selectedCountry) {
+  const pageCount = await getPageCount(type, selectedCountry);
+  randomPage = Math.floor(Math.random() * pageCount) + 1;
+}
   let url = `https://api.themoviedb.org/3/discover/${type}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&sort_by=popularity.desc&page=${randomPage}`;
 
   if (selectedGenreName !== "all" && selectedGenreId) {
