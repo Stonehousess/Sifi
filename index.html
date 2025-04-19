@@ -1022,9 +1022,14 @@ isMovie = type === "movie";
 const genreObj = genres.find(g => g.name === selectedGenreName);
 const selectedGenreId = type === "tv" ? genreObj?.tv : genreObj?.movie;
 
-// 📅 Year range filter
-const yearFrom = parseInt(document.getElementById("year-from")?.value || "2000");
-const yearTo = parseInt(document.getElementById("year-to")?.value || "2025");
+// 📅 Year range filter (default = All Years)
+const yearFromInput = parseInt(document.getElementById("year-from")?.value || "1900");
+const yearToInput = parseInt(document.getElementById("year-to")?.value || "2025");
+
+const defaultYearFrom = 1900;
+const defaultYearTo = 2025;
+
+const useYearFilter = yearFromInput !== defaultYearFrom || yearToInput !== defaultYearTo;
 
 
 // 🔀 Random page
@@ -1037,11 +1042,11 @@ const randomPage = Math.floor(Math.random() * 80) + 1;
   if (selectedRating > 0) {
     url += `&vote_average.gte=${selectedRating}`;
   }
-  if (yearFrom && yearTo && yearFrom <= yearTo) {
+  if (useYearFilter && yearFromInput <= yearToInput) {
   if (isMovie) {
-    url += `&primary_release_date.gte=${yearFrom}-01-01&primary_release_date.lte=${yearTo}-12-31`;
+    url += `&primary_release_date.gte=${yearFromInput}-01-01&primary_release_date.lte=${yearToInput}-12-31`;
   } else {
-    url += `&first_air_date.gte=${yearFrom}-01-01&first_air_date.lte=${yearTo}-12-31`;
+    url += `&first_air_date.gte=${yearFromInput}-01-01&first_air_date.lte=${yearToInput}-12-31`;
   }
 }
   
