@@ -591,11 +591,23 @@ body.red-letter-mode #info-panel {
       <label>Country: 
         <select id="country-select">
           <option value="">Any</option>
-          <option value="US">🇺🇸 US</option>
-          <option value="GB">🇬🇧 UK</option>
-          <option value="FR">🇫🇷 France</option>
-          <option value="JP">🇯🇵 Japan</option>
-          <option value="KR">🇰🇷 Korea</option>
+          <option value="US">🇺🇸</option>
+          <option value="GB">🇬🇧</option>
+          <option value="FR">🇫🇷</option>
+          <option value="JP">🇯🇵</option>
+          <option value="IT">🇮🇹</option>
+          <option value="CA">🇨🇦</option>
+          <option value="CN">🇨🇳</option>
+          <option value="DE">🇩🇪</option>
+          <option value="IN">🇮🇳</option>
+          <option value="ES">🇪🇸</option>
+          <option value="BR">🇧🇷</option>
+          <option value="IE">🇮🇪</option>
+          <option value="AU">🇦🇺</option>
+          <option value="KR">🇰🇷</option>
+          <option value="MX">🇲🇽</option>
+          <option value="BE">🇧🇪</option>
+          <option value="TR">🇹🇷</option>
         </select>
       </label>
 
@@ -700,6 +712,8 @@ body.red-letter-mode #info-panel {
   let swipeCooldown = false;
   window.tmdbClickBound = false;
   let lastMouseMoveTime = 0;
+  let failedFetchCount = 0;
+  const MAX_FAILED_FETCHES = 5;
 
 function closeAllPanels() {
   document.getElementById("filter-panel").classList.remove("active");
@@ -1060,9 +1074,34 @@ const randomPage = Math.floor(Math.random() * 80) + 1;
     const res = await fetch(url);
     const data = await res.json();
     const results = data.results;
-    if (!results || results.length === 0) return false;
+    if (!results || results.length === 0) {
+  failedFetchCount++;
+  console.warn(`❌ No results found (attempt ${failedFetchCount}/${MAX_FAILED_FETCHES})`);
+
+  if (failedFetchCount >= MAX_FAILED_FETCHES) {
+    console.warn("🚨 Max failures reached — resetting filters");
+
+    document.getElementById("genre-select").value = "all";
+    document.getElementById("country-select").value = "";
+    document.getElementById("type-select").value = "all";
+    document.getElementById("rating-range").value = 0;
+    document.getElementById("year-from").value = 1900;
+    document.getElementById("year-to").value = 2025;
+
+    failedFetchCount = 0;
+
+    // Optional: update display labels if needed
+    document.getElementById("year-from-display").textContent = "1900";
+    document.getElementById("year-to-display").textContent = "2025";
+
+    alert("🎛️ Filters reset — no matches found 5 times in a row.");
+  }
+
+  return false;
+}
 
     const item = results[Math.floor(Math.random() * results.length)];
+    failedFetchCount = 0;
     const docRef = doc(db, "films", String (item. id));
     if (!item.poster_path) {
       console.warn("Missing poster — retrying...");
