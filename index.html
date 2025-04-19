@@ -775,47 +775,38 @@ function resetPanelFade() {
       .replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt()));
   }
 
-function onPlayerStateChange(event) {
-  console.log("🎬 Player state changed:", event.data);
+if (event.data === YT.PlayerState.ENDED) {
+  console.log("🔚 Trailer ended");
 
-  if (event.data === YT.PlayerState.PLAYING) {
-    trailerPaused = false;
-    clearTimeout(failSafeTimeout);
-    clearTimeout(backupStateTimeout);
-    console.log("✅ Trailer is now playing");
-  }
+  // ✅ Always unlock before advancing
+  isTrailerAdvancing = false;
+  trailerPlaying = false;
+  trailerPaused = false;
 
-  if (event.data === YT.PlayerState.ENDED) {
-    clearTimeout(failSafeTimeout);
-    clearTimeout(backupStateTimeout);
-    trailerPlaying = false;
-    trailerPaused = false;
+  clearTimeout(failSafeTimeout);
+  clearTimeout(backupStateTimeout);
 
-    console.log("🔚 Trailer ended");
-
-    isTrailerAdvancing = false; // ✅ Unlock for next fetch
-
-    if (!window.autoTrailerMode) {
-      console.log("🎬 Single trailer mode — closing trailer and resetting timer");
-      setTimeout(() => {
-        closeTrailer();
-      }, 500);
-    } else {
-      console.log("🔁 Autoplay mode — loading next trailer");
-
-      setTimeout(() => {
+  if (!window.autoTrailerMode) {
+    console.log("🎬 Single trailer mode — closing trailer and resetting timer");
+    setTimeout(() => closeTrailer(), 500);
+  } else {
+    console.log("🔁 Autoplay mode — loading next trailer...");
+    setTimeout(() => {
+      if (!isTrailerAdvancing) {
         findTrailerAndPlay();
-      }, 1000);
+      }
+    }, 1000);
 
-      failSafeTimeout = setTimeout(() => {
-        if (isTrailerAdvancing) {
-          console.warn("⏱️ Fail-safe: Forcing trailer advance reset");
-          isTrailerAdvancing = false;
-          findTrailerAndPlay();
-        }
-      }, 15000);
-    }
+    // ⛑️ Secondary failsafe if loop gets stuck
+    failSafeTimeout = setTimeout(() => {
+      if (isTrailerAdvancing) {
+        console.warn("⏱️ Fail-safe: Forcing trailer advance reset");
+        isTrailerAdvancing = false;
+        findTrailerAndPlay();
+      }
+    }, 15000);
   }
+}
 
   if (event.data === YT.PlayerState.PAUSED) {
     trailerPaused = true;
@@ -982,6 +973,20 @@ function playTrailer(url) {
       }
     }
   }, 1000);
+// ⏱️ Final backup if END/PAUSED never fires (e.g., player freezes)
+setTimeout(() => {
+  const state = trailerPlayer?.getPlayerState?.();
+  if (
+    isTrailerAdvancing &&
+    window.autoTrailerMode &&
+    state !== YT.PlayerState.ENDED &&
+    state !== YT.PlayerState.PAUSED
+  ) {
+    console.warn("🛑 Final backup triggered — forcing next trailer");
+    isTrailerAdvancing = false;
+    findTrailerAndPlay();
+  }
+}, 120000); // 🔁 2 minute safety net
 }
 function closeTrailer() {
   console.log("❎ Closing trailer player...");
