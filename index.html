@@ -779,43 +779,42 @@ function onPlayerStateChange(event) {
   console.log("🎬 Player state changed:", event.data);
 
   if (event.data === YT.PlayerState.PLAYING) {
-  trailerPaused = false;
-  clearTimeout(failSafeTimeout);
-  clearTimeout(backupStateTimeout);
-
-  // ✅ DO NOT unlock here — let END handle it
-  // isTrailerAdvancing = false;
-
-  console.log("✅ Trailer is now playing");
-}
+    trailerPaused = false;
+    clearTimeout(failSafeTimeout);
+    clearTimeout(backupStateTimeout);
+    console.log("✅ Trailer is now playing");
+  }
 
   if (event.data === YT.PlayerState.ENDED) {
-  clearTimeout(failSafeTimeout);
-  clearTimeout(backupStateTimeout);
-  trailerPlaying = false;
-  trailerPaused = false;
+    clearTimeout(failSafeTimeout);
+    clearTimeout(backupStateTimeout);
+    trailerPlaying = false;
+    trailerPaused = false;
 
-  console.log("🔚 Trailer ended");
+    console.log("🔚 Trailer ended");
 
-  if (!window.autoTrailerMode) {
-    isTrailerAdvancing = false; // ✅ Only reset here
-    console.log("🎬 Single trailer mode — closing trailer and resetting timer");
-    setTimeout(() => {
-      closeTrailer();
-    }, 500);
-  } else {
-    console.log("🔁 Autoplay mode — loading next trailer");
-    setTimeout(() => {
-      findTrailerAndPlay();
-    }, 1000);
+    // ✅ Always unlock before deciding what to do next
+    isTrailerAdvancing = false;
 
-    failSafeTimeout = setTimeout(() => {
-      if (isTrailerAdvancing) {
-        console.warn("⏱️ Fail-safe: Forcing trailer advance reset");
-        isTrailerAdvancing = false;
+    if (!window.autoTrailerMode) {
+      console.log("🎬 Single trailer mode — closing trailer and resetting timer");
+      setTimeout(() => {
+        closeTrailer();
+      }, 500);
+    } else {
+      console.log("🔁 Autoplay mode — loading next trailer");
+      setTimeout(() => {
         findTrailerAndPlay();
-      }
-    }, 15000);
+      }, 1000);
+
+      failSafeTimeout = setTimeout(() => {
+        if (isTrailerAdvancing) {
+          console.warn("⏱️ Fail-safe: Forcing trailer advance reset");
+          isTrailerAdvancing = false;
+          findTrailerAndPlay();
+        }
+      }, 15000);
+    }
   }
 }
 
@@ -892,7 +891,7 @@ function playTrailer(url) {
   trailerPaused = false;
   currentTrailerUrl = url;
   lastTrailerId = videoId;
-
+  console.log("🎥 Playing trailer with ID:", videoId, "| autoMode:", window.autoTrailerMode, "| isAdvancing:", isTrailerAdvancing);
   trailerPlayer.loadVideoById(videoId);
   trailerPlayer.playVideo?.();
 
