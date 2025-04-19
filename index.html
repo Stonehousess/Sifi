@@ -775,36 +775,44 @@ function resetPanelFade() {
       .replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt()));
   }
 
-if (event.data === YT.PlayerState.ENDED) {
-  console.log("🔚 Trailer ended");
+function onPlayerStateChange(event) {
+  console.log("🎬 Player state changed:", event.data);
 
-  // ✅ Always unlock before advancing
-  isTrailerAdvancing = false;
-  trailerPlaying = false;
-  trailerPaused = false;
+  if (event.data === YT.PlayerState.PLAYING) {
+    trailerPaused = false;
+    clearTimeout(failSafeTimeout);
+    clearTimeout(backupStateTimeout);
+    console.log("✅ Trailer is now playing");
+  }
 
-  clearTimeout(failSafeTimeout);
-  clearTimeout(backupStateTimeout);
+  if (event.data === YT.PlayerState.ENDED) {
+    console.log("🔚 Trailer ended");
+    isTrailerAdvancing = false;
+    trailerPlaying = false;
+    trailerPaused = false;
 
-  if (!window.autoTrailerMode) {
-    console.log("🎬 Single trailer mode — closing trailer and resetting timer");
-    setTimeout(() => closeTrailer(), 500);
-  } else {
-    console.log("🔁 Autoplay mode — loading next trailer...");
-    setTimeout(() => {
-      if (!isTrailerAdvancing) {
-        findTrailerAndPlay();
-      }
-    }, 1000);
+    clearTimeout(failSafeTimeout);
+    clearTimeout(backupStateTimeout);
 
-    // ⛑️ Secondary failsafe if loop gets stuck
-    failSafeTimeout = setTimeout(() => {
-      if (isTrailerAdvancing) {
-        console.warn("⏱️ Fail-safe: Forcing trailer advance reset");
-        isTrailerAdvancing = false;
-        findTrailerAndPlay();
-      }
-    }, 15000);
+    if (!window.autoTrailerMode) {
+      console.log("🎬 Single trailer mode — closing trailer and resetting timer");
+      setTimeout(() => closeTrailer(), 500);
+    } else {
+      console.log("🔁 Autoplay mode — loading next trailer...");
+      setTimeout(() => {
+        if (!isTrailerAdvancing) {
+          findTrailerAndPlay();
+        }
+      }, 1000);
+
+      failSafeTimeout = setTimeout(() => {
+        if (isTrailerAdvancing) {
+          console.warn("⏱️ Fail-safe: Forcing trailer advance reset");
+          isTrailerAdvancing = false;
+          findTrailerAndPlay();
+        }
+      }, 15000);
+    }
   }
 
   if (event.data === YT.PlayerState.PAUSED) {
