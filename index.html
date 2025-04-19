@@ -781,43 +781,51 @@ function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.PLAYING) {
     trailerPaused = false;
     clearTimeout(failSafeTimeout);
-    clearTimeout(backupStateTimeout); // ✅ NEW: cleanup backup timeout
+    clearTimeout(backupStateTimeout);
     isTrailerAdvancing = false;
-    
     console.log("✅ Trailer is now playing");
   }
 
   if (event.data === YT.PlayerState.ENDED) {
-  isTrailerAdvancing = false;
-  clearTimeout(failSafeTimeout);
-  clearTimeout(backupStateTimeout);
-  trailerPlaying = false;
-  trailerPaused = false;
-  console.log("🔚 Trailer ended");
+    isTrailerAdvancing = false;
+    clearTimeout(failSafeTimeout);
+    clearTimeout(backupStateTimeout);
+    trailerPlaying = false;
+    trailerPaused = false;
+    console.log("🔚 Trailer ended");
 
-  if (!window.autoTrailerMode) {
-    console.log("🎬 Single trailer mode — closing trailer and resetting timer");
-    setTimeout(() => {
-      closeTrailer(); // ✅ Close trailer overlay
-    }, 500); // Slight delay feels more natural
-  } else {
-    console.log("🔁 Autoplay mode — loading next trailer");
-    setTimeout(() => {
-      findTrailerAndPlay(); // ✅ Continue loop
-    }, 1000);
+    if (!window.autoTrailerMode) {
+      console.log("🎬 Single trailer mode — closing trailer and resetting timer");
+      setTimeout(() => {
+        closeTrailer();
+      }, 500);
+    } else {
+      console.log("🔁 Autoplay mode — loading next trailer");
+      isTrailerAdvancing = true;
+      setTimeout(() => {
+        findTrailerAndPlay();
+      }, 1000);
+
+      failSafeTimeout = setTimeout(() => {
+        if (isTrailerAdvancing) {
+          console.warn("⏱️ Fail-safe: Forcing trailer advance reset");
+          isTrailerAdvancing = false;
+          findTrailerAndPlay();
+        }
+      }, 15000);
+    }
   }
-}
 
   if (event.data === YT.PlayerState.PAUSED) {
-  trailerPaused = true;
-  if (overlayInfo) overlayInfo.style.opacity = "1";
-  console.log("⏸️ Trailer paused");
+    trailerPaused = true;
+    if (overlayInfo) overlayInfo.style.opacity = "1";
+    console.log("⏸️ Trailer paused");
 
-  if (fetchTimer) {
-    clearTimeout(fetchTimer); // ✅ Prevent refetch during pause
-    fetchTimer = null;
+    if (fetchTimer) {
+      clearTimeout(fetchTimer);
+      fetchTimer = null;
+    }
   }
-}
 }
 window.onPlayerStateChange = onPlayerStateChange;
 function extractYouTubeId(url) {
@@ -1298,7 +1306,10 @@ async function findTrailerAndPlay() {
   if (trailerLoopFirst && currentTrailerUrl) {
   console.log("⏯️ Playing current trailer before looping...");
   trailerLoopFirst = false;
+
   playTrailer(currentTrailerUrl);
+
+  // Allow the rest of the autoplay to proceed via `onPlayerStateChange`
   return;
 }
   window.autoTrailerMode = true;
