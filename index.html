@@ -793,24 +793,19 @@ function onPlayerStateChange(event) {
 
     console.log("🔚 Trailer ended");
 
-    // ✅ Always unlock before deciding what to do next
-    isTrailerAdvancing = false;
+    isTrailerAdvancing = false; // ✅ Unlock for next fetch
 
     if (!window.autoTrailerMode) {
-  isTrailerAdvancing = false; // ✅ This is fine here
-  console.log("🎬 Single trailer mode — closing trailer and resetting timer");
-  setTimeout(() => {
-    closeTrailer();
-  }, 500);
-} else {
-  console.log("🔁 Autoplay mode — loading next trailer");
+      console.log("🎬 Single trailer mode — closing trailer and resetting timer");
+      setTimeout(() => {
+        closeTrailer();
+      }, 500);
+    } else {
+      console.log("🔁 Autoplay mode — loading next trailer");
 
-  isTrailerAdvancing = false; // ✅ ADD THIS before calling next
-
-  setTimeout(() => {
-    findTrailerAndPlay();
-  }, 1000);
-}
+      setTimeout(() => {
+        findTrailerAndPlay();
+      }, 1000);
 
       failSafeTimeout = setTimeout(() => {
         if (isTrailerAdvancing) {
@@ -821,7 +816,6 @@ function onPlayerStateChange(event) {
       }, 15000);
     }
   }
-
 
   if (event.data === YT.PlayerState.PAUSED) {
     trailerPaused = true;
