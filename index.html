@@ -1265,26 +1265,28 @@ function applyFilmToUI(data) {
   if (genreAnchor) {
   const extraHTML = `
   <div id="info-crew" style="margin-top:2px; margin-bottom:2px;">
-    <div style="font-size:55px; line-height:1; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
-      ${data.title} ${data.year}
-    </div>
+  <div style="font-size:55px; line-height:1; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
+    ${data.title} ${data.year}
+  </div>
 
-    <div style="font-size:30px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase;">
-  🎭 :  ${data.castList}<br>
-  <span style="text-transform:none;">k</span> ${data.director} | 
-  <span style="text-transform:none;">j</span> ${data.studio} | 
-  ${getFlagEmoji(data.originCountry)} | 
-  &nbsp; <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
+  <div style="font-size:30px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase; line-height:1.05;">
+    🎭 : ${data.castList}
+    <div style="line-height:1.05; text-transform: none;">
+      <span style="text-transform:none;">k</span> ${data.director} | 
+      <span style="text-transform:none;">j</span> ${data.studio} | 
+      ${getFlagEmoji(data.originCountry)} | 
+      <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
+    </div>
+  </div>
+
+  <div id="info-description" style="margin-top:1px; font-size:22px; line-height:1; color:#dce4e8; font-family:'Bubble', sans-serif;">
+    ${data.overview}
+  </div>
+
+  <div id="info-meta" style="margin-top:1px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
+    ${data.rating} • ${isMovie ? `${data.runtime} min` : `${data.episodeCount} eps × ${data.runtime} min`} • ${data.genres?.join(" / ") || "No Genre Info"} • ${data.budget}
+  </div>
 </div>
-
-    <div id="info-description" style="margin-top:1px; font-size:22px; line-height:1; color:#dce4e8; font-family:'Bubble', sans-serif;">
-      ${data.overview}
-    </div>
-
-    <div id="info-meta" style="margin-top:1px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
-      ${data.rating} • ${isMovie ? `${data.runtime} min` : `${data.episodeCount} eps × ${data.runtime} min`} • ${data.genres?.join(" / ") || "No Genre Info"} • ${data.budget}
-    </div>
-  </div>`;
   genreAnchor.insertAdjacentHTML('afterend', extraHTML);
 }
 
