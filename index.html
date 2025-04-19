@@ -790,34 +790,34 @@ function onPlayerStateChange(event) {
 }
 
   if (event.data === YT.PlayerState.ENDED) {
-    isTrailerAdvancing = false;
-    clearTimeout(failSafeTimeout);
-    clearTimeout(backupStateTimeout);
-    trailerPlaying = false;
-    trailerPaused = false;
-    console.log("🔚 Trailer ended");
+  clearTimeout(failSafeTimeout);
+  clearTimeout(backupStateTimeout);
+  trailerPlaying = false;
+  trailerPaused = false;
 
-    if (!window.autoTrailerMode) {
-      console.log("🎬 Single trailer mode — closing trailer and resetting timer");
-      setTimeout(() => {
-        closeTrailer();
-      }, 500);
-    } else {
-      console.log("🔁 Autoplay mode — loading next trailer");
-      isTrailerAdvancing = true;
-      setTimeout(() => {
+  console.log("🔚 Trailer ended");
+
+  if (!window.autoTrailerMode) {
+    isTrailerAdvancing = false; // ✅ Only reset here
+    console.log("🎬 Single trailer mode — closing trailer and resetting timer");
+    setTimeout(() => {
+      closeTrailer();
+    }, 500);
+  } else {
+    console.log("🔁 Autoplay mode — loading next trailer");
+    setTimeout(() => {
+      findTrailerAndPlay();
+    }, 1000);
+
+    failSafeTimeout = setTimeout(() => {
+      if (isTrailerAdvancing) {
+        console.warn("⏱️ Fail-safe: Forcing trailer advance reset");
+        isTrailerAdvancing = false;
         findTrailerAndPlay();
-      }, 1000);
-
-      failSafeTimeout = setTimeout(() => {
-        if (isTrailerAdvancing) {
-          console.warn("⏱️ Fail-safe: Forcing trailer advance reset");
-          isTrailerAdvancing = false;
-          findTrailerAndPlay();
-        }
-      }, 15000);
-    }
+      }
+    }, 15000);
   }
+}
 
   if (event.data === YT.PlayerState.PAUSED) {
     trailerPaused = true;
