@@ -1211,6 +1211,7 @@ await setDoc(docRef, {
   popularity: item.popularity,
   originCountry,
   trailerUrl: currentTrailerUrl,
+  trailerKey: lastTrailerId,
   genre: currentGenre.name,
   type,
   tmdbUrl: currentTMDBUrl,
@@ -1218,31 +1219,34 @@ await setDoc(docRef, {
   castList,
   studio,
   budget,
+  posterUrl: posterPath,
+  metaText,
   timestamp: Date.now(),
   timestampReadable: new Date().toISOString(),
   cachedBy: "public"
 });
+
 return {
-  posterPath,
+  id: item.id,
   title,
   overview,
-  rating,
-  releaseDate,
   year,
+  releaseDate,
   runtime,
-  episodeCount,
+  rating,
+  popularity: item.popularity,
   originCountry,
+  trailerUrl: currentTrailerUrl,
+  trailerKey: lastTrailerId,
+  genre: currentGenre.name,
+  type,
+  tmdbUrl: currentTMDBUrl,
   director,
   castList,
   studio,
   budget,
-  metaText,
-  trailerUrl: currentTrailerUrl,
-  trailerKey: lastTrailerId,
-  tmdbUrl,  //currentTMDBUrl,
-  type,
-  genre: currentGenre.name,
-  id: item.id
+  posterPath,
+  metaText
 };
 
        
