@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>📼VCR📼 🎭</title>
+  <style>
+  html, body {
+  background-color: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#movie-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---------------- Poster ---------------- */
+
+#poster-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  overflow: hidden;
+}
+
+#poster-border {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  background: none;
+  margin: 0 auto;
+  padding: 0;
+  z-index: 1;
+  overflow: visible;
+  width: auto;
+}
+
+#movie-poster {
+  max-width: 100vw;
+  max-height: 100vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: auto;
+  display: block;
+  user-select: none;
+  animation: glowing-tides 5s infinite ease-in-out;
+}
+
+#movie-poster.loaded {
+  opacity: 1;
+}
+/* ---------------- Fonts ---------------- */
+
+@font-face {
+  font-family: 'BlowBrush';
+  src: url('fonts/Portland-0jrd.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'DigitalDisplay';
+  src: url('fonts/Digital7Italic-BW658.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SFMovie';
+  src: url('fonts/SF Movie Poster.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Details';
+  src: url('fonts/ClassicMarkerDemo-gwDPq.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Noir';
+  src: url('fonts/FilmNoirAdventure-X3732.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Library';
+  src: url('fonts/Library3am-5V3Z.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Bubble';
+  src: url('fonts/BubbleSansRegular-PVA5d.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'January';
+  src: url('fonts/JanuarySnack-0vzYX.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Show';
+  src: url('fonts/ShowgirlRegular-7OXJw.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Credits';
+  src: url('fonts/Uni_acc.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+
+}
+/* ---------------- Floating Buttons ---------------- */
+
+.floating-buttons {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  z-index: 1000;
+  transition: opacity 0.5s ease;
+}
+
+.floating-buttons.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.floating-buttons button,
+.floating-buttons > #save-button-wrapper {
+  height: 40px;
+  width: 40px;
+  background: rgba(255, 255, 255, 0.07);
+  border: none;
+  padding: 0;
+  margin: 0 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.floating-buttons button:hover,
+#save-button-wrapper:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ---------------- Info Panel ---------------- */
+
+#info-panel {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 700px;
+  height: 65px;
+  background: rgba(20, 20, 20, 0.9);
+  color: white;
+  padding: 2px 12px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  transition: all 0.3s ease-in-out;
+  z-index: 2000;
+  opacity: 0.8;
+  overflow: hidden;
+  cursor: pointer;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+#info-panel.expanded {
+  height: auto;
+  opacity: 0.9;
+}
+
+#info-panel.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#info-content {
+  pointer-events: auto;
+  opacity: 0.7;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 10px;
+  transition: opacity 0.2s ease 0.3s;
+}
+
+#info-panel.expanded #info-content {
+  opacity: 0.65;
+}
+
+#info-title {
+  font-size: 40px;
+  font-weight: normal; /* BlowBrush doesn’t need bold */
+  font-family: 'Library', sans-serif;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+#info-meta {
+  font-size: 30px;
+  color: #ffcc00;
+  font-family: 'DigitalDisplay', monospace;
+  letter-spacing: 1px;
+}
+
+#info-description {
+  margin-top: 4px;
+  font-size: 22px;
+  line-height: 1;
+  color: #dce4e8;
+  word-wrap: break-word;
+  font-weight: normal; /* BlowBrush doesn’t need bold */
+  font-family: 'Bubble', sans-serif;
+}
+
+#info-genre {
+  margin-top: 4px;
+  font-size: 18px;
+  color: #aaa;
+  display: block;
+  font-weight: normal; /* BlowBrush doesn’t need bold */
+  font-family: 'SFMovie', sans-serif;
+}
+.crew-font {
+  font-family: 'SFMovie', sans-serif;
+}
+.genre-text {
+  font-size: 25px; /* or whatever size you prefer */
+  font-family: Noir; /* override other fonts if needed */
+  line-height: 0.95;
+}
+.tmdb-link {
+  font-size: 25px;
+  font-family: Noir;
+  color: #00ccff;
+  text-decoration: none;
+  line-height: 0.95;
+}
+/* ---------------- Info Panel Buttons ---------------- */
+
+.info-buttons {
+  display: flex;
+  justify-content: center;     /* or space-evenly if you want edge spacing */
+  align-items: center;
+  gap: 1px;                    /* ✅ creates the 1px space */
+  padding: 0;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto 10px auto;
+  background: transparent;
+}
+
+.info-buttons button,
+#save-button-wrapper {
+  flex: 1 1 0;                    /* ✅ Let them share available space equally */
+  max-width: calc(20% - 1px);     /* ✅ Adjust for 1px gap between each */
+  height: 63px;
+  background: rgba(255, 255, 255, 0.07);
+  border: none;
+  border-radius: 1px;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;             /* ✅ Needed for overlay ring etc */
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.info-buttons button:hover,
+#save-button-wrapper:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ---------------- Shared Button Images ---------------- */
+
+.info-buttons button:hover img,
+#save-button-wrapper:hover img {
+  opacity: 1;
+}
+.info-buttons button img,
+#save-button {
+  width: 90%;         /* Scale nicely inside */
+  height: auto;       /* Maintain aspect ratio */
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+  opacity: 0.9;
+  pointer-events: none;
+  user-select: none;
+}
+.floating-buttons button img {
+  height: 100%;
+  width: auto;
+  max-height: 100%;
+  max-width: 100%;
+}
+
+/* ---------------- Save Timer Ring ---------------- */
+
+#save-timer-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+#save-timer-ring circle {
+  fill: none;
+  stroke: red;
+  stroke-width: 4;
+  stroke-dasharray: 113.1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+/* ---------------- Filter Panel ---------------- */
+
+#filter-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(20, 20, 20, 0.5);
+  color: white;
+  padding: 16px 20px;
+  z-index: 2000;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+#filter-panel.active {
+  transform: translateY(0);
+}
+#filter-content {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+#filter-content label {
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #ffcc00;
+}
+#filter-content input,
+#filter-content select {
+  margin-top: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+}
+
+/* ---------------- Player ---------------- */
+
+.overlay-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.overlay-btn {
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: 1px solid white;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+#overlay-info {
+  opacity: 0;
+  transition: opacity 0.5s;
+  text-align: center;
+  margin-top: 20px;
+  color: white;
+  max-width: 80%;
+}
+
+#overlay-title {
+  font-size: 60px;
+  font-weight: bold;
+  font-family: 'Credits', sans-serif;
+  font-weight: normal;
+  text-transform: uppercase;
+}
+#overlay-meta {
+  color: #ffcc00;
+  font-size: 25px;
+}
+#overlay-description {
+  font-size: 20px;
+  margin-top: 8px;
+}
+#trailer-overlay {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#trailer-overlay.active {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: all;
+}
+
+  .player-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+  #player {
+  Z-index: 9999;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+}
+.close-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#trailer-container {
+  position: relative;
+}
+
+#popout-overlay-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+#popout-overlay-button .overlay-btn {
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+/* ---------------- Misc ---------------- */
+
+#loading-spinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #111;
+  color: #ffcc00;
+  padding: 20px 40px;
+  font-size: 20px;
+  border: 2px solid #ffcc00;
+  border-radius: 10px;
+  z-index: 2000;
+  display: none;
+}
+
+#flag {
+  font-size: 1.4em;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+/* ---------------- Animations ---------------- */
+
+@keyframes glowing-tides {
+  0%   { box-shadow: -10px 0 10px red, 10px 0 10px red; }
+  25%  { box-shadow: -12px 0 12px orange, 12px 0 12px orange; }
+  50%  { box-shadow: -14px 0 14px yellow, 14px 0 14px yellow; }
+  75%  { box-shadow: -12px 0 12px orange, 12px 0 12px orange; }
+  100% { box-shadow: -10px 0 10px red, 10px 0 10px red; }
+}
+body.red-letter-mode {
+  background: #1a0000;
+  color: #ffcc00;
+  font-family: 'SFMovie', sans-serif;
+}
+body.red-letter-mode #info-panel {
+  background: rgba(90, 0, 0, 0.95);
+}
+</style>
+ </head>
+  <body>
+  <div id="movie-container">
+  <div id="poster-wrapper">
+    <div id="poster-border">
+      <img alt="" draggable="false" id="movie-poster" />
+    </div>
+  </div>
+
+  <!-- ✅ Clean and fixed Info Panel layout -->
+<div id="info-panel">
+  <div id="info-content">
+    
+    <!-- Floating Info Panel Buttons -->
+    <div class="info-buttons">
+      <button id="tmdb-button">
+        <img src="tmdb.png" alt="TMDB" />
+      </button>
+      <div id="save-button-wrapper" role="button">
+        <img id="save-button" src="record.png" alt="Save" />
+        <svg id="save-timer-ring" viewBox="0 0 80 80">
+          <circle r="30" cx="40" cy="40" />
+        </svg>
+      </div>
+      <button id="trailer-button">
+        <img src="play.png" alt="Play" />
+      </button>
+      <button id="genre-button">
+        <img src="shuffle.png" alt="Shuffle" />
+      </button>
+      <button id="next-button">
+        <img src="next.png" alt="Next" />
+      </button>
+    </div>
+
+    <!-- ✅ This is where the dynamic info gets injected -->
+    <div id="info-genre" style="display:none;"></div>
+          
+      <div id="movie-type"></div>
+      <div id="movie-runtime"></div>
+    </div>
+  </div>
+
+  <!-- 📥 Pull-down Filter Panel -->
+  <div id="filter-panel" class="hidden">
+    <div id="filter-content">
+      <div id="year-label">All Years</div>
+
+      <label>Year From:
+  <input type="range" id="year-from" min="1900" max="2025" value="1900" step="1">
+  <span id="year-from-display">2000</span>
+</label>
+
+<label>Year To:
+  <input type="range" id="year-to" min="1900" max="2025" value="2025" step="1">
+  <span id="year-to-display">2025</span>
+</label>
+
+      <label>Country: 
+        <select id="country-select">
+          <option value="">Any</option>
+          <option value="US">🇺🇸</option>
+          <option value="GB">🇬🇧</option>
+          <option value="FR">🇫🇷</option>
+          <option value="JP">🇯🇵</option>
+          <option value="IT">🇮🇹</option>
+          <option value="CA">🇨🇦</option>
+          <option value="CN">🇨🇳</option>
+          <option value="DE">🇩🇪</option>
+          <option value="IN">🇮🇳</option>
+          <option value="ES">🇪🇸</option>
+          <option value="BR">🇧🇷</option>
+          <option value="IE">🇮🇪</option>
+          <option value="AU">🇦🇺</option>
+          <option value="KR">🇰🇷</option>
+          <option value="MX">🇲🇽</option>
+          <option value="BE">🇧🇪</option>
+          <option value="TR">🇹🇷</option>
+        </select>
+      </label>
+
+      <label>Type: 
+        <select id="type-select">
+          <option value="all">All</option>
+          <option value="movie">Movie</option>
+          <option value="tv">TV</option>
+        </select>
+      </label>
+
+      <label>Genre: 
+        <select id="genre-select"></select>
+        <option value="Animation" selected>Animation</option>
+      </label>
+
+      <label>Min Rating: 
+        <input type="range" id="rating-range" min="0" max="10" step="0.1" value="0">
+      </label>
+      <button id="filter-summary-btn" class="overlay-btn">Show Filters</button>
+      <button id="theme-button" class="overlay-btn">Toggle RLM Theme</button>
+    </div>
+  </div>
+</body>
+  <div id="trailer-overlay">
+  <div class="player-wrapper">
+    <div id="player"></div>
+  <div id="popout-overlay-button" class="overlay-float">
+      <button onclick="popoutTrailer()" class="overlay-btn">Pop Out</button>
+    </div>
+  </div>
+<div id="overlay-info">
+  <div style="font-size:60px; line-height:0.9; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
+    <span style="font-size:60px;"><span id="overlay-title">TITLE</span></span>
+    <span style="font-size:55px;">(<span id="overlay-year">YEAR</span>)</span>
+  </div>
+
+  <div style="font-size:34px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase; line-height:1;">
+    <div id="overlay-cast">CAST</div>
+    <div>
+      <span style="text-transform:none;">k</span> <span id="overlay-director">DIRECTOR</span> |
+      <span style="text-transform:none;">j</span> <span id="overlay-studio">STUDIO</span> |
+      <span id="overlay-flag">🌍</span> |
+      <a id="overlay-tmdb" href="#" target="_blank" class="tmdb-link">TMDB</a>
+    </div>
+  </div>
+
+  <div id="overlay-meta" style="font-size:26px; font-family:'DigitalDisplay', monospace; color:#ffcc00; letter-spacing:1px;">
+    META
+  </div>
+
+  <div id="overlay-description" style="font-size:20px; color:#dce4e8; font-family:'Bubble', sans-serif; line-height:1.2; margin-top:4px;">
+    DESCRIPTION
+  </div>
+</div>
+  <div class="overlay-buttons">
+  <button id="overlay-next" onclick="findTrailerAndPlay()" class="overlay-btn">Next</button>
+  <button onclick="document.getElementById('genre-button').click()" class="overlay-btn">Genre</button>
+  <button onclick="window.open(currentTMDBUrl, '_blank')" class="overlay-btn">TMDB</button>
+  <button onclick="document.getElementById('save-button').click()" class="overlay-btn">Save</button>
+  <button onclick="closeTrailer()" class="overlay-btn">Close</button>
+</div>
+</div>
+
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyACJHIOV-OAC8HYdAF8byCBseK7Hrqkdfk",
+    authDomain: "vcra-44ef7.firebaseapp.com",
+    projectId: "vcra-44ef7",
+    storageBucket: "vcra-44ef7.appspot.com",
+    messagingSenderId: "7232539586",
+    appId: "1:27232539586:web:6c01859c308b6a6ec37c5b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // now you can use: doc(), getDoc(), setDoc()
+  // move all your Firebase logic (like getRandomTitle, Firestore read/write, etc.) into here
+
+
+
+  let genres = [
+    { name: "Sci-Fi", movie: "878", tv: "10765" },
+    { name: "Adventure", movie: "12", tv: "10759" },
+    { name: "Comedy", movie: "35", tv: "35" },
+    { name: "Documentary", movie: "99", tv: "99" },
+    { name: "Animation", movie: "16", tv: "16" },
+    { name: "Romance", movie: "10749", tv: "18" },
+    { name: "Crime", movie: "80", tv: "80" },
+    { name: "Mystery", movie: "9648", tv: "9648" }
+  ];
+
+  let isMovie;
+  let currentGenre = genres.find(g => g.name === "Animation") || genres[0];
+  let currentTMDBUrl = "", currentTrailerUrl = "";
+  let panelTimer, panelFadeTimer;
+  let trailerPlaying = false;
+  window.autoTrailerMode = false;
+  let longPressTimer;
+  let fetchTimer = null; // 🔁 Track the fetch loop
+  let isFetching = false; // ✅ Prevent double fetches
+  let fadeTimer = null;   // ✅ Ensure fadeTimer is declared early
+  let trailerLoopFirst = true;
+  let trailerPaused = false;
+  let overlayInfo = null;
+  let failSafeTimeout = null; // This is fine to declare here too
+  let isTrailerAdvancing = false;
+  let lastTrailerId = null;
+  let failSafeSkips = 0;
+  let backupStateTimeout = null;
+  let currentPollInterval = null;
+  let fetchHistory = [];
+  let historyIndex = 0;
+  let swipeState = "poster"; // "poster", "info", or "filter"
+  let swipeCooldown = false;
+  window.tmdbClickBound = false;
+  let lastMouseMoveTime = 0;
+  let failedFetchCount = 0;
+  const MAX_FAILED_FETCHES = 5;
+
+function closeAllPanels() {
+  document.getElementById("filter-panel").classList.remove("active");
+  document.getElementById("info-panel").classList.remove("expanded");
+  swipeState = "poster";
+}
+
+  function togglePanel(forceExpand = null) {
+  const panel = document.getElementById('info-panel');
+  const shouldExpand = forceExpand !== null
+    ? forceExpand
+    : !panel.classList.contains('expanded');
+
+  clearTimeout(panelFadeTimer);
+  clearTimeout(panelTimer);
+
+  if (shouldExpand) {
+    panel.classList.remove('hidden');
+    panel.classList.add('expanded');
+    swipeState = "info";
+
+    // Auto-collapse after 15s
+    panelTimer = setTimeout(() => {
+      panel.classList.remove("expanded");
+      // Don't hide instantly — allow unexpanded version to linger
+      resetPanelFade(); // ✅ Only fade out after 5s
+      swipeState = "poster";
+    }, 15000);
+  } else {
+    panel.classList.remove("expanded");
+    // ⏳ Let the unexpanded panel remain for 5 seconds
+    resetPanelFade(); // ✅ Handle delayed hide
+    swipeState = "poster";
+  }
+}
+
+function resetPanelFade() {
+  const panel = document.getElementById('info-panel');
+  clearTimeout(panelFadeTimer);
+
+  if (panel.classList.contains("expanded")) {
+    // If expanded, wait 15s then collapse (but don't hide immediately)
+    panelFadeTimer = setTimeout(() => {
+      panel.classList.remove("expanded");
+      // Let the collapsed version stay visible for 5s after collapse
+      resetPanelFade(); // 🌀 Call again to start the 5s hide timer
+    }, 15000);
+  } else {
+    // If not expanded, hide after 5s
+    panelFadeTimer = setTimeout(() => {
+      panel.classList.add("hidden");
+    }, 5000); // ✅ Was 10s, now 5s for consistency
+  }
+}
+  function getFlagEmoji(countryCode) {
+    if (!countryCode) return "";
+    return countryCode
+      .toUpperCase()
+      .replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt()));
+  }
+
+function onPlayerStateChange(event) {
+  console.log("🎬 Player state changed:", event.data);
+
+  if (event.data === YT.PlayerState.PLAYING) {
+    trailerPaused = false;
+    clearTimeout(failSafeTimeout);
+    clearTimeout(backupStateTimeout);
+    console.log("✅ Trailer is now playing");
+  }
+
+  if (event.data === YT.PlayerState.ENDED) {
+    console.log("🔚 Trailer ended");
+    isTrailerAdvancing = false;
+    trailerPlaying = false;
+    trailerPaused = false;
+
+    clearTimeout(failSafeTimeout);
+    clearTimeout(backupStateTimeout);
+
+    if (!window.autoTrailerMode) {
+      console.log("🎬 Single trailer mode — closing trailer and resetting timer");
+      setTimeout(() => closeTrailer(), 500);
+    } else {
+      console.log("🔁 Autoplay mode — loading next trailer...");
+      setTimeout(() => {
+        if (!isTrailerAdvancing) {
+          findTrailerAndPlay();
+        }
+      }, 1000);
+
+      failSafeTimeout = setTimeout(() => {
+        if (isTrailerAdvancing) {
+          console.warn("⏱️ Fail-safe: Forcing trailer advance reset");
+          isTrailerAdvancing = false;
+          findTrailerAndPlay();
+        }
+      }, 15000);
+    }
+  }
+
+  if (event.data === YT.PlayerState.PAUSED) {
+    trailerPaused = true;
+    if (overlayInfo) overlayInfo.style.opacity = "1";
+    console.log("⏸️ Trailer paused");
+
+    if (fetchTimer) {
+      clearTimeout(fetchTimer);
+      fetchTimer = null;
+    }
+  }
+}
+window.onPlayerStateChange = onPlayerStateChange;
+function extractYouTubeId(url) {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.searchParams.get("v") || urlObj.pathname.split("/").pop();
+  } catch {
+    return null;
+  }
+}
+function playTrailer(url) {
+  if (!url || !trailerPlayer || !youtubeReady) return;
+
+  const videoId = extractYouTubeId(url);
+  if (!videoId) return;
+
+  // 🧹 Kill any existing fetch or poll timers
+  if (fetchTimer) clearTimeout(fetchTimer);
+  if (fadeTimer) clearTimeout(fadeTimer);
+  if (overlayFadeTimer) clearTimeout(overlayFadeTimer);
+  if (currentPollInterval) clearInterval(currentPollInterval);
+
+  fetchTimer = null;
+  currentPollInterval = null;
+
+  // 🎬 Force trailer overlay visible
+  const overlay = document.getElementById('trailer-overlay');
+  const playerWrapper = document.querySelector('.player-wrapper');
+
+  overlay.classList.add('active');
+  overlay.style.visibility = 'visible';
+  overlay.style.opacity = '1';
+  overlay.style.pointerEvents = 'auto';
+  overlay.style.zIndex = '3000';
+
+  if (playerWrapper) {
+    playerWrapper.style.removeProperty("display");
+  }
+
+  const playerVideoUrl = trailerPlayer.getVideoUrl?.();
+  const isSameVideo = playerVideoUrl?.includes(videoId);
+
+  if (isSameVideo) {
+  if (!window.autoTrailerMode) {
+    console.log("🔁 Replaying same trailer manually");
+    trailerPlayer.seekTo(0);
+    trailerPlayer.playVideo();
+    return;
+  } else {
+  console.log("⏭️ Same trailer detected in autoplay — forcing refetch");
+  lastTrailerId = null;
+  isTrailerAdvancing = false; // ✅ Important: allow next fetch
+  findTrailerAndPlay();       // ✅ Immediately trigger next trailer
+  return;
+}
+}
+
+  // 🔄 Set trailer state
+  isTrailerAdvancing = true;
+  trailerPlaying = true;
+  trailerPaused = false;
+  currentTrailerUrl = url;
+  lastTrailerId = videoId;
+  console.log("🎥 Playing trailer with ID:", videoId, "| autoMode:", window.autoTrailerMode, "| isAdvancing:", isTrailerAdvancing);
+  trailerPlayer.loadVideoById(videoId);
+  trailerPlayer.playVideo?.();
+  console.log("🎥 Playing trailer with ID:", videoId, "| autoMode:", window.autoTrailerMode, "| isAdvancing:", isTrailerAdvancing);
+  // 🔔 Show trailer info overlay briefly
+  overlayInfo.style.opacity = "1";
+  overlayFadeTimer = setTimeout(() => {
+    overlayInfo.style.opacity = "0";
+  }, 3000);
+
+  // 🧯 Backup fallback if state never changes
+  const backupTimeout = setTimeout(() => {
+    const state = trailerPlayer?.getPlayerState?.();
+    if (
+      state !== YT.PlayerState.PLAYING &&
+      state !== YT.PlayerState.BUFFERING &&
+      state !== YT.PlayerState.ENDED &&
+      window.autoTrailerMode
+    ) {
+      console.warn("🚨 Backup: no state change — forcing next trailer.");
+      isTrailerAdvancing = false;
+      findTrailerAndPlay();
+    }
+  }, 15000);
+
+  // ⏱️ FailSafe in case trailer fails completely
+  failSafeTimeout = setTimeout(() => {
+    const state = trailerPlayer?.getPlayerState?.();
+    if (
+      state !== YT.PlayerState.PLAYING &&
+      state !== YT.PlayerState.BUFFERING &&
+      state !== YT.PlayerState.ENDED &&
+      window.autoTrailerMode
+    ) {
+      console.warn("⛔ Trailer failed to play — skipping...");
+      isTrailerAdvancing = false;
+      failSafeSkips++;
+
+      if (failSafeSkips >= 5) {
+        console.warn("🚨 Multiple failures — waiting before retrying...");
+        setTimeout(() => {
+          failSafeSkips = 0;
+          findTrailerAndPlay();
+        }, 3000);
+      } else {
+        findTrailerAndPlay();
+      }
+    } else {
+      console.log("✅ FailSafe check passed — trailer is playing or ended.");
+      failSafeSkips = 0;
+    }
+  }, 10000);
+
+  // 📡 Scoped polling loop to check for end of trailer
+  let pollTries = 0;
+  const maxPolls = 180;
+
+  currentPollInterval = setInterval(() => {
+    if (!window.autoTrailerMode || !trailerPlayer) {
+      clearInterval(currentPollInterval);
+      currentPollInterval = null;
+      return;
+    }
+
+    const state = trailerPlayer.getPlayerState?.();
+
+    if (state === YT.PlayerState.ENDED) {
+      console.warn("📽️ Trailer ended — playing next...");
+      clearInterval(currentPollInterval);
+      currentPollInterval = null;
+      clearTimeout(backupTimeout);
+      clearTimeout(failSafeTimeout);
+      failSafeTimeout = null;
+
+      if (!isTrailerAdvancing) {
+        findTrailerAndPlay();
+      }
+    }
+
+    if (++pollTries > maxPolls) {
+      console.warn("⏳ Poll timeout — forcing next trailer.");
+      clearInterval(currentPollInterval);
+      currentPollInterval = null;
+      clearTimeout(backupTimeout);
+      clearTimeout(failSafeTimeout);
+      failSafeTimeout = null;
+
+      if (!isTrailerAdvancing) {
+        findTrailerAndPlay();
+      }
+    }
+  }, 1000);
+// ⏱️ Final backup if END/PAUSED never fires (e.g., player freezes)
+setTimeout(() => {
+  const state = trailerPlayer?.getPlayerState?.();
+  if (
+    isTrailerAdvancing &&
+    window.autoTrailerMode &&
+    state !== YT.PlayerState.ENDED &&
+    state !== YT.PlayerState.PAUSED
+  ) {
+    console.warn("🛑 Final backup triggered — forcing next trailer");
+    isTrailerAdvancing = false;
+    findTrailerAndPlay();
+  }
+}, 120000); // 🔁 2 minute safety net
+}
+function closeTrailer() {
+  console.log("❎ Closing trailer player...");
+  isTrailerAdvancing = false; // ✅ Add this in the reset block
+  // ✅ Clear recovery timers
+  clearTimeout(failSafeTimeout);
+  clearTimeout(backupStateTimeout);
+  if (currentPollInterval) clearInterval(currentPollInterval);
+
+  // ✅ Reset state
+  window.autoTrailerMode = false;
+  trailerLoopFirst = true;
+  trailerPlaying = false;
+  trailerPaused = false;
+  isTrailerAdvancing = false;
+  failSafeSkips = 0;
+
+  // ✅ Safely stop the trailer if playing
+  if (trailerPlayer?.stopVideo) {
+    try {
+      trailerPlayer.stopVideo();
+      trailerPlayer.clearVideo?.();
+    } catch (err) {
+      console.warn("⚠️ Error stopping video:", err);
+    }
+  }
+
+  // ✅ Hide the overlay and player
+  const overlay = document.getElementById('trailer-overlay');
+  const playerWrapper = document.querySelector('.player-wrapper');
+
+  overlay.classList.remove('active');
+  overlay.style.opacity = '0';
+  overlay.style.visibility = 'hidden';
+  overlay.style.pointerEvents = 'none';
+
+  if (playerWrapper) {
+    playerWrapper.style.display = 'none';
+  }
+
+  // ✅ Clear any pending fetch loop
+  if (fetchTimer) clearTimeout(fetchTimer);
+
+  // ✅ Restart fetch after delay (20s) and re-show ring countdown
+  fetchTimer = setTimeout(() => {
+    console.log("🔁 Restarting auto fetch after trailer close...");
+    startAutoFetch();
+    startFetchCountdown(60000); // standard loop
+  }, 20000);
+
+  startFetchCountdown(20000); // shorter visual indicator
+}
+async function getPageCount(type, country) {
+  const url = `https://api.themoviedb.org/3/discover/${type}?api_key=e8d804d1f104509d3c1c5b1166485ae6&with_origin_country=${country}&page=1`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return Math.min(data.total_pages || 1, 80); // cap at 80 just like before
+}
+async function getRandomTitle(requireTrailer = false, overrideType = null, overrideGenreId = null) {
+  const selectedGenreName = document.getElementById("genre-select")?.value;
+  const selectedCountry = document.getElementById("country-select")?.value;
+  const selectedType = document.getElementById("type-select")?.value || "movie";
+  const selectedRating = parseFloat(document.getElementById("rating-range")?.value || 0);
+
+  const type = selectedType === "all" ? (Math.random() < 0.5 ? "movie" : "tv") : selectedType;
+  isMovie = type === "movie";
+
+  const genreObj = genres.find(g => g.name === selectedGenreName);
+  const selectedGenreId = type === "tv" ? genreObj?.tv : genreObj?.movie;
+
+  const yearFromInput = parseInt(document.getElementById("year-from")?.value || "1900");
+  const yearToInput = parseInt(document.getElementById("year-to")?.value || "2025");
+  const defaultYearFrom = 1900;
+  const defaultYearTo = 2025;
+  const useYearFilter = yearFromInput !== defaultYearFrom || yearToInput !== defaultYearTo;
+
+  let randomPage = Math.floor(Math.random() * 80) + 1;
+  if (selectedCountry) {
+    const pageCount = await getPageCount(type, selectedCountry);
+    randomPage = Math.floor(Math.random() * pageCount) + 1;
+  }
+
+  let url = `https://api.themoviedb.org/3/discover/${type}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&sort_by=popularity.desc&page=${randomPage}`;
+
+  if (selectedGenreName !== "all" && selectedGenreId) url += `&with_genres=${selectedGenreId}`;
+  if (selectedRating > 0) url += `&vote_average.gte=${selectedRating}`;
+  if (useYearFilter && yearFromInput <= yearToInput) {
+    if (isMovie) {
+      url += `&primary_release_date.gte=${yearFromInput}-01-01&primary_release_date.lte=${yearToInput}-12-31`;
+    } else {
+      url += `&first_air_date.gte=${yearFromInput}-01-01&first_air_date.lte=${yearToInput}-12-31`;
+    }
+  }
+  if (selectedCountry) url += `&with_origin_country=${selectedCountry}`;
+
+  console.log("🌐 Fetching with URL:", url);
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const results = data.results;
+    if (!results || results.length === 0) {
+      failedFetchCount++;
+      console.warn(`❌ No results found (attempt ${failedFetchCount}/${MAX_FAILED_FETCHES})`);
+      if (failedFetchCount >= MAX_FAILED_FETCHES) {
+        console.warn("🚨 Max failures reached — resetting filters");
+        document.getElementById("genre-select").value = "all";
+        document.getElementById("country-select").value = "";
+        document.getElementById("type-select").value = "all";
+        document.getElementById("rating-range").value = 0;
+        document.getElementById("year-from").value = 1900;
+        document.getElementById("year-to").value = 2025;
+        failedFetchCount = 0;
+        document.getElementById("year-from-display").textContent = "1900";
+        document.getElementById("year-to-display").textContent = "2025";
+        alert("🎛️ Filters reset — no matches found 5 times in a row.");
+      }
+      return false;
+    }
+
+    const item = results[Math.floor(Math.random() * results.length)];
+    failedFetchCount = 0;
+    const docRef = doc(db, "films", String(item.id));
+    if (!item.poster_path) {
+      console.warn("Missing poster — retrying...");
+      return getRandomTitle(requireTrailer);
+    }
+
+    const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w780${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Image";
+    const title = item.title || item.name || "Untitled";
+    const overview = item.overview || "No description available.";
+    const rating = item.vote_average ? `${Math.round(item.vote_average * 10)}%` : "--";
+    const releaseDate = item.release_date || item.first_air_date || "";
+    const year = releaseDate ? releaseDate.substring(0, 4) : "";
+
+    const detailUrl = `https://api.themoviedb.org/3/${type}/${item.id}?api_key=e8d804d1f104509d3c1c5b1166485ae6&language=en-US&append_to_response=credits,videos`;
+    const detailRes = await fetch(detailUrl);
+    const detailData = await detailRes.json();
+
+    const director = detailData.credits?.crew?.find(c => c.job === "Director")?.name || "Unknown";
+    const castList = detailData.credits?.cast?.slice(0, 5).map(c => c.name).join(", ") || "Unknown";
+    const studio = detailData.production_companies?.[0]?.name || "Unknown";
+    const budget = isMovie && detailData.budget ? `$${(detailData.budget / 1_000_000).toFixed(1)}M` : "--";
+    const trailer = detailData.videos?.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
+    currentTrailerUrl = trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
+    lastTrailerId = trailer ? trailer.key : null;
+    const runtime = detailData.runtime || (Array.isArray(detailData.episode_run_time) ? detailData.episode_run_time[0] : "--");
+    const episodeCount = detailData.number_of_episodes ?? "--";
+    const originCountry = detailData.origin_country?.[0] || detailData.production_countries?.[0]?.iso_3166_1 || "";
+
+    const metaText = isMovie
+      ? `⭐️ ${rating} • 🍿 • ${runtime} mins • ${getFlagEmoji(originCountry)}`
+      : `⭐️ ${rating} • 📺 • ${episodeCount} eps × ${runtime} mins • ${getFlagEmoji(originCountry)}`;
+
+    const tmdbUrl = `https://www.themoviedb.org/${type}/${item.id}`;
+
+    await setDoc(docRef, {
+  id: item.id,
+  title,
+  overview,
+  year,
+  releaseDate,
+  runtime: runtime ?? "--",
+  episodeCount: episodeCount ?? "--",
+  rating,
+  popularity: item.popularity,
+  originCountry,
+  trailerUrl: currentTrailerUrl,
+  trailerKey: lastTrailerId,
+  genre: currentGenre.name,
+  type,
+  tmdbUrl: currentTMDBUrl,
+  director: director ?? "Unknown",
+  castList: castList ?? "Unknown",
+  studio: studio ?? "Unknown",
+  budget: budget ?? "--",
+  posterUrl: posterPath,
+  metaText,
+  timestamp: Date.now(),
+  timestampReadable: new Date().toISOString(),
+  cachedBy: "public"
+});
+
+    return {
+  id: item.id,
+  title,
+  overview,
+  year,
+  releaseDate,
+  runtime: runtime ?? "--",
+  episodeCount: episodeCount ?? "--",
+  rating,
+  popularity: item.popularity,
+  originCountry,
+  trailerUrl: currentTrailerUrl,
+  trailerKey: lastTrailerId,
+  genre: currentGenre.name,
+  type,
+  tmdbUrl: currentTMDBUrl,
+  director: director ?? "Unknown",
+  castList: castList ?? "Unknown",
+  studio: studio ?? "Unknown",
+  budget: budget ?? "--",
+  posterPath,
+  metaText
+};
+  } catch (err) {
+    console.error("Failed to fetch from TMDB:", err);
+    return false;
+  }
+}
+function applyFilmToUI(data) {
+  console.log("📦 Current history count:", fetchHistory.length);
+  swipeState = "poster";
+
+  // 🕘 Store history (unless we're recalling one)
+  if (!window.applyingFromHistory) {
+    fetchHistory.unshift(data);
+    if (fetchHistory.length > 5) fetchHistory.pop();
+    historyIndex = 0;
+    document.getElementById("tmdb-button").disabled = fetchHistory.length === 0;
+  }
+
+  // 🔁 Set core UI elements
+  document.getElementById("movie-poster").src = data.posterPath;
+  document.getElementById("overlay-title").textContent = data.title;
+  document.getElementById("overlay-year").textContent = data.year;
+  document.getElementById("overlay-cast").textContent = data.castList.toUpperCase();
+  document.getElementById("overlay-director").textContent = data.director.toUpperCase();
+  document.getElementById("overlay-studio").textContent = data.studio.toUpperCase();
+  document.getElementById("overlay-flag").textContent = getFlagEmoji(data.originCountry);
+  document.getElementById("overlay-tmdb").href = data.tmdbUrl;
+  document.getElementById("overlay-description").textContent = data.overview;
+
+  document.getElementById("overlay-meta").textContent = isMovie
+    ? `${data.rating} • ${data.runtime} min • ${data.genre} • ${data.budget}`
+    : `${data.rating} • ${data.episodeCount ?? "--"} eps × ${data.runtime ?? "--"} min • ${data.genre} • ${data.budget}`;
+
+  // ✅ Update genre name
+  const genreNameEl = document.getElementById("genre-name");
+  if (genreNameEl) genreNameEl.textContent = data.genre;
+
+  // ✅ Update floating TMDB link
+  const tmdbLink = document.getElementById("tmdb-link");
+  if (tmdbLink) {
+    tmdbLink.innerHTML = `| <a href="${data.tmdbUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
+  }
+
+  // ✅ Refresh info panel
+  document.getElementById("info-crew")?.remove();
+  const genreAnchor = document.getElementById("info-genre");
+  if (genreAnchor) {
+    const extraHTML = `
+      <div id="info-crew" style="margin-top:0px; margin-bottom:1px;">
+        <div style="line-height:0.92; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
+          <span style="font-size:70px;">${data.title}</span>
+          <span style="font-size:67px;">(${data.year})</span>
+        </div>
+
+        <div style="font-size:40px; color:#d4d4d4; font-family: 'Credits', 'Helvetica Neue', Helvetica, Arial, sans-serif; text-transform: uppercase; line-height:0.95;">
+          <span>${data.castList}</span>
+          <div style="line-height:1;">
+            <span style="text-transform:none;">k</span> <span style="text-transform:uppercase;">${data.director}</span>  
+            <span style="text-transform:none;">  j</span> <span style="text-transform:uppercase;">${data.studio}</span> | 
+            ${getFlagEmoji(data.originCountry)} | 
+            <a href="${data.tmdbUrl}" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
+          </div>
+        </div>
+
+        <div id="info-description" style="margin-top:1.5px; font-size:20px; line-height:1; color:#dce4e8; font-family:'Bubble', sans-serif;">
+          ${data.overview}
+        </div>
+
+        <div id="info-meta" style="margin-top:1px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
+          ${data.rating} • ${isMovie ? `${data.runtime} min` : `${data.episodeCount ?? "--"} eps × ${data.runtime ?? "--"} min`} • ${data.genre || "No Genre Info"} • ${data.budget}
+        </div>
+      </div>
+    `;
+    genreAnchor.insertAdjacentHTML('afterend', extraHTML);
+  }
+
+  // ✅ Handle trailer button status
+  currentTMDBUrl = data.tmdbUrl;
+  currentTrailerUrl = data.trailerUrl;
+
+  const trailerBtn = document.getElementById("trailer-button");
+  const trailerImg = trailerBtn?.querySelector("img");
+
+  if (!data.trailerUrl) {
+    trailerBtn.disabled = true;
+    trailerImg.src = "play-disabled.png";
+    trailerImg.style.opacity = "0.3";
+  } else {
+    trailerBtn.disabled = false;
+    trailerImg.src = "play.png";
+    trailerImg.style.opacity = "0.6";
+    trailerBtn.style.cursor = "pointer";
+  }
+
+  // ✅ Bind TMDB recall button
+  const tmdbBtn = document.getElementById("tmdb-button");
+  tmdbBtn.disabled = false;
+  if (!window.tmdbClickBound) {
+    tmdbBtn.onclick = (e) => {
+      e.stopPropagation();
+      console.log("🖱️ TMDB button clicked");
+      if (fetchHistory.length === 0) return;
+
+      historyIndex = (historyIndex + 1) % fetchHistory.length;
+      const previous = fetchHistory[historyIndex];
+      if (previous) {
+        window.applyingFromHistory = true;
+        applyFilmToUI(previous);
+        window.applyingFromHistory = false;
+      }
+    };
+    window.tmdbClickBound = true;
+  }
+}
+async function findTrailerAndPlay() {
+  console.log("🎯 Entered findTrailerAndPlay. isTrailerAdvancing:", isTrailerAdvancing, "| autoTrailerMode:", window.autoTrailerMode);
+
+  if (isTrailerAdvancing) {
+    console.warn("🚦 Trailer advance already in progress — skipping...");
+    return;
+  }
+
+  // ✅ Move auto mode activation BEFORE anything else
+  window.autoTrailerMode = true;
+  isTrailerAdvancing = true;
+
+  if (!youtubeReady || !trailerPlayer) {
+    console.warn("⏳ YouTube Player not ready — please wait...");
+    isTrailerAdvancing = false;
+    return;
+  }
+
+  if (trailerLoopFirst && currentTrailerUrl) {
+    console.log("⏯️ Playing current trailer before looping...");
+    trailerLoopFirst = false;
+    playTrailer(currentTrailerUrl);
+    return;
+  }
+
+  closeAllPanels();
+
+  if (fetchTimer) {
+    clearTimeout(fetchTimer);
+    fetchTimer = null;
+  }
+
+  const overlay = document.getElementById("trailer-overlay");
+  const playerWrapper = document.querySelector(".player-wrapper");
+
+  if (overlay) {
+    overlay.classList.add("active");
+    overlay.style.visibility = "visible";
+    overlay.style.opacity = "1";
+    overlay.style.pointerEvents = "auto";
+  }
+
+  if (playerWrapper) {
+    playerWrapper.style.display = "block";
+  }
+
+  let found = false;
+  let attempts = 0;
+
+  while (attempts < 7) {
+    const data = await getRandomTitle(true);
+
+    if (data && data.trailerUrl?.includes("youtube.com")) {
+      console.log("🎬 Found trailer — playing", data.trailerUrl);
+      applyFilmToUI(data);
+
+      setTimeout(() => {
+        playTrailer(data.trailerUrl);
+
+        // 🛟 Backup to unlock if stuck
+        setTimeout(() => {
+          if (isTrailerAdvancing) {
+            console.warn("🕒 Backup: trailer likely didn't start — unlocking advance.");
+            isTrailerAdvancing = false;
+          }
+        }, 8000);
+      }, 200);
+
+      found = true;
+      break;
+    }
+
+    attempts++;
+    console.warn(`🔁 Attempt ${attempts}: No trailer found — retrying...`);
+  }
+
+  if (!found) {
+    console.warn("⛔ No valid trailer found after 7 tries. Retrying in 3 seconds...");
+    isTrailerAdvancing = false;
+
+    // 🧠 Important: Add a small delay so the call stack clears
+    setTimeout(() => {
+      findTrailerAndPlay(); // 🔁 retry cleanly
+    }, 3000);
+  }
+}
+// 🌐 Expose the trailer play function
+window.findTrailerAndPlay = findTrailerAndPlay;
+
+document.addEventListener("wheel", (e) => {
+  // 🛑 Ignore horizontal scrolls (trackpad swipes)
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+    return;
+  }
+
+  if (swipeCooldown) return;
+  swipeCooldown = true;
+  setTimeout(() => swipeCooldown = false, 500);
+
+  const deltaY = e.deltaY;
+  const filterPanel = document.getElementById("filter-panel");
+  const infoPanel = document.getElementById("info-panel");
+
+  console.log("🎡 Wheel event | deltaY:", deltaY, "| swipeState:", swipeState);
+
+  // 🔽 Scroll down — show info panel
+  if (deltaY > 5) {
+    if (swipeState === "filter") {
+      filterPanel.classList.remove("active");
+      swipeState = "poster";
+    } else {
+      closeAllPanels();
+      togglePanel(true);
+    }
+  }
+
+  // 🔼 Scroll up — toggle filter or collapse info
+  else if (deltaY < -5) {
+    if (swipeState === "info") {
+      togglePanel(false);
+    } else if (swipeState === "poster") {
+      closeAllPanels();
+      filterPanel.classList.add("active");
+      swipeState = "filter";
+
+      clearTimeout(window.filterAutoCloseTimer);
+      window.filterAutoCloseTimer = setTimeout(() => {
+        if (swipeState === "filter") {
+          closeAllPanels();
+        }
+      }, 10000);
+    }
+  }
+});
+
+
+let saving = false;
+document.getElementById("save-button").onclick = () => {
+  if (saving) return;
+  saving = true;
+
+  const img = new Image();
+  img.crossOrigin = "anonymous"; // 🔑 Try to allow CORS fetch
+  img.src = document.getElementById("movie-poster").src;
+
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "vcr.jpg";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setTimeout(() => saving = false, 1000);
+    }, "image/jpeg");
+  };
+
+  img.onerror = () => {
+    alert("❌ Couldn't download image — CORS blocked by host.");
+    saving = false;
+  };
+};
+document.getElementById("genre-button").onclick = () => {
+  currentGenre = genres[Math.floor(Math.random() * genres.length)];
+  const genreSelect = document.getElementById("genre-select");
+  genreSelect.value = currentGenre.name; // ✅ Sync dropdown 
+  document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
+
+  // ✅ Get selected type from UI
+  const selectedType = document.getElementById("type-select").value;
+
+  // ✅ Update genre ID to match selected type
+  const selectedGenreId = selectedType === "tv" ? currentGenre.tv : currentGenre.movie;
+
+  // ✅ Clear any timer
+  if (fetchTimer) clearTimeout(fetchTimer);
+
+  fetchWithCountdown(false, true, selectedType, selectedGenreId).then(() => {
+  fetchTimer = setTimeout(startAutoFetch, 60000); // ✅ Restart loop
+ });
+};
+document.getElementById("next-button").onclick = () => {
+  if (fetchTimer) clearTimeout(fetchTimer);
+  trailerLoopFirst = true;
+
+  // Stop current trailer if playing
+  if (trailerPlayer?.stopVideo) {
+    trailerPlayer.stopVideo();
+  }
+
+  // Show trailer overlay if not visible
+  const overlay = document.getElementById("trailer-overlay");
+  if (!overlay.classList.contains("active")) {
+    overlay.classList.add("active");
+  }
+
+  // ✅ Always enable autoplay mode
+  window.autoTrailerMode = true;
+
+  findTrailerAndPlay();
+};
+
+const trailerBtn = document.getElementById("trailer-button");
+trailerBtn.addEventListener("mousedown", () => {
+  longPressTimer = setTimeout(() => {
+    if (fetchTimer) clearTimeout(fetchTimer);
+    window.autoTrailerMode = true;
+    trailerLoopFirst = true;
+    findTrailerAndPlay(); // start autoplay mode
+  }, 600); // long press threshold
+});
+
+trailerBtn.addEventListener("mouseup", () => clearTimeout(longPressTimer));
+trailerBtn.addEventListener("mouseleave", () => clearTimeout(longPressTimer));
+
+trailerBtn.addEventListener("click", () => {
+  if (!currentTrailerUrl || !currentTrailerUrl.includes("youtube.com")) {
+  console.warn("❌ No trailer available — click blocked.");
+  return;
+}
+
+window.autoTrailerMode = false; // Single play only
+playTrailer(currentTrailerUrl);
+});
+function popoutTrailer() {
+  if (currentTrailerUrl) {
+    window.open(currentTrailerUrl, '_blank', 'width=800,height=450');
+  } else {
+    console.warn("🎞️ No trailer URL to pop out.");
+  }
+}
+
+
+window.addEventListener("keydown", (e) => {
+  const trailerVisible = document.getElementById("trailer-overlay")?.classList.contains("active");
+
+  // Only intercept our own shortcuts if trailer is visible
+  if (trailerVisible && !["n", "Escape"].includes(e.key)) {
+    return; // Let YouTube handle all other keys
+  }
+
+  // Global shortcuts
+  if (e.key === "n") {
+    if (window.autoTrailerMode) {
+      findTrailerAndPlay();
+    } else {
+      fetchWithCountdown(false, true); // ✅ keep swipe state
+    }
+  }
+
+  if (e.key === "Escape" && trailerPlaying) {
+    closeTrailer();
+  }
+});
+
+let overlayFadeTimer;
+
+function showOverlayInfo() {
+  overlayInfo.style.opacity = "1";
+  const popoutBtn = document.getElementById("popout-overlay-button");
+  if (popoutBtn) popoutBtn.style.opacity = "1";
+
+  clearTimeout(overlayFadeTimer);
+
+  if (!trailerPaused) {
+    overlayFadeTimer = setTimeout(() => {
+      overlayInfo.style.opacity = "0";
+      if (popoutBtn) popoutBtn.style.opacity = "0";
+    }, 3000);
+  }
+}
+
+['mousemove', 'touchstart', 'keydown'].forEach(event => {
+  document.getElementById("trailer-overlay").addEventListener(event, showOverlayInfo);
+});
+function startFetchCountdown(duration = 60000) {
+  const circle = document.querySelector("#save-timer-ring circle");
+  const totalLength = 2 * Math.PI * 30;
+
+  let startTime = performance.now();
+
+  function animate(time) {
+    const elapsed = time - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    circle.style.strokeDashoffset = totalLength * (1 - progress);
+    if (progress < 1) requestAnimationFrame(animate);
+  }
+
+  circle.style.strokeDasharray = totalLength;
+  circle.style.strokeDashoffset = 0;
+
+  requestAnimationFrame(animate);
+} // ✅ <- THIS was missing
+function toggleMute() {
+  if (!trailerPlayer) return;
+  const muted = trailerPlayer.isMuted();
+  if (muted) {
+    trailerPlayer.unMute();
+    console.log("🔊 Unmuted");
+  } else {
+    trailerPlayer.mute();
+    console.log("🔇 Muted");
+  }
+}
+window.toggleMute = toggleMute;
+function startAutoFetch() {
+  if (window.autoTrailerMode) {
+    console.log("⏹️ Auto trailer mode active — not starting auto fetch loop.");
+    return;
+  }
+
+  if (fetchTimer) {
+    clearTimeout(fetchTimer);
+    fetchTimer = null;
+  }
+
+  fetchWithCountdown(false, true).then(() => {
+    // ✅ Re-check in case autoplay mode was activated during the fetch
+    if (!window.autoTrailerMode) {
+      fetchTimer = setTimeout(startAutoFetch, 60000);
+    } else {
+      console.log("🛑 Skipped auto fetch loop restart — autoplay is now active.");
+    }
+  });
+}
+function fetchWithCountdown(requireTrailer = false, preserveSwipeState = true) {
+  if (window.autoTrailerMode) return Promise.resolve(false);
+  if (isFetching) return Promise.resolve(false);
+  isFetching = true;
+
+  return getRandomTitle(requireTrailer).then((data) => {
+    if (data) {
+      applyFilmToUI(data);
+
+      if (!preserveSwipeState && swipeState === "info") {
+        togglePanel(false);
+        swipeState = "poster";
+      }
+
+      startFetchCountdown(60000);
+      isFetching = false;
+      return true; // ✅ important for .then chains
+    } else {
+      isFetching = false;
+      return false;
+    }
+  }).catch((err) => {
+    console.error("Error in fetch:", err);
+    isFetching = false;
+    return false;
+  });
+}
+
+function convertToCSV(dataArray) {
+  if (!dataArray.length) return "";
+
+  const headers = Object.keys(dataArray[0]);
+  const rows = dataArray.map(row => headers.map(h => JSON.stringify(row[h] ?? "")).join(","));
+  return [headers.join(","), ...rows].join("\n");
+}
+
+async function exportFirestoreAsCSV() {
+  const snapshot = await getDocs(collection(db, "films")); // replace "saved" if needed
+  const data = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  const csv = convertToCSV(data);
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "firebase-saved-films.csv";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+// Prevent double-save by handling wrapper click cleanly
+const wrapper = document.getElementById("save-button-wrapper");
+wrapper.addEventListener("click", (e) => {
+  e.stopPropagation();
+  document.getElementById("save-button").click(); // Now guarded
+});
+function updateYearLabel() {
+  const yearFrom = parseInt(document.getElementById("year-from")?.value || "1900");
+  const yearTo = parseInt(document.getElementById("year-to")?.value || "2025");
+
+  document.getElementById("year-from-display").textContent = yearFrom;
+  document.getElementById("year-to-display").textContent = yearTo;
+
+  const yearLabel = document.getElementById("year-label");
+  if (yearFrom === 1900 && yearTo === 2025) {
+    yearLabel.textContent = "All Years";
+  } else if (yearFrom === yearTo) {
+    yearLabel.textContent = `${yearFrom}`;
+  } else {
+    yearLabel.textContent = `${yearFrom} – ${yearTo}`;
+  }
+}
+window.onload = () => {
+  console.log("✅ window.onload fired");
+
+  // DOM References
+  overlayInfo = document.getElementById("overlay-info");
+  const genreSelect = document.getElementById("genre-select");
+  const moviePoster = document.getElementById("movie-poster");
+  const floatingButtons = document.querySelector(".floating-buttons");
+
+  // ✅ Init Genre Dropdown
+  document.getElementById("tmdb-button").disabled = true;
+  genreSelect.innerHTML = `<option value="all">All</option>` + 
+    genres.map(g => `<option value="${g.name}">${g.name}</option>`).join("");
+  genreSelect.value = "Animation";
+  currentGenre = genres.find(g => g.name === "Animation");
+
+  // ✅ Theme toggle
+  const themeButton = document.getElementById("theme-button");
+  if (themeButton) {
+    themeButton.onclick = () => {
+      document.body.classList.toggle("red-letter-mode");
+    };
+  } else {
+    console.warn("⚠️ theme-button not found");
+  }
+
+  // ✅ Filter summary
+  const filterSummaryBtn = document.getElementById("filter-summary-btn");
+  if (filterSummaryBtn) {
+    filterSummaryBtn.onclick = () => {
+      const genre = genreSelect.value;
+      const country = document.getElementById("country-select").value;
+      const type = document.getElementById("type-select").value;
+      const rating = document.getElementById("rating-range").value;
+      const year = document.getElementById("year-range")?.value || 
+                  `${document.getElementById("year-from").value}-${document.getElementById("year-to").value}`;
+
+      alert(`🎛️ Current Filters:\n\nGenre: ${genre}\nCountry: ${country}\nType: ${type}\nRating ≥ ${rating}\nYear(s): ${year}`);
+    };
+  }
+
+  // ✅ Genre change event
+  genreSelect.addEventListener("change", (e) => {
+    const selected = e.target.value;
+    currentGenre = genres.find(g => g.name === selected) || { name: "all", movie: "", tv: "" };
+    document.getElementById("genre-button").querySelector("img").src = `${currentGenre.name.toLowerCase()}.png`;
+
+    if (fetchTimer) clearTimeout(fetchTimer);
+    fetchWithCountdown(false, true).then(() => {
+      fetchTimer = setTimeout(startAutoFetch, 60000);
+    });
+  });
+
+  // ✅ Year label
+  updateYearLabel();
+  document.getElementById("year-from")?.addEventListener("input", updateYearLabel);
+  document.getElementById("year-to")?.addEventListener("input", updateYearLabel);
+
+  // ✅ Auto-hide floating buttons
+  fadeTimer = setTimeout(() => floatingButtons.classList.add("hidden"), 5000);
+  resetPanelFade();
+
+  // ✅ Swipe handling
+  let touchStartY = 0;
+  let touchEndY = 0;
+
+  document.addEventListener("touchstart", e => touchStartY = e.changedTouches[0].screenY);
+  document.addEventListener("touchend", e => {
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipeGesture();
+  });
+
+  function handleSwipeGesture() {
+    if (swipeCooldown) return;
+    swipeCooldown = true;
+    setTimeout(() => swipeCooldown = false, 500);
+
+    const deltaY = touchEndY - touchStartY;
+    const filterPanel = document.getElementById("filter-panel");
+
+    if (deltaY > 4) {
+      if (swipeState === "info") togglePanel(false);
+      else if (swipeState === "poster") {
+        togglePanel(false);
+        filterPanel.classList.add("active");
+        swipeState = "filter";
+        clearTimeout(window.filterAutoCloseTimer);
+        window.filterAutoCloseTimer = setTimeout(() => {
+          if (swipeState === "filter") {
+            filterPanel.classList.remove("active");
+            swipeState = "poster";
+          }
+        }, 10000);
+      }
+    } else if (deltaY < -4) {
+      if (swipeState === "filter") {
+        filterPanel.classList.remove("active");
+        swipeState = "poster";
+      } else if (swipeState === "poster") {
+        filterPanel.classList.remove("active");
+        togglePanel(true);
+        swipeState = "info";
+      }
+    }
+  }
+
+  // ✅ Keyboard shortcuts
+  document.addEventListener("keydown", (e) => {
+    const key = e.key.toLowerCase();
+    if (key === "e") exportFirestoreAsCSV?.();
+    if (key === "m") toggleMute?.();
+    if (key === "n" || key === "arrowright") document.getElementById("next-button")?.click();
+    if (key === "f") {
+      const iframe = document.querySelector("#player iframe");
+      const wrapper = document.getElementById("player");
+      if (!document.fullscreenElement) {
+        (iframe?.requestFullscreen?.() || wrapper?.requestFullscreen?.()).catch(err => {
+          console.warn("❌ Fullscreen failed:", err);
+        });
+      } else {
+        document.exitFullscreen?.();
+      }
+    }
+  });
+
+  // ✅ Poster click for new title
+  moviePoster.addEventListener("click", () => {
+    if (fetchTimer) clearTimeout(fetchTimer);
+    fetchWithCountdown(false, true).then(() => {
+      fetchTimer = setTimeout(startAutoFetch, 60000);
+    });
+  });
+
+  // ✅ Trailer overlay focus recovery
+  document.getElementById("trailer-overlay")?.addEventListener("click", () => {
+    setTimeout(() => window.focus(), 300);
+  });
+  document.getElementById("player")?.addEventListener("click", () => {
+    setTimeout(() => window.focus(), 300);
+  });
+
+  // ✅ History Recall (TMDB)
+  document.getElementById("tmdb-button").onclick = (e) => {
+    e.stopPropagation();
+    console.log("🖱️ TMDB button clicked");
+    console.log("📜 History count:", fetchHistory.length);
+    if (fetchHistory.length === 0) return;
+
+    historyIndex = (historyIndex + 1) % fetchHistory.length;
+    const previous = fetchHistory[historyIndex];
+    if (previous) {
+      window.applyingFromHistory = true;
+      applyFilmToUI(previous);
+      window.applyingFromHistory = false;
+    }
+  };
+
+  // ✅ Mousemove reveal info panel
+  document.addEventListener("mousemove", () => {
+    const now = Date.now();
+    if (now - lastMouseMoveTime < 200) return;
+    lastMouseMoveTime = now;
+
+    const infoPanel = document.getElementById("info-panel");
+
+    if (!infoPanel.classList.contains("expanded")) {
+      infoPanel.classList.remove("hidden");
+
+      clearTimeout(panelFadeTimer);
+      panelFadeTimer = setTimeout(() => {
+        if (!infoPanel.classList.contains("expanded")) {
+          infoPanel.classList.add("hidden");
+        }
+      }, 5000);
+    }
+  });
+
+  // ✅ First load
+  console.log("🚀 Starting first fetch...");
+  fetchWithCountdown(false, true).then(() => {
+    fetchTimer = setTimeout(startAutoFetch, 60000);
+  });
+};
+
+  
+
+// ✅ Expose methods globally (MUST be outside onload!)
+window.closeTrailer = closeTrailer;
+window.togglePanel = togglePanel;
+window.playTrailer = playTrailer;
+window.showOverlayInfo = showOverlayInfo;
+window.failSafeTimeout = null;
+</script>
+<script>
+  // These must also exist globally for the player to work
+  let trailerPlayer = null;
+  let youtubeReady = false;
+
+  window.onYouTubeIframeAPIReady = function () {
+    trailerPlayer = new YT.Player("player", {
+      height: "390",
+      width: "640",
+      videoId: "",
+      playerVars: {
+        enablejsapi: 1,
+        controls: 1,
+        modestbranding: 1,
+        rel: 0,
+        showinfo: 0
+      },
+      events: {
+        onReady: () => {
+          youtubeReady = true;
+          console.log("✅ YouTube Player is fully ready");
+        },
+        onStateChange: window.onPlayerStateChange
+      }
+    });
+
+    console.log("✅ YouTube Player ready");
+  };
+</script>
+
+<script>
+  const poster = document.getElementById('movie-poster');
+  if (poster.complete) {
+    poster.classList.add('loaded');
+  } else {
+    poster.addEventListener('load', () => {
+      poster.classList.add('loaded');
+    });
+  }
+</script>
+</body>
+</html>
