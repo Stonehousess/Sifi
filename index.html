@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" data-lt-installed="true"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="file:///Users/admin/Documents/GitHub/Sifi/favicon.ico" type="image/x-icon">
   <title>📼VCR📼 🎭</title>
   <style>
   html, body {
@@ -64,6 +64,23 @@
   animation: glowing-tides 5s infinite ease-in-out;
 }
 
+
+
+/* Mobile poster optimization */
+@media (max-width: 768px) {
+  #movie-poster {
+    max-width: none;
+    max-height: none;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+  }
+  
+  #poster-wrapper {
+    overflow: hidden;
+  }
+}
+
 #movie-poster.loaded {
   opacity: 1;
 }
@@ -84,20 +101,7 @@
   text-align: center;
 }
 
-.loading-spinner {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2000;
-  display: none;
-}
 
-.loading-spinner img {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-}
 
 /* ---------------- Fonts ---------------- */
 
@@ -421,29 +425,134 @@
 }
 
 #filter-content {
-  max-width: 700px;
+  max-width: 900px;
   margin: 0 auto;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filter-row {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
   gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-item {
+  flex: 1;
+  min-width: 150px;
+  max-width: 200px;
+}
+
+.year-range-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
   justify-content: center;
+}
+
+.filter-label {
+  font-size: 16px;
+  color: #ffcc00;
+  font-weight: bold;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+}
+
+.year-sliders {
+  display: flex;
+  gap: 10px;
   align-items: center;
 }
 
-#filter-content label {
+.year-slider {
+  width: 150px;
+  cursor: pointer;
+}
+
+.year-display {
   font-size: 16px;
+  color: #ffcc00;
+  font-weight: bold;
+  text-align: center;
+  min-width: 120px;
+  text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+}
+
+#filter-content label {
+  font-size: 14px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   color: #ffcc00;
+  margin-bottom: 8px;
+  text-shadow: 0 0 5px rgba(255, 204, 0, 0.3);
 }
 
 #filter-content input,
 #filter-content select {
   margin-top: 4px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-size: 14px;
+  width: 100%;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+#filter-content input:focus,
+#filter-content select:focus {
+  outline: 2px solid #ffcc00;
+  border-color: #ffcc00;
+  box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Remove default browser styling */
+#filter-content select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffcc00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 30px;
+}
+
+/* Button row styling */
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.filter-buttons .overlay-btn {
+  min-width: 120px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.filter-buttons .overlay-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 /* ---------------- Player ---------------- */
@@ -587,6 +696,105 @@ body.red-letter-mode #info-panel {
   background: rgba(90, 0, 0, 0.95);
 }
 
+/* VCR-style filter panel */
+body.vcr-mode #filter-panel {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  border: 2px solid #ffcc00;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+}
+
+body.vcr-mode #filter-content {
+  background: rgba(0, 0, 0, 0.9);
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #ffcc00;
+  box-shadow: 0 0 20px rgba(255, 204, 0, 0.2);
+}
+
+body.vcr-mode .filter-row {
+  border-bottom: 1px solid rgba(255, 204, 0, 0.3);
+  padding-bottom: 15px;
+}
+
+body.vcr-mode .filter-label {
+  color: #ffcc00;
+  font-family: 'DigitalDisplay', monospace;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
+}
+
+body.vcr-mode #filter-content label {
+  color: #ffcc00;
+  font-family: 'DigitalDisplay', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
+}
+
+body.vcr-mode #filter-content select,
+body.vcr-mode #filter-content input {
+  background: #000 !important;
+  border: 1px solid #ffcc00 !important;
+  color: #ffcc00 !important;
+  font-family: 'DigitalDisplay', monospace !important;
+  box-shadow: inset 0 0 5px rgba(255, 204, 0, 0.3) !important;
+  background-image: none !important;
+}
+
+body.vcr-mode #filter-content select:focus,
+body.vcr-mode #filter-content input:focus {
+  outline: 2px solid #ffcc00 !important;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.5), inset 0 0 5px rgba(255, 204, 0, 0.3) !important;
+  background: #000 !important;
+}
+
+body.vcr-mode .year-display {
+  color: #ffcc00;
+  font-family: 'DigitalDisplay', monospace;
+  text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
+}
+
+body.vcr-mode .filter-buttons {
+  border-top: 2px solid #ffcc00;
+  padding-top: 15px;
+  margin-top: 20px;
+}
+
+body.vcr-mode .overlay-btn {
+  background: linear-gradient(45deg, #ffcc00, #ffaa00);
+  color: #000;
+  border: 1px solid #ffcc00;
+  font-family: 'DigitalDisplay', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+body.vcr-mode .overlay-btn:hover {
+  background: linear-gradient(45deg, #ffdd00, #ffcc00);
+  box-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
+}
+
+body.vcr-mode .year-display {
+  color: #ffcc00;
+  font-family: 'DigitalDisplay', monospace;
+  text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
+}
+
+body.vcr-mode .year-slider::-webkit-slider-thumb {
+  background: #ffcc00;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+}
+
+body.vcr-mode .year-slider::-moz-range-thumb {
+  background: #ffcc00;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+}
+
 /* ---------------- Responsive Design ---------------- */
 
 @media (max-width: 768px) {
@@ -636,7 +844,40 @@ body.red-letter-mode #info-panel {
   }
   
   #filter-content {
+    padding: 15px;
+  }
+  
+  .filter-row {
+    flex-direction: column;
     gap: 15px;
+  }
+  
+  .filter-item {
+    min-width: 100%;
+  }
+  
+  .year-range-section {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .year-sliders {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .year-slider {
+    width: 200px;
+  }
+  
+  .filter-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .filter-buttons .overlay-btn {
+    min-width: 150px;
+    margin: 5px 0;
   }
   
   #filter-content label {
@@ -782,43 +1023,150 @@ body.red-letter-mode #info-panel {
 .mobile-device select {
   font-size: 16px;
 }
+
+.year-range-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.year-slider {
+  width: 200px;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.year-display {
+  font-size: 16px;
+  color: #ffcc00;
+  font-weight: bold;
+  text-align: center;
+}
+
+.year-min-display,
+.year-max-display {
+  font-weight: bold;
+}
+
+.year-min-display {
+  margin-right: 5px;
+}
+
+.year-max-display {
+  margin-left: 5px;
+}
+
+/* Improve slider appearance */
+.year-slider::-webkit-slider-thumb {
+  background: #ffcc00;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.year-slider::-moz-range-thumb {
+  background: #ffcc00;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.year-slider::-webkit-slider-track {
+  background: #333;
+  border-radius: 5px;
+}
+
+.year-slider::-moz-range-track {
+  background: #333;
+  border-radius: 5px;
+}
+
+.clear-filters-btn {
+  background-color: #ff3b3b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.clear-filters-btn:hover {
+  background-color: #cc2929;
+}
 </style>
 </head>
 <body>
   <div id="movie-container">
     <div id="poster-wrapper">
       <div id="poster-border">
-        <img alt="Movie poster" draggable="false" id="movie-poster" />
+        <img alt="" draggable="false" id="movie-poster" class="loaded" src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/p08FoXVFgcRm5QZBaGj0VKa2W2Y.webp">
       </div>
     </div>
 
     <!-- Info Panel -->
-    <div id="info-panel">
+    <div id="info-panel" class="hidden">
       <div id="info-content">
         
         <!-- Floating Info Panel Buttons -->
         <div class="info-buttons">
           <button id="tmdb-button" aria-label="View TMDB information">
-            <img src="tmdb.png" alt="TMDB" />
+            <img src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/tmdb.png" alt="TMDB">
           </button>
           <div id="save-button-wrapper" role="button" aria-label="Save movie poster">
-            <img id="save-button" src="record.png" alt="Save" />
+            <img id="save-button" src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/record.png" alt="Save">
             <svg id="save-timer-ring" viewBox="0 0 80 80">
-              <circle r="30" cx="40" cy="40" />
+              <circle r="30" cx="40" cy="40" style="stroke-dasharray: 188.496px; stroke-dashoffset: 66.8935px;"></circle>
             </svg>
           </div>
-          <button id="trailer-button" aria-label="Play trailer">
-            <img src="play.png" alt="Play" />
+          <button id="trailer-button" aria-label="Play trailer" style="cursor: pointer;">
+            <img src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/play.png" alt="Play" style="opacity: 0.6;">
           </button>
           <button id="genre-button" aria-label="Change genre">
-            <img src="shuffle.png" alt="Shuffle" />
+            <img src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/shuffle.png" alt="Shuffle">
           </button>
           <button id="next-button" aria-label="Next movie">
-            <img src="next.png" alt="Next" />
+            <img src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/next.png" alt="Next">
           </button>
         </div>
 
         <div id="info-genre" style="display:none;"></div>
+          <div id="info-crew" style="margin-top:0px; margin-bottom:1px;">
+            <div style="line-height:0.92; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
+              <span style="font-size:70px;">A Shaun the Sheep Movie: Farmageddon</span>
+              <span style="font-size:67px;">(2019)</span>
+            </div>
+
+            <div style="font-size:40px; color:#d4d4d4; font-family: 'Credits', 'Helvetica Neue', Helvetica, Arial, sans-serif; text-transform: uppercase; line-height:0.95;">
+              <span>Justin Fletcher, John Sparkes, Amalia Vitale, Kate Harbour, David Holt</span>
+              <div style="line-height:1;">
+                <span style="text-transform:none;">k</span> <span style="text-transform:uppercase;">Will Becher</span>  
+                <span style="text-transform:none;">  j</span> <span style="text-transform:uppercase;">StudioCanal</span> | 
+                🇬🇧 | 
+                <a href="https://www.themoviedb.org/movie/422803" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
+              </div>
+            </div>
+
+            <div id="info-description" style="margin-top:1.5px; font-size:20px; line-height:1; color:#dce4e8; font-family:'Bubble', sans-serif;">
+              When an alien with amazing powers crash-lands near Mossy 
+Bottom Farm, Shaun the Sheep goes on a mission to shepherd the 
+intergalactic visitor home before a sinister organization can capture 
+her.
+            </div>
+
+            <div id="info-meta" style="margin-top:1px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
+              69% • 87 min • Animation • --
+            </div>
+          </div>
+        
+          
+        
+          
+        
+          
+        
+          
+        
         <div id="movie-type"></div>
         <div id="movie-runtime"></div>
       </div>
@@ -827,59 +1175,119 @@ body.red-letter-mode #info-panel {
     <!-- Filter Panel -->
     <div id="filter-panel" class="hidden">
       <div id="filter-content">
-        <div id="year-label">All Years</div>
+        <!-- Line 1: Year Range -->
+        <div class="filter-row">
+          <div class="year-range-section">
+            <span class="filter-label">Year Range:</span>
+            <div class="year-sliders">
+              <input type="range" id="year-min" min="1900" max="2025" value="1900" step="1" class="year-slider">
+              <input type="range" id="year-max" min="1900" max="2025" value="2025" step="1" class="year-slider">
+            </div>
+            <div class="year-display">
+              <span id="year-min-display">1900</span> - <span id="year-max-display">2025</span>
+            </div>
+          </div>
+        </div>
 
-        <label>Year From:
-          <input type="range" id="year-from" min="1900" max="2025" value="1900" step="1">
-          <span id="year-from-display">2000</span>
-        </label>
+        <!-- Line 2: Presets, Genre, Type, Country -->
+        <div class="filter-row">
+          <div class="filter-item">
+            <label>Presets:
+              <select id="preset-select">
+                <option value="" selected="selected">Custom</option>
+                <option value="usa-80s">🇺🇸 USA 1980-1989</option>
+                <option value="usa-90s">🇺🇸 USA 1990-1999</option>
+                <option value="usa-80s-90s">🇺🇸 USA 1980-1999</option>
+                <option value="uk-80s">🇬🇧 UK 1980-1989</option>
+                <option value="uk-90s">🇬🇧 UK 1990-1999</option>
+                <option value="japan-80s">🇯🇵 Japan 1980-1989</option>
+                <option value="japan-90s">🇯🇵 Japan 1990-1999</option>
+                <option value="classic-50s">🎬 Classic 1950-1959</option>
+                <option value="classic-60s">🎬 Classic 1960-1969</option>
+                <option value="modern-2010s">🎬 Modern 2010-2019</option>
+                <option value="modern-2020s">🎬 Modern 2020-2025</option>
+              </select>
+            </label>
+          </div>
 
-        <label>Year To:
-          <input type="range" id="year-to" min="1900" max="2025" value="2025" step="1">
-          <span id="year-to-display">2025</span>
-        </label>
+          <div class="filter-item">
+            <label>Genre: 
+              <select id="genre-select"><option value="all">All</option><option value="Sci-Fi">Sci-Fi</option><option value="Adventure">Adventure</option><option value="Comedy">Comedy</option><option value="Documentary">Documentary</option><option value="Animation" selected="selected">Animation</option><option value="Romance">Romance</option><option value="Crime">Crime</option><option value="Mystery">Mystery</option><option value="Action">Action</option><option value="Drama">Drama</option><option value="Thriller">Thriller</option><option value="Horror">Horror</option><option value="Fantasy">Fantasy</option><option value="War">War</option><option value="Western">Western</option><option value="Family">Family</option><option value="History">History</option><option value="Music">Music</option><option value="Sport">Sport</option></select>
+            </label>
+          </div>
 
-        <label>Country: 
-          <select id="country-select">
-            <option value="">Any</option>
-            <option value="US">🇺🇸</option>
-            <option value="GB">🇬🇧</option>
-            <option value="FR">🇫🇷</option>
-            <option value="JP">🇯🇵</option>
-            <option value="IT">🇮🇹</option>
-            <option value="CA">🇨🇦</option>
-            <option value="CN">🇨🇳</option>
-            <option value="DE">🇩🇪</option>
-            <option value="IN">🇮🇳</option>
-            <option value="ES">🇪🇸</option>
-            <option value="BR">🇧🇷</option>
-            <option value="IE">🇮🇪</option>
-            <option value="AU">🇦🇺</option>
-            <option value="KR">🇰🇷</option>
-            <option value="MX">🇲🇽</option>
-            <option value="BE">🇧🇪</option>
-            <option value="TR">🇹🇷</option>
-          </select>
-        </label>
+          <div class="filter-item">
+            <label>Type: 
+              <select id="type-select">
+                <option value="all" selected="selected">All</option>
+                <option value="movie">Movie</option>
+                <option value="tv">TV</option>
+              </select>
+            </label>
+          </div>
 
-        <label>Type: 
-          <select id="type-select">
-            <option value="all">All</option>
-            <option value="movie">Movie</option>
-            <option value="tv">TV</option>
-          </select>
-        </label>
+          <div class="filter-item">
+            <label>Country: 
+              <select id="country-select">
+                <option value="" selected="selected">Any</option>
+                <option value="US">🇺🇸</option>
+                <option value="GB">🇬🇧</option>
+                <option value="FR">🇫🇷</option>
+                <option value="JP">🇯🇵</option>
+                <option value="IT">🇮🇹</option>
+                <option value="CA">🇨🇦</option>
+                <option value="CN">🇨🇳</option>
+                <option value="DE">🇩🇪</option>
+                <option value="IN">🇮🇳</option>
+                <option value="ES">🇪🇸</option>
+                <option value="BR">🇧🇷</option>
+                <option value="IE">🇮🇪</option>
+                <option value="AU">🇦🇺</option>
+                <option value="KR">🇰🇷</option>
+                <option value="MX">🇲🇽</option>
+                <option value="BE">🇧🇪</option>
+                <option value="TR">🇹🇷</option>
+              </select>
+            </label>
+          </div>
+        </div>
 
-        <label>Genre: 
-          <select id="genre-select"></select>
-        </label>
+        <!-- Line 3: Trailer, Rating, Additional Filters -->
+        <div class="filter-row">
+          <div class="filter-item">
+            <label>Trailer: 
+              <select id="trailer-select">
+                <option value="any" selected="selected">Any</option>
+                <option value="required">With Trailer Only</option>
+              </select>
+            </label>
+          </div>
 
-        <label>Min Rating: 
-          <input type="range" id="rating-range" min="0" max="10" step="0.1" value="0">
-        </label>
+          <div class="filter-item">
+            <label>Min Rating: 
+              <input type="range" id="rating-range" min="0" max="10" step="0.1" value="0">
+              <span id="rating-display">0</span>
+            </label>
+          </div>
+
+          <div class="filter-item">
+            <label>Sort By: 
+              <select id="sort-select">
+                <option value="popularity.desc" selected="selected">Popularity</option>
+                <option value="vote_average.desc">Rating</option>
+                <option value="release_date.desc">Newest</option>
+                <option value="release_date.asc">Oldest</option>
+                <option value="title.asc">Title A-Z</option>
+              </select>
+            </label>
+          </div>
+        </div>
         
-        <button id="filter-summary-btn" class="overlay-btn">Show Filters</button>
-        <button id="theme-button" class="overlay-btn">Toggle RLM Theme</button>
+        <div class="filter-buttons">
+          <button id="filter-summary-btn" class="overlay-btn">Show Filters</button>
+          <button id="theme-button" class="overlay-btn">🎬 VCR Mode</button>
+          <button id="clear-filters-btn" class="overlay-btn">Clear All</button>
+        </div>
       </div>
     </div>
   </div>
@@ -887,7 +1295,7 @@ body.red-letter-mode #info-panel {
   <!-- Trailer Overlay -->
   <div id="trailer-overlay">
     <div class="player-wrapper">
-      <div id="player"></div>
+      <iframe id="player" frameborder="0" allowfullscreen="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" title="YouTube video player" width="640" height="390" src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/a.html"></iframe>
       <div id="popout-overlay-button" class="overlay-float">
         <button onclick="popoutTrailer()" class="overlay-btn">Pop Out</button>
       </div>
@@ -895,27 +1303,26 @@ body.red-letter-mode #info-panel {
     
     <div id="overlay-info">
       <div style="font-size:60px; line-height:0.9; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
-        <span style="font-size:60px;"><span id="overlay-title">TITLE</span></span>
-        <span style="font-size:55px;">(<span id="overlay-year">YEAR</span>)</span>
+        <span style="font-size:60px;"><span id="overlay-title">A Shaun the Sheep Movie: Farmageddon</span></span>
+        <span style="font-size:55px;">(<span id="overlay-year">2019</span>)</span>
       </div>
 
       <div style="font-size:34px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase; line-height:1;">
-        <div id="overlay-cast">CAST</div>
+        <div id="overlay-cast">JUSTIN FLETCHER, JOHN SPARKES, AMALIA VITALE, KATE HARBOUR, DAVID HOLT</div>
         <div>
-          <span style="text-transform:none;">k</span> <span id="overlay-director">DIRECTOR</span> |
-          <span style="text-transform:none;">j</span> <span id="overlay-studio">STUDIO</span> |
-          <span id="overlay-flag">🌍</span> |
-          <a id="overlay-tmdb" href="#" target="_blank" class="tmdb-link">TMDB</a>
+          <span style="text-transform:none;">k</span> <span id="overlay-director">WILL BECHER</span> |
+          <span style="text-transform:none;">j</span> <span id="overlay-studio">STUDIOCANAL</span> |
+          <span id="overlay-flag">🇬🇧</span> |
+          <a id="overlay-tmdb" href="https://www.themoviedb.org/movie/422803" target="_blank" class="tmdb-link">TMDB</a>
         </div>
       </div>
 
-      <div id="overlay-meta" style="font-size:26px; font-family:'DigitalDisplay', monospace; color:#ffcc00; letter-spacing:1px;">
-        META
-      </div>
+      <div id="overlay-meta" style="font-size:26px; font-family:'DigitalDisplay', monospace; color:#ffcc00; letter-spacing:1px;">69% • 87 min • Animation • --</div>
 
-      <div id="overlay-description" style="font-size:20px; color:#dce4e8; font-family:'Bubble', sans-serif; line-height:1.2; margin-top:4px;">
-        DESCRIPTION
-      </div>
+      <div id="overlay-description" style="font-size:20px; color:#dce4e8; font-family:'Bubble', sans-serif; line-height:1.2; margin-top:4px;">When
+ an alien with amazing powers crash-lands near Mossy Bottom Farm, Shaun 
+the Sheep goes on a mission to shepherd the intergalactic visitor home 
+before a sinister organization can capture her.</div>
     </div>
     
     <div class="overlay-buttons">
@@ -927,13 +1334,10 @@ body.red-letter-mode #info-panel {
     </div>
   </div>
 
-  <!-- Loading and Error Messages -->
-  <div id="loading-spinner" class="loading-spinner">
-    <img src="animation.png" alt="Loading..." />
-  </div>
+  <!-- Error Messages -->
   <div id="error-message" class="error-message" style="display: none;"></div>
 
-  <script src="https://www.youtube.com/iframe_api"></script>
+  <script type="text/javascript" id="www-widgetapi-script" src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/www-widgetapi.js" async=""></script><script src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/iframe_api.js"></script>
   <script type="module">
     // Configuration - Move to environment variables in production
     const CONFIG = {
@@ -967,7 +1371,18 @@ body.red-letter-mode #info-panel {
           { name: "Animation", movie: "16", tv: "16" },
           { name: "Romance", movie: "10749", tv: "18" },
           { name: "Crime", movie: "80", tv: "80" },
-          { name: "Mystery", movie: "9648", tv: "9648" }
+          { name: "Mystery", movie: "9648", tv: "9648" },
+          { name: "Action", movie: "28", tv: "10759" },
+          { name: "Drama", movie: "18", tv: "18" },
+          { name: "Thriller", movie: "53", tv: "53" },
+          { name: "Horror", movie: "27", tv: "27" },
+          { name: "Fantasy", movie: "14", tv: "10765" },
+          { name: "War", movie: "10752", tv: "10768" },
+          { name: "Western", movie: "37", tv: "37" },
+          { name: "Family", movie: "10751", tv: "10751" },
+          { name: "History", movie: "36", tv: "36" },
+          { name: "Music", movie: "10402", tv: "10402" },
+          { name: "Sport", movie: "10751", tv: "10751" }
         ];
         
         this.currentGenre = this.genres.find(g => g.name === "Animation") || this.genres[0];
@@ -1045,8 +1460,9 @@ body.red-letter-mode #info-panel {
       }
 
       static showLoading(show = true) {
-        const loadingEl = document.getElementById('loading-spinner');
-        loadingEl.style.display = show ? 'block' : 'none';
+        // Loading spinner completely disabled - using glowing line effect instead
+        // const loadingEl = document.getElementById('loading-spinner');
+        // loadingEl.style.display = 'none';
       }
 
       static async handleApiError(error, context = '') {
@@ -1096,13 +1512,42 @@ body.red-letter-mode #info-panel {
         }
       }
 
-      async getPageCount(type, country) {
+      async getPageCount(type, country, genreId = null, yearMin = null, yearMax = null, rating = null) {
         try {
-          const data = await this.makeRequest(`/discover/${type}`, {
-            with_origin_country: country,
+          const params = {
             page: 1
-          });
-          return Math.min(data.total_pages || 1, 80);
+          };
+          
+          if (country) params.with_origin_country = country;
+          if (genreId) params.with_genres = genreId;
+          if (rating > 0) params['vote_average.gte'] = rating;
+          
+          if (yearMin && yearMax && yearMin !== 1900 && yearMax !== 2025) {
+            if (type === "movie") {
+              params['primary_release_date.gte'] = `${yearMin}-01-01`;
+              params['primary_release_date.lte'] = `${yearMax}-12-31`;
+            } else {
+              params['first_air_date.gte'] = `${yearMin}-01-01`;
+              params['first_air_date.lte'] = `${yearMax}-12-31`;
+            }
+          }
+
+          const data = await this.makeRequest(`/discover/${type}`, params);
+          const totalPages = data.total_pages || 1;
+          const totalResults = data.total_results || 0;
+          
+          console.log(`📊 Genre analysis: ${totalResults} results, ${totalPages} pages available`);
+          
+          // Adjust page range based on results
+          if (totalResults < 100) {
+            console.warn(`⚠️ Low results (${totalResults}) - expanding search parameters`);
+            return Math.min(totalPages, 500); // Search more pages for low-result genres
+          } else if (totalResults > 10000) {
+            console.log(`✅ High results (${totalResults}) - using standard page range`);
+            return Math.min(totalPages, 80); // Standard range for popular genres
+          } else {
+            return Math.min(totalPages, 200); // Balanced range
+          }
         } catch (error) {
           console.warn('Failed to get page count:', error);
           return 80; // Fallback
@@ -1117,6 +1562,8 @@ body.red-letter-mode #info-panel {
           const selectedCountry = document.getElementById("country-select")?.value;
           const selectedType = document.getElementById("type-select")?.value || "movie";
           const selectedRating = parseFloat(document.getElementById("rating-range")?.value || 0);
+          const requireTrailer = document.getElementById("trailer-select")?.value === "required";
+          const selectedSort = document.getElementById("sort-select")?.value || "popularity.desc";
 
           const type = selectedType === "all" ? (Math.random() < 0.5 ? "movie" : "tv") : selectedType;
           appState.isMovie = type === "movie";
@@ -1124,21 +1571,27 @@ body.red-letter-mode #info-panel {
           const genreObj = appState.genres.find(g => g.name === selectedGenreName);
           const selectedGenreId = type === "tv" ? genreObj?.tv : genreObj?.movie;
 
-          const yearFromInput = parseInt(document.getElementById("year-from")?.value || "1900");
-          const yearToInput = parseInt(document.getElementById("year-to")?.value || "2025");
-          const defaultYearFrom = 1900;
-          const defaultYearTo = 2025;
-          const useYearFilter = yearFromInput !== defaultYearFrom || yearToInput !== defaultYearTo;
+          const yearMinInput = parseInt(document.getElementById("year-min")?.value || "1900");
+          const yearMaxInput = parseInt(document.getElementById("year-max")?.value || "2025");
+          const defaultYearMin = 1900;
+          const defaultYearMax = 2025;
+          const useYearFilter = yearMinInput !== defaultYearMin || yearMaxInput !== defaultYearMax;
 
-          let randomPage = Math.floor(Math.random() * 80) + 1;
-          if (selectedCountry) {
-            const pageCount = await this.getPageCount(type, selectedCountry);
-            randomPage = Math.floor(Math.random() * pageCount) + 1;
-          }
+          // Get dynamic page count based on current filters
+          const pageCount = await this.getPageCount(
+            type, 
+            selectedCountry, 
+            selectedGenreId,
+            yearMinInput,
+            yearMaxInput,
+            selectedRating
+          );
+          
+          let randomPage = Math.floor(Math.random() * pageCount) + 1;
 
           const params = {
             language: 'en-US',
-            sort_by: 'popularity.desc',
+            sort_by: selectedSort,
             page: randomPage
           };
 
@@ -1148,13 +1601,13 @@ body.red-letter-mode #info-panel {
           if (selectedRating > 0) {
             params['vote_average.gte'] = selectedRating;
           }
-          if (useYearFilter && yearFromInput <= yearToInput) {
+          if (useYearFilter && yearMinInput <= yearMaxInput) {
             if (appState.isMovie) {
-              params['primary_release_date.gte'] = `${yearFromInput}-01-01`;
-              params['primary_release_date.lte'] = `${yearToInput}-12-31`;
+              params['primary_release_date.gte'] = `${yearMinInput}-01-01`;
+              params['primary_release_date.lte'] = `${yearMaxInput}-12-31`;
             } else {
-              params['first_air_date.gte'] = `${yearFromInput}-01-01`;
-              params['first_air_date.lte'] = `${yearToInput}-12-31`;
+              params['first_air_date.gte'] = `${yearMinInput}-01-01`;
+              params['first_air_date.lte'] = `${yearMaxInput}-12-31`;
             }
           }
           if (selectedCountry) {
@@ -1168,8 +1621,28 @@ body.red-letter-mode #info-panel {
             console.warn(`No results found (attempt ${appState.failedFetchCount}/${appState.MAX_FAILED_FETCHES})`);
             
             if (appState.failedFetchCount >= appState.MAX_FAILED_FETCHES) {
-              this.resetFilters();
-              ErrorHandler.showError('No matches found. Filters have been reset.');
+              console.warn("🔄 Too many failed attempts - trying with relaxed filters");
+              
+              // Try with relaxed filters before giving up
+              const relaxedParams = { ...params };
+              delete relaxedParams.with_genres;
+              delete relaxedParams.with_origin_country;
+              
+              const relaxedData = await this.makeRequest(`/discover/${type}`, relaxedParams);
+              
+              if (relaxedData.results && relaxedData.results.length > 0) {
+                console.log("✅ Found results with relaxed filters");
+                const item = relaxedData.results[Math.floor(Math.random() * relaxedData.results.length)];
+                const detailData = await this.makeRequest(`/${type}/${item.id}`, {
+                  language: 'en-US',
+                  append_to_response: 'credits,videos'
+                });
+                appState.failedFetchCount = 0;
+                return this.processMovieData(item, detailData, type);
+              } else {
+                this.resetFilters();
+                ErrorHandler.showError('No matches found. Filters have been reset.');
+              }
             }
             return false;
           }
@@ -1188,7 +1661,15 @@ body.red-letter-mode #info-panel {
             append_to_response: 'credits,videos'
           });
 
-          return this.processMovieData(item, detailData, type);
+          const processedData = this.processMovieData(item, detailData, type);
+          
+          // If trailer is required but not found, skip this item
+          if (requireTrailer && !processedData.trailerUrl) {
+            console.log("🎬 Trailer required but not found - skipping");
+            return this.getRandomTitle(requireTrailer, overrideType, overrideGenreId);
+          }
+
+          return processedData;
           
         } catch (error) {
           await ErrorHandler.handleApiError(error, 'getRandomTitle');
@@ -1258,16 +1739,45 @@ body.red-letter-mode #info-panel {
         };
       }
 
+      async validateGenre(genreName, type) {
+        try {
+          const genreObj = this.genres.find(g => g.name === genreName);
+          if (!genreObj) return false;
+          
+          const genreId = type === "tv" ? genreObj.tv : genreObj.movie;
+          if (!genreId) return false;
+          
+          // Test the genre with a simple search
+          const testData = await this.makeRequest(`/discover/${type}`, {
+            with_genres: genreId,
+            page: 1
+          });
+          
+          const hasResults = testData.total_results > 0;
+          console.log(`🔍 Genre validation: ${genreName} (${type}) - ${hasResults ? '✅ Valid' : '❌ No results'}`);
+          
+          return hasResults;
+        } catch (error) {
+          console.warn(`⚠️ Genre validation failed for ${genreName} (${type}):`, error);
+          return false;
+        }
+      }
+
       resetFilters() {
         document.getElementById("genre-select").value = "all";
         document.getElementById("country-select").value = "";
         document.getElementById("type-select").value = "all";
         document.getElementById("rating-range").value = 0;
-        document.getElementById("year-from").value = 1900;
-        document.getElementById("year-to").value = 2025;
+        document.getElementById("year-min").value = 1900;
+        document.getElementById("year-max").value = 2025;
+        document.getElementById("preset-select").value = "";
+        document.getElementById("trailer-select").value = "any";
+        document.getElementById("sort-select").value = "popularity.desc";
         appState.failedFetchCount = 0;
-        document.getElementById("year-from-display").textContent = "1900";
-        document.getElementById("year-to-display").textContent = "2025";
+        document.getElementById("year-min-display").textContent = "1900";
+        document.getElementById("year-max-display").textContent = "2025";
+        document.getElementById("rating-display").textContent = "0";
+        updateYearLabel();
       }
     }
 
@@ -1438,6 +1948,32 @@ body.red-letter-mode #info-panel {
         if (appState.fetchTimer) {
           clearTimeout(appState.fetchTimer);
           appState.fetchTimer = null;
+        }
+      }
+
+      // Handle region/age restrictions and other errors
+      if (event.data === YT.PlayerState.UNSTARTED) {
+        console.log("⚠️ Video unstarted - possible region/age restriction");
+        if (appState.autoTrailerMode) {
+          console.log("🔄 Auto mode: Skipping restricted video");
+          setTimeout(() => {
+            if (!appState.isTrailerAdvancing) {
+              findTrailerAndPlay();
+            }
+          }, 2000);
+        }
+      }
+
+      // Handle video errors
+      if (event.data === -1) {
+        console.log("❌ Video error detected");
+        if (appState.autoTrailerMode) {
+          console.log("🔄 Auto mode: Skipping error video");
+          setTimeout(() => {
+            if (!appState.isTrailerAdvancing) {
+              findTrailerAndPlay();
+            }
+          }, 2000);
         }
       }
     }
@@ -1696,7 +2232,7 @@ body.red-letter-mode #info-panel {
 
       let found = false;
       let attempts = 0;
-      const maxAttempts = 5; // Reduced from 7 to 5
+      const maxAttempts = 5;
 
       while (attempts < maxAttempts) {
         try {
@@ -1737,7 +2273,7 @@ body.red-letter-mode #info-panel {
 
         setTimeout(() => {
           findTrailerAndPlay();
-        }, 5000); // Increased from 3000 to 5000
+        }, 5000);
       }
     }
 
@@ -1831,20 +2367,88 @@ body.red-letter-mode #info-panel {
     }
 
     function updateYearLabel() {
-      const yearFrom = parseInt(document.getElementById("year-from")?.value || "1900");
-      const yearTo = parseInt(document.getElementById("year-to")?.value || "2025");
+      const yearMin = parseInt(document.getElementById("year-min")?.value || "1900");
+      const yearMax = parseInt(document.getElementById("year-max")?.value || "2025");
 
-      document.getElementById("year-from-display").textContent = yearFrom;
-      document.getElementById("year-to-display").textContent = yearTo;
+      document.getElementById("year-min-display").textContent = yearMin;
+      document.getElementById("year-max-display").textContent = yearMax;
+    }
 
-      const yearLabel = document.getElementById("year-label");
-      if (yearFrom === 1900 && yearTo === 2025) {
-        yearLabel.textContent = "All Years";
-      } else if (yearFrom === yearTo) {
-        yearLabel.textContent = `${yearFrom}`;
-      } else {
-        yearLabel.textContent = `${yearFrom} – ${yearTo}`;
+    function applyPreset(presetValue) {
+      const yearMinSlider = document.getElementById("year-min");
+      const yearMaxSlider = document.getElementById("year-max");
+      const countrySelect = document.getElementById("country-select");
+      const typeSelect = document.getElementById("type-select");
+
+      switch (presetValue) {
+        case "usa-80s":
+          yearMinSlider.value = 1980;
+          yearMaxSlider.value = 1989;
+          countrySelect.value = "US";
+          typeSelect.value = "movie";
+          break;
+        case "usa-90s":
+          yearMinSlider.value = 1990;
+          yearMaxSlider.value = 1999;
+          countrySelect.value = "US";
+          typeSelect.value = "movie";
+          break;
+        case "usa-80s-90s":
+          yearMinSlider.value = 1980;
+          yearMaxSlider.value = 1999;
+          countrySelect.value = "US";
+          typeSelect.value = "movie";
+          break;
+        case "uk-80s":
+          yearMinSlider.value = 1980;
+          yearMaxSlider.value = 1989;
+          countrySelect.value = "GB";
+          typeSelect.value = "movie";
+          break;
+        case "uk-90s":
+          yearMinSlider.value = 1990;
+          yearMaxSlider.value = 1999;
+          countrySelect.value = "GB";
+          typeSelect.value = "movie";
+          break;
+        case "japan-80s":
+          yearMinSlider.value = 1980;
+          yearMaxSlider.value = 1989;
+          countrySelect.value = "JP";
+          typeSelect.value = "movie";
+          break;
+        case "japan-90s":
+          yearMinSlider.value = 1990;
+          yearMaxSlider.value = 1999;
+          countrySelect.value = "JP";
+          typeSelect.value = "movie";
+          break;
+        case "classic-50s":
+          yearMinSlider.value = 1950;
+          yearMaxSlider.value = 1959;
+          countrySelect.value = "";
+          typeSelect.value = "movie";
+          break;
+        case "classic-60s":
+          yearMinSlider.value = 1960;
+          yearMaxSlider.value = 1969;
+          countrySelect.value = "";
+          typeSelect.value = "movie";
+          break;
+        case "modern-2010s":
+          yearMinSlider.value = 2010;
+          yearMaxSlider.value = 2019;
+          countrySelect.value = "";
+          typeSelect.value = "all";
+          break;
+        case "modern-2020s":
+          yearMinSlider.value = 2020;
+          yearMaxSlider.value = 2025;
+          countrySelect.value = "";
+          typeSelect.value = "all";
+          break;
       }
+      updateYearLabel();
     }
 
     // Event Handlers
@@ -2033,7 +2637,7 @@ body.red-letter-mode #info-panel {
             if (appState.swipeState === "filter") {
               closeAllPanels();
             }
-          }, 10000);
+          }, 30000);
         }
       }
     });
@@ -2068,7 +2672,7 @@ body.red-letter-mode #info-panel {
               filterPanel.classList.remove("active");
               appState.swipeState = "poster";
             }
-          }, 10000);
+          }, 30000);
         }
       } else if (deltaY < -4) {
         if (appState.swipeState === "filter") {
@@ -2140,7 +2744,9 @@ body.red-letter-mode #info-panel {
       const themeButton = document.getElementById("theme-button");
       if (themeButton) {
         themeButton.onclick = () => {
-          document.body.classList.toggle("red-letter-mode");
+          document.body.classList.toggle("vcr-mode");
+          const isVcrMode = document.body.classList.contains("vcr-mode");
+          themeButton.textContent = isVcrMode ? "🎬 VCR Mode" : "🎬 VCR Mode";
         };
       }
 
@@ -2152,15 +2758,45 @@ body.red-letter-mode #info-panel {
           const country = document.getElementById("country-select").value;
           const type = document.getElementById("type-select").value;
           const rating = document.getElementById("rating-range").value;
-          const year = `${document.getElementById("year-from").value}-${document.getElementById("year-to").value}`;
+          const yearMin = document.getElementById("year-min").value;
+          const yearMax = document.getElementById("year-max").value;
+          const preset = document.getElementById("preset-select").value;
+          const trailer = document.getElementById("trailer-select").value;
+          const sort = document.getElementById("sort-select").value;
 
-          alert(`🎛️ Current Filters:\n\nGenre: ${genre}\nCountry: ${country}\nType: ${type}\nRating ≥ ${rating}\nYear(s): ${year}`);
+          let yearText = yearMin === yearMax ? yearMin : `${yearMin}-${yearMax}`;
+          if (yearMin === "1900" && yearMax === "2025") yearText = "All Years";
+
+          const sortText = {
+            "popularity.desc": "Popularity",
+            "vote_average.desc": "Rating",
+            "release_date.desc": "Newest",
+            "release_date.asc": "Oldest",
+            "title.asc": "Title A-Z"
+          }[sort] || "Popularity";
+
+          alert(`🎛️ Current Filters:\n\nGenre: ${genre}\nCountry: ${country}\nType: ${type}\nRating ≥ ${rating}\nYear(s): ${yearText}\nTrailer: ${trailer === "required" ? "Required" : "Any"}\nSort: ${sortText}${preset ? `\nPreset: ${preset}` : ""}`);
         };
       }
 
       // Genre change event
-      genreSelect.addEventListener("change", (e) => {
+      genreSelect.addEventListener("change", async (e) => {
         const selected = e.target.value;
+        const selectedType = document.getElementById("type-select").value;
+        
+        if (selected !== "all") {
+          // Validate the genre for the current type
+          const isValid = await tmdbService.validateGenre(selected, selectedType === "all" ? "movie" : selectedType);
+          
+          if (!isValid) {
+            console.warn(`⚠️ Genre "${selected}" may not have good results for ${selectedType} type`);
+            // Optionally show a warning to the user
+            if (selectedType !== "all") {
+              ErrorHandler.showError(`⚠️ "${selected}" may have limited results for ${selectedType.toUpperCase()}. Consider trying "All" types.`, 3000);
+            }
+          }
+        }
+        
         appState.currentGenre = appState.genres.find(g => g.name === selected) || { name: "all", movie: "", tv: "" };
         document.getElementById("genre-button").querySelector("img").src = `${appState.currentGenre.name.toLowerCase()}.png`;
 
@@ -2170,10 +2806,50 @@ body.red-letter-mode #info-panel {
         });
       });
 
-      // Year label
+      // Year range slider logic
+      const yearMinSlider = document.getElementById("year-min");
+      const yearMaxSlider = document.getElementById("year-max");
+      
+      yearMinSlider?.addEventListener("input", (e) => {
+        const minValue = parseInt(e.target.value);
+        const maxValue = parseInt(yearMaxSlider.value);
+        if (minValue > maxValue) {
+          yearMaxSlider.value = minValue;
+        }
+        updateYearLabel();
+      });
+      
+      yearMaxSlider?.addEventListener("input", (e) => {
+        const maxValue = parseInt(e.target.value);
+        const minValue = parseInt(yearMinSlider.value);
+        if (maxValue < minValue) {
+          yearMinSlider.value = maxValue;
+        }
+        updateYearLabel();
+      });
+
+      // Rating display
+      const ratingSlider = document.getElementById("rating-range");
+      ratingSlider?.addEventListener("input", (e) => {
+        document.getElementById("rating-display").textContent = e.target.value;
+      });
+
+      // Preset selection
+      const presetSelect = document.getElementById("preset-select");
+      presetSelect?.addEventListener("change", (e) => {
+        if (e.target.value) {
+          applyPreset(e.target.value);
+        }
+      });
+
+      // Clear filters button
+      const clearFiltersBtn = document.getElementById("clear-filters-btn");
+      clearFiltersBtn?.addEventListener("click", () => {
+        tmdbService.resetFilters();
+      });
+
+      // Initialize year label
       updateYearLabel();
-      document.getElementById("year-from")?.addEventListener("input", updateYearLabel);
-      document.getElementById("year-to")?.addEventListener("input", updateYearLabel);
 
       // Auto-hide floating buttons
       appState.fadeTimer = setTimeout(() => floatingButtons.classList.add("hidden"), 5000);
@@ -2231,9 +2907,27 @@ body.red-letter-mode #info-panel {
         }
       });
 
+      // Validate genres on startup
+      async function validateAllGenres() {
+        console.log("🔍 Validating all genres...");
+        for (const genre of appState.genres) {
+          const movieValid = await tmdbService.validateGenre(genre.name, "movie");
+          const tvValid = await tmdbService.validateGenre(genre.name, "tv");
+          
+          if (!movieValid || !tvValid) {
+            console.warn(`⚠️ Genre "${genre.name}" has issues: Movie=${movieValid}, TV=${tvValid}`);
+          }
+        }
+        console.log("✅ Genre validation complete");
+      }
+      
+      // Run validation in background
+      validateAllGenres();
+
       // First load
       console.log("🚀 Starting first fetch...");
       fetchWithCountdown(false, true).then(() => {
+        window.initialLoadComplete = true;
         appState.fetchTimer = setTimeout(startAutoFetch, 60000);
       });
     };
@@ -2249,5 +2943,6 @@ body.red-letter-mode #info-panel {
     window.onPlayerStateChange = onPlayerStateChange;
     window.failSafeTimeout = null;
   </script>
-</body>
-</html>
+
+
+</body></html>
