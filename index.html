@@ -1283,7 +1283,7 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     </div>
     
     <div class="overlay-buttons">
-      <button id="overlay-next" onclick="findTrailerAndPlay()" class="overlay-btn">Next</button>
+              <button id="overlay-next" onclick="nextTrailer()" class="overlay-btn">Next</button>
       <button onclick="document.getElementById('genre-button').click()" class="overlay-btn">Genre</button>
       <button onclick="window.open(currentTMDBUrl, '_blank')" class="overlay-btn">TMDB</button>
       <button onclick="document.getElementById('save-button').click()" class="overlay-btn">Save</button>
@@ -1885,16 +1885,14 @@ body.vcr-mode .year-slider::-moz-range-thumb {
         appState.trailerPlaying = false;
         appState.trailerPaused = false;
 
-        if (!appState.autoTrailerMode) {
-          console.log("🎬 Single trailer mode — closing trailer");
-          appState.isTrailerAdvancing = false;
-          setTimeout(() => closeTrailer(), 500);
-        } else {
-          console.log("🔁 Autoplay mode — loading next trailer...");
-          appState.isTrailerAdvancing = false;
+        if (appState.autoTrailerMode) {
+          console.log("🔁 Auto-trailer mode — loading next trailer...");
           setTimeout(() => {
             findTrailerAndPlay();
           }, 1000);
+        } else {
+          console.log("🎬 Single trailer mode — trailer ended, staying open");
+          // Don't close trailer in single mode - let user decide
         }
       }
 
@@ -2001,16 +1999,9 @@ body.vcr-mode .year-slider::-moz-range-thumb {
 
     function closeTrailer() {
       console.log("❎ Closing trailer player...");
-      console.log("🎬 Before reset - autoTrailerMode:", appState.autoTrailerMode);
       
-      // Always allow manual closing, but disable auto-trailer mode
-      if (appState.autoTrailerMode) {
-        console.log("🎬 Auto-trailer mode active — disabling auto mode and closing trailer");
-        appState.autoTrailerMode = false;
-      }
-      
+      // Reset trailer state (but don't touch autoTrailerMode)
       appState.resetTrailerState();
-      console.log("🎬 After reset - autoTrailerMode:", appState.autoTrailerMode);
 
       // Safely stop the trailer if playing
       if (trailerPlayer?.stopVideo) {
@@ -2479,19 +2470,50 @@ body.vcr-mode .year-slider::-moz-range-thumb {
       });
     };
 
-    document.getElementById("next-button").onclick = () => {
-      if (appState.fetchTimer) clearTimeout(appState.fetchTimer);
+    // Simple function to play current trailer (single trailer mode)
+    function playCurrentTrailer() {
+      if (!appState.currentTrailerUrl || !appState.currentTrailerUrl.includes("youtube.com")) {
+        console.warn("❌ No trailer available.");
+        return;
+      }
+
+      // Disable auto-trailer mode for single trailer play
+      appState.autoTrailerMode = false;
+      console.log("🎬 Playing current trailer (single mode)");
       
-      // Clear any existing timers that might interfere
-      appState.clearAllTimers();
+      // Show trailer overlay and play
+      const overlay = document.getElementById("trailer-overlay");
+      overlay.classList.add("active");
+      overlay.style.visibility = "visible";
+      overlay.style.opacity = "1";
+      overlay.style.pointerEvents = "auto";
       
-      // Enable auto mode when next button is pressed
+      // Play the current trailer
+      if (trailerPlayer && youtubeReady) {
+        const videoId = extractYouTubeId(appState.currentTrailerUrl);
+        if (videoId) {
+          trailerPlayer.loadVideoById(videoId);
+          trailerPlayer.playVideo();
+          appState.trailerPlaying = true;
+          appState.trailerPaused = false;
+        }
+      }
+    }
+
+    // Simple auto-trailer mode - plays trailers continuously
+    function startAutoTrailerMode() {
+      console.log("🎬 Starting auto-trailer mode");
       appState.autoTrailerMode = true;
-      
-      // Always find and play next trailer immediately
-      console.log("🔍 Finding next trailer...");
       findTrailerAndPlay();
-    };
+    }
+
+    // Next trailer function - immediately skips to next trailer
+    function nextTrailer() {
+      console.log("⏭️ Skipping to next trailer...");
+      findTrailerAndPlay();
+    }
+
+    document.getElementById("next-button").onclick = startAutoTrailerMode;
 
     // Trailer button with long press
     const trailerBtn = document.getElementById("trailer-button");
@@ -2510,15 +2532,7 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     trailerBtn.addEventListener("mouseup", () => clearTimeout(appState.longPressTimer));
     trailerBtn.addEventListener("mouseleave", () => clearTimeout(appState.longPressTimer));
 
-    trailerBtn.addEventListener("click", () => {
-      if (!appState.currentTrailerUrl || !appState.currentTrailerUrl.includes("youtube.com")) {
-        console.warn("❌ No trailer available — click blocked.");
-        return;
-      }
-
-      appState.autoTrailerMode = false;
-      playTrailer(appState.currentTrailerUrl);
-    });
+    trailerBtn.addEventListener("click", playCurrentTrailer);
 
     // Keyboard Shortcuts
     window.addEventListener("keydown", (e) => {
@@ -2529,7 +2543,7 @@ body.vcr-mode .year-slider::-moz-range-thumb {
       }
 
       if (e.key === "n") {
-        // Simulate next button click
+        // Simulate auto-trailer button click
         document.getElementById("next-button").click();
       }
 
@@ -2876,6 +2890,9 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     window.playTrailer = playTrailer;
     window.showOverlayInfo = showOverlayInfo;
     window.findTrailerAndPlay = findTrailerAndPlay;
+    window.nextTrailer = nextTrailer;
+    window.startAutoTrailerMode = startAutoTrailerMode;
+    window.playCurrentTrailer = playCurrentTrailer;
     window.toggleMute = toggleMute;
     window.popoutTrailer = popoutTrailer;
     window.onPlayerStateChange = onPlayerStateChange;
