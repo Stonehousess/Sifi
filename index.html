@@ -1283,7 +1283,8 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     </div>
     
     <div class="overlay-buttons">
-              <button id="overlay-next" onclick="nextTrailer()" class="overlay-btn">Next</button>
+      <button id="overlay-next" onclick="nextTrailer()" class="overlay-btn">Next</button>
+      <button id="overlay-auto-toggle" onclick="toggleAutoTrailer()" class="overlay-btn">Auto: OFF</button>
       <button onclick="document.getElementById('genre-button').click()" class="overlay-btn">Genre</button>
       <button onclick="window.open(currentTMDBUrl, '_blank')" class="overlay-btn">TMDB</button>
       <button onclick="document.getElementById('save-button').click()" class="overlay-btn">Save</button>
@@ -1777,14 +1778,22 @@ body.vcr-mode .year-slider::-moz-range-thumb {
           controls: 1,
           modestbranding: 1,
           rel: 0,
-          showinfo: 0
+          showinfo: 0,
+          origin: window.location.origin
         },
         events: {
           onReady: () => {
             youtubeReady = true;
             console.log("✅ YouTube Player is fully ready");
+            
+            // Test if events are working
+            setTimeout(() => {
+              console.log("🧪 Testing player event system...");
+              console.log("🧪 Player object:", trailerPlayer);
+              console.log("🧪 Player ready state:", trailerPlayer.getPlayerState());
+            }, 1000);
           },
-          onStateChange: window.onPlayerStateChange
+          onStateChange: onPlayerStateChange
         }
       });
 
@@ -1868,174 +1877,129 @@ body.vcr-mode .year-slider::-moz-range-thumb {
       }
     }
 
-    // YouTube Player State Management
-    function onPlayerStateChange(event) {
-      console.log("🎬 ===== PLAYER STATE CHANGED =====", event.data);
-      console.log("🎬 State name:", getStateName(event.data));
-
-      if (event.data === YT.PlayerState.PLAYING) {
-        appState.trailerPaused = false;
-        appState.isTrailerAdvancing = false; // Reset when trailer actually starts playing
-        console.log("✅ Trailer is now playing");
-        console.log("🎬 isTrailerAdvancing reset to false");
-      }
-
-            if (event.data === YT.PlayerState.ENDED) {
+    // Simple player state change handler
+    window.onPlayerStateChange = function(event) {
+      console.log("🎬 ===== PLAYER STATE EVENT RECEIVED =====");
+      console.log("🎬 Event data:", event.data);
+      console.log("🎬 Event target:", event.target);
+      console.log("🎬 Auto-trailer mode:", isAutoTrailerMode);
+      
+      if (event.data === YT.PlayerState.ENDED) {
         console.log("🔚 Trailer ended");
-        appState.trailerPlaying = false;
-        appState.trailerPaused = false;
-
-        if (appState.autoTrailerMode) {
-          console.log("🔁 Auto-trailer mode — loading next trailer...");
+        
+        if (isAutoTrailerMode) {
+          console.log("🔁 Auto mode - finding next trailer");
           setTimeout(() => {
             findTrailerAndPlay();
           }, 1000);
         } else {
-          console.log("🎬 Single trailer mode — trailer ended, staying open");
-          // Don't close trailer in single mode - let user decide
+          console.log("🎬 Single mode - trailer ended, staying open");
         }
       }
-
-      if (event.data === YT.PlayerState.PAUSED) {
-        appState.trailerPaused = true;
-        if (appState.overlayInfo) appState.overlayInfo.style.opacity = "1";
-        console.log("⏸️ Trailer paused");
-
-        if (appState.fetchTimer) {
-          clearTimeout(appState.fetchTimer);
-          appState.fetchTimer = null;
-        }
-      }
-
-      // Handle region/age restrictions and other errors
+      
       if (event.data === YT.PlayerState.UNSTARTED) {
         console.log("⚠️ Video unstarted - possible region/age restriction");
-        if (appState.autoTrailerMode) {
+        if (isAutoTrailerMode) {
           console.log("🔄 Auto mode: Skipping restricted video");
           setTimeout(() => {
-            if (!appState.isTrailerAdvancing) {
-              findTrailerAndPlay();
-            }
+            findTrailerAndPlay();
           }, 2000);
         }
       }
-
-      // Handle video errors
+      
       if (event.data === -1) {
         console.log("❌ Video error detected");
-        if (appState.autoTrailerMode) {
+        if (isAutoTrailerMode) {
           console.log("🔄 Auto mode: Skipping error video");
           setTimeout(() => {
-            if (!appState.isTrailerAdvancing) {
-              findTrailerAndPlay();
-            }
+            findTrailerAndPlay();
           }, 2000);
         }
       }
     }
 
-    // Trailer Management Functions
+    // Simple trailer player function
     function playTrailer(url) {
-      console.log("🎥 playTrailer called with URL:", url);
-      console.log("🎥 Current state - autoTrailerMode:", appState.autoTrailerMode, "isTrailerAdvancing:", appState.isTrailerAdvancing);
+      console.log("🎥 Playing trailer:", url);
       
-      if (!url || !trailerPlayer || !youtubeReady) return;
+      if (!url) {
+        console.error("❌ No URL provided");
+        return;
+      }
 
       const videoId = extractYouTubeId(url);
-      if (!videoId) return;
+      if (!videoId) {
+        console.error("❌ Could not extract video ID from URL:", url);
+        return;
+      }
 
-      // Clear existing timers
-      appState.clearAllTimers();
-
+      console.log("🎥 Loading video ID:", videoId);
+      
       // Show trailer overlay
       const overlay = document.getElementById('trailer-overlay');
-      const playerWrapper = document.querySelector('.player-wrapper');
-
+      const playerDiv = document.getElementById('player');
+      
+      if (!overlay || !playerDiv) {
+        console.error("❌ Trailer overlay or player div not found");
+        return;
+      }
+      
+      // Show the overlay
       overlay.classList.add('active');
       overlay.style.visibility = 'visible';
       overlay.style.opacity = '1';
       overlay.style.pointerEvents = 'auto';
-      overlay.style.zIndex = '3000';
-
-      if (playerWrapper) {
-        playerWrapper.style.removeProperty("display");
-      }
-
-      const playerVideoUrl = trailerPlayer.getVideoUrl?.();
-      const isSameVideo = playerVideoUrl?.includes(videoId);
-
-      if (isSameVideo) {
-        if (!appState.autoTrailerMode) {
-          console.log("🔁 Replaying same trailer manually");
-          trailerPlayer.seekTo(0);
-          trailerPlayer.playVideo();
-          return;
-        } else {
-          console.log("🔁 Same trailer detected in auto mode — finding new trailer");
-          findTrailerAndPlay();
-          return;
-        }
-      }
-
-      // Set trailer state
-      appState.isTrailerAdvancing = false; // Reset this when trailer actually starts
-      appState.trailerPlaying = true;
-      appState.trailerPaused = false;
-      appState.currentTrailerUrl = url;
-      appState.lastTrailerId = videoId;
       
-      console.log("🎥 Playing trailer with ID:", videoId);
-      trailerPlayer.loadVideoById(videoId);
-      trailerPlayer.playVideo?.();
-
-
-
-      // Show trailer info overlay briefly
-      appState.overlayInfo.style.opacity = "1";
-      appState.overlayFadeTimer = setTimeout(() => {
-        appState.overlayInfo.style.opacity = "0";
-      }, 3000);
+      // Create YouTube iframe directly
+      const iframe = document.createElement('iframe');
+      iframe.width = '100%';
+      iframe.height = '100%';
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+      iframe.frameBorder = '0';
+      iframe.allowFullscreen = true;
+      
+      // Clear existing content and add iframe
+      playerDiv.innerHTML = '';
+      playerDiv.appendChild(iframe);
+      
+      // Set up auto-advance for auto-trailer mode
+      if (isAutoTrailerMode) {
+        startAutoAdvanceTimer();
+      }
     }
 
+    // Simple close trailer function
     function closeTrailer() {
-      console.log("❎ Closing trailer player...");
+      console.log("❎ Closing trailer player");
       
-      // Reset trailer state (but don't touch autoTrailerMode)
-      appState.resetTrailerState();
-
-      // Safely stop the trailer if playing
-      if (trailerPlayer?.stopVideo) {
-        try {
-          trailerPlayer.stopVideo();
-          trailerPlayer.clearVideo?.();
-        } catch (err) {
-          console.warn("⚠️ Error stopping video:", err);
-        }
+      // Clear auto-advance timer
+      if (window.autoAdvanceTimer) {
+        clearTimeout(window.autoAdvanceTimer);
+        window.autoAdvanceTimer = null;
+        console.log("🛑 Cleared auto-advance timer");
       }
-
-      // Hide the overlay and player
+      
+      // Clear the player div
+      const playerDiv = document.getElementById('player');
+      if (playerDiv) {
+        playerDiv.innerHTML = '';
+      }
+      
+      // Hide overlay
       const overlay = document.getElementById('trailer-overlay');
-      const playerWrapper = document.querySelector('.player-wrapper');
-
       overlay.classList.remove('active');
       overlay.style.opacity = '0';
       overlay.style.visibility = 'hidden';
       overlay.style.pointerEvents = 'none';
-
-      if (playerWrapper) {
-        playerWrapper.style.display = 'none';
-      }
-
-      // Only restart auto-fetch if NOT in auto-trailer mode
-      if (!appState.autoTrailerMode) {
-        appState.fetchTimer = setTimeout(() => {
-          console.log("🔁 Restarting auto fetch after trailer close...");
+      
+      // Restart auto-fetch if not in auto-trailer mode
+      if (!isAutoTrailerMode) {
+        console.log("🔄 Restarting auto-fetch after trailer close");
+        setTimeout(() => {
           startAutoFetch();
-          startFetchCountdown(60000);
         }, 20000);
-        startFetchCountdown(20000);
       } else {
-        console.log("🎬 Auto-trailer mode active — not restarting auto-fetch");
+        console.log("⏹️ Auto-trailer mode active — not restarting auto-fetch");
       }
     }
 
@@ -2075,6 +2039,13 @@ body.vcr-mode .year-slider::-moz-range-thumb {
       const tmdbLink = document.getElementById("tmdb-link");
       if (tmdbLink) {
         tmdbLink.innerHTML = `| <a href="${data.tmdbUrl}" target="_blank" style="color:#00ccff;">TMDB</a>`;
+      }
+      
+      // Store trailer URL for single trailer mode
+      if (data.trailerUrl) {
+        currentTrailerUrl = data.trailerUrl;
+        appState.currentTrailerUrl = data.trailerUrl; // Also set in appState for compatibility
+        console.log("🎬 Trailer URL stored:", data.trailerUrl);
       }
 
       // Refresh info panel
@@ -2149,90 +2120,44 @@ body.vcr-mode .year-slider::-moz-range-thumb {
       }
     }
 
-    // Trailer Finding and Playing
+    // Simple trailer finding function
     async function findTrailerAndPlay() {
-      console.log("🎯 Finding next trailer...");
-
-      // Set flags
-      appState.isTrailerAdvancing = true;
-      appState.autoTrailerMode = true;
-
-      if (!youtubeReady || !trailerPlayer) {
-        console.warn("⏳ YouTube Player not ready — please wait...");
-        appState.isTrailerAdvancing = false;
-        return;
-      }
-
-      // Reset trailer loop first flag for continuous playback
-      appState.trailerLoopFirst = false;
-
-      closeAllPanels();
-
-      if (appState.fetchTimer) {
-        clearTimeout(appState.fetchTimer);
-        appState.fetchTimer = null;
-      }
-
-      const overlay = document.getElementById("trailer-overlay");
-      const playerWrapper = document.querySelector(".player-wrapper");
-
-      if (overlay) {
-        overlay.classList.add("active");
-        overlay.style.visibility = "visible";
-        overlay.style.opacity = "1";
-        overlay.style.pointerEvents = "auto";
-      }
-
-      if (playerWrapper) {
-        playerWrapper.style.display = "block";
-      }
-
-      let found = false;
-      let attempts = 0;
-      const maxAttempts = 5;
-
-      while (attempts < maxAttempts) {
-        try {
-          const data = await tmdbService.getRandomTitle(true);
-
-          if (data && data.trailerUrl?.includes("youtube.com")) {
-            console.log("🎬 Found trailer — playing", data.trailerUrl);
-            applyFilmToUI(data);
-
-            setTimeout(() => {
-              playTrailer(data.trailerUrl);
-            }, 200);
-
-            found = true;
-            break;
-          }
-
-          attempts++;
-          console.warn(`🔁 Attempt ${attempts}: No trailer found — retrying...`);
+      console.log("🔍 Finding next trailer...");
+      
+      try {
+        const data = await tmdbService.getRandomTitle(true);
+        
+        if (data && data.trailerUrl?.includes("youtube.com")) {
+          console.log("🎬 Found trailer — playing", data.trailerUrl);
           
-          // Add a small delay between attempts to avoid overwhelming the API
-          if (attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
-        } catch (error) {
-          console.error("Error fetching trailer:", error);
-          attempts++;
+          // Update UI with film data
+          applyFilmToUI(data);
           
-          if (attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+          // Store current trailer URL
+          currentTrailerUrl = data.trailerUrl;
+          
+          // Play the trailer in popup
+          playTrailer(data.trailerUrl);
+          
+          // Start auto-advance timer if in auto mode
+          if (isAutoTrailerMode) {
+            startAutoAdvanceTimer();
           }
+        } else {
+          console.log("🎬 No trailer found, trying again...");
+          setTimeout(() => {
+            if (isAutoTrailerMode) {
+              findTrailerAndPlay();
+            }
+          }, 2000);
         }
-      }
-
-      if (!found) {
-        console.warn("⛔ No valid trailer found after 5 tries. Retrying in 5 seconds...");
-        appState.isTrailerAdvancing = false;
-
+      } catch (error) {
+        console.error("Error finding trailer:", error);
         setTimeout(() => {
-          if (appState.autoTrailerMode) {
+          if (isAutoTrailerMode) {
             findTrailerAndPlay();
           }
-        }, 5000);
+        }, 2000);
       }
     }
 
@@ -2257,7 +2182,7 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     }
 
     function startAutoFetch() {
-      if (appState.autoTrailerMode) {
+      if (isAutoTrailerMode) {
         console.log("⏹️ Auto trailer mode active — not starting auto fetch loop.");
         return;
       }
@@ -2268,7 +2193,7 @@ body.vcr-mode .year-slider::-moz-range-thumb {
       }
 
       fetchWithCountdown(false, true).then(() => {
-        if (!appState.autoTrailerMode) {
+        if (!isAutoTrailerMode) {
           appState.fetchTimer = setTimeout(startAutoFetch, 60000);
         } else {
           console.log("🛑 Skipped auto fetch loop restart — autoplay is now active.");
@@ -2277,7 +2202,7 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     }
 
     function fetchWithCountdown(requireTrailer = false, preserveSwipeState = true) {
-      if (appState.autoTrailerMode) return Promise.resolve(false);
+      if (isAutoTrailerMode) return Promise.resolve(false);
       if (appState.isFetching) return Promise.resolve(false);
       appState.isFetching = true;
 
@@ -2470,85 +2395,148 @@ body.vcr-mode .year-slider::-moz-range-thumb {
       });
     };
 
-    // Simple function to play current trailer (single trailer mode)
-    function playCurrentTrailer() {
-      if (!appState.currentTrailerUrl || !appState.currentTrailerUrl.includes("youtube.com")) {
-        console.warn("❌ No trailer available.");
+    // ===== SIMPLE TRAILER SYSTEM =====
+    
+    // Global trailer state
+    let isAutoTrailerMode = false;
+    let currentTrailerUrl = null;
+    
+    // 1. Single Trailer Mode - Play current trailer, stay open
+    function playSingleTrailer() {
+      console.log("🎬 Single trailer button clicked");
+      console.log("🎬 Current trailer URL:", currentTrailerUrl);
+      console.log("🎬 AppState trailer URL:", appState.currentTrailerUrl);
+      
+      // Use either global or appState trailer URL
+      const trailerUrl = currentTrailerUrl || appState.currentTrailerUrl;
+      
+      if (!trailerUrl) {
+        console.warn("❌ No trailer available - trying to find one...");
+        // Try to find a trailer if none is available
+        findTrailerAndPlay();
         return;
       }
-
-      // Disable auto-trailer mode for single trailer play
-      appState.autoTrailerMode = false;
-      console.log("🎬 Playing current trailer (single mode)");
       
-      // Show trailer overlay and play
-      const overlay = document.getElementById("trailer-overlay");
-      overlay.classList.add("active");
-      overlay.style.visibility = "visible";
-      overlay.style.opacity = "1";
-      overlay.style.pointerEvents = "auto";
+      console.log("🎬 Playing single trailer");
+      isAutoTrailerMode = false;
       
-      // Play the current trailer
-      if (trailerPlayer && youtubeReady) {
-        const videoId = extractYouTubeId(appState.currentTrailerUrl);
-        if (videoId) {
-          trailerPlayer.loadVideoById(videoId);
-          trailerPlayer.playVideo();
-          appState.trailerPlaying = true;
-          appState.trailerPaused = false;
+      // Play trailer in popup
+      playTrailer(trailerUrl);
+    }
+    
+    // 2. Auto-Trailer Mode - Play trailers continuously
+    function startAutoTrailerMode() {
+      console.log("🎬 Auto-trailer button clicked");
+      console.log("🎬 Starting auto-trailer mode");
+      
+      // Stop any background fetching
+      if (appState.fetchTimer) {
+        clearTimeout(appState.fetchTimer);
+        appState.fetchTimer = null;
+        console.log("🛑 Stopped background auto-fetch");
+      }
+      
+      isAutoTrailerMode = true;
+      findTrailerAndPlay();
+    }
+    
+    // 3. Manual Skip - Skip to next trailer immediately
+    function skipToNextTrailer() {
+      console.log("⏭️ Skipping to next trailer");
+      findTrailerAndPlay();
+    }
+    
+    // 4. Toggle Auto-Trailer Mode
+    function toggleAutoTrailer() {
+      isAutoTrailerMode = !isAutoTrailerMode;
+      const button = document.getElementById('overlay-auto-toggle');
+      
+      if (isAutoTrailerMode) {
+        console.log("🎬 Auto-trailer mode ENABLED");
+        button.textContent = "Auto: ON";
+        button.style.backgroundColor = "#ffcc00";
+        button.style.color = "#000";
+        
+        // Start auto-advance timer for current trailer
+        startAutoAdvanceTimer();
+      } else {
+        console.log("🎬 Auto-trailer mode DISABLED");
+        button.textContent = "Auto: OFF";
+        button.style.backgroundColor = "";
+        button.style.color = "";
+        
+        // Clear auto-advance timer
+        if (window.autoAdvanceTimer) {
+          clearTimeout(window.autoAdvanceTimer);
+          window.autoAdvanceTimer = null;
         }
       }
     }
-
-    // Simple auto-trailer mode - plays trailers continuously
-    function startAutoTrailerMode() {
-      console.log("🎬 Starting auto-trailer mode");
-      appState.autoTrailerMode = true;
-      findTrailerAndPlay();
-    }
-
-    // Next trailer function - immediately skips to next trailer
-    function nextTrailer() {
-      console.log("⏭️ Skipping to next trailer...");
-      findTrailerAndPlay();
-    }
-
-    document.getElementById("next-button").onclick = startAutoTrailerMode;
-
-    // Trailer button with long press
-    const trailerBtn = document.getElementById("trailer-button");
-    trailerBtn.addEventListener("mousedown", () => {
-      appState.longPressTimer = setTimeout(() => {
-        if (appState.fetchTimer) clearTimeout(appState.fetchTimer);
-        
-        // Force reset trailer state to allow immediate skipping
-        appState.isTrailerAdvancing = false;
-        appState.autoTrailerMode = true;
-        appState.trailerLoopFirst = true;
+    
+    // 5. Quick advance function (for testing)
+    function quickAdvance() {
+      console.log("⚡ Quick advance triggered");
+      if (isAutoTrailerMode) {
         findTrailerAndPlay();
-      }, 600);
-    });
-
-    trailerBtn.addEventListener("mouseup", () => clearTimeout(appState.longPressTimer));
-    trailerBtn.addEventListener("mouseleave", () => clearTimeout(appState.longPressTimer));
-
-    trailerBtn.addEventListener("click", playCurrentTrailer);
-
-    // Keyboard Shortcuts
-    window.addEventListener("keydown", (e) => {
-      const trailerVisible = document.getElementById("trailer-overlay")?.classList.contains("active");
-
-      if (trailerVisible && !["n", "Escape"].includes(e.key)) {
-        return;
       }
-
-      if (e.key === "n") {
-        // Simulate auto-trailer button click
-        document.getElementById("next-button").click();
+    }
+    
+    // Auto-advance timer function
+    function startAutoAdvanceTimer() {
+      if (window.autoAdvanceTimer) {
+        clearTimeout(window.autoAdvanceTimer);
       }
+      
+      console.log("🔁 Auto mode - will advance after trailer");
+      window.autoAdvanceTimer = setTimeout(() => {
+        if (isAutoTrailerMode) {
+          console.log("🔁 Auto mode - advancing to next trailer");
+          findTrailerAndPlay();
+        }
+      }, 15000); // 15 seconds for testing (change back to 60000 for production)
+    }
 
-      if (e.key === "Escape" && appState.trailerPlaying) {
+    // Button assignments
+    console.log("🔧 Setting up button assignments...");
+    
+    const nextButton = document.getElementById("next-button");
+    const trailerButton = document.getElementById("trailer-button");
+    const overlayNextButton = document.getElementById("overlay-next");
+    
+    if (nextButton) {
+      nextButton.onclick = startAutoTrailerMode;
+      console.log("✅ Auto-trailer button assigned");
+    } else {
+      console.error("❌ Auto-trailer button not found");
+    }
+    
+    if (trailerButton) {
+      trailerButton.onclick = playSingleTrailer;
+      console.log("✅ Single trailer button assigned");
+    } else {
+      console.error("❌ Single trailer button not found");
+    }
+    
+    if (overlayNextButton) {
+      overlayNextButton.onclick = skipToNextTrailer;
+      console.log("✅ Overlay next button assigned");
+    } else {
+      console.error("❌ Overlay next button not found");
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'n' || e.key === 'N') {
+        startAutoTrailerMode();
+      }
+      if (e.key === 'Escape') {
         closeTrailer();
+      }
+      if (e.key === 'a' || e.key === 'A') {
+        toggleAutoTrailer();
+      }
+      if (e.key === 'q' || e.key === 'Q') {
+        quickAdvance();
       }
     });
 
@@ -2885,14 +2873,17 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     };
 
     // Expose methods globally
+    // Make functions globally available
     window.closeTrailer = closeTrailer;
     window.togglePanel = togglePanel;
     window.playTrailer = playTrailer;
     window.showOverlayInfo = showOverlayInfo;
-    window.findTrailerAndPlay = findTrailerAndPlay;
-    window.nextTrailer = nextTrailer;
+    window.playSingleTrailer = playSingleTrailer;
     window.startAutoTrailerMode = startAutoTrailerMode;
-    window.playCurrentTrailer = playCurrentTrailer;
+    window.skipToNextTrailer = skipToNextTrailer;
+    window.toggleAutoTrailer = toggleAutoTrailer;
+    window.quickAdvance = quickAdvance;
+    window.findTrailerAndPlay = findTrailerAndPlay;
     window.toggleMute = toggleMute;
     window.popoutTrailer = popoutTrailer;
     window.onPlayerStateChange = onPlayerStateChange;
