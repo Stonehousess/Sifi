@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-lt-installed="true"><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<html lang="en">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="file:///Users/admin/Documents/GitHub/Sifi/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <title>📼VCR📼 🎭</title>
   <style>
   html, body {
@@ -903,11 +903,7 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     min-width: 44px;
   }
   
-  /* Mobile loading spinner */
-  .loading-spinner img {
-    width: 50px;
-    height: 50px;
-  }
+
 }
 
 @media (max-width: 480px) {
@@ -968,11 +964,7 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     height: 65px;
   }
   
-  /* Extra small loading spinner */
-  .loading-spinner img {
-    width: 40px;
-    height: 40px;
-  }
+
 }
 
 /* Landscape orientation optimizations */
@@ -1100,73 +1092,37 @@ body.vcr-mode .year-slider::-moz-range-thumb {
   <div id="movie-container">
     <div id="poster-wrapper">
       <div id="poster-border">
-        <img alt="" draggable="false" id="movie-poster" class="loaded" src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/p08FoXVFgcRm5QZBaGj0VKa2W2Y.webp">
+        <img alt="" draggable="false" id="movie-poster" />
       </div>
     </div>
 
     <!-- Info Panel -->
-    <div id="info-panel" class="hidden">
+    <div id="info-panel">
       <div id="info-content">
         
         <!-- Floating Info Panel Buttons -->
         <div class="info-buttons">
           <button id="tmdb-button" aria-label="View TMDB information">
-            <img src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/tmdb.png" alt="TMDB">
+            <img src="tmdb.png" alt="TMDB" />
           </button>
           <div id="save-button-wrapper" role="button" aria-label="Save movie poster">
-            <img id="save-button" src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/record.png" alt="Save">
+            <img id="save-button" src="record.png" alt="Save" />
             <svg id="save-timer-ring" viewBox="0 0 80 80">
-              <circle r="30" cx="40" cy="40" style="stroke-dasharray: 188.496px; stroke-dashoffset: 66.8935px;"></circle>
+              <circle r="30" cx="40" cy="40" />
             </svg>
           </div>
-          <button id="trailer-button" aria-label="Play trailer" style="cursor: pointer;">
-            <img src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/play.png" alt="Play" style="opacity: 0.6;">
+          <button id="trailer-button" aria-label="Play trailer">
+            <img src="play.png" alt="Play" />
           </button>
           <button id="genre-button" aria-label="Change genre">
-            <img src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/shuffle.png" alt="Shuffle">
+            <img src="shuffle.png" alt="Shuffle" />
           </button>
           <button id="next-button" aria-label="Next movie">
-            <img src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/next.png" alt="Next">
+            <img src="next.png" alt="Next" />
           </button>
         </div>
 
         <div id="info-genre" style="display:none;"></div>
-          <div id="info-crew" style="margin-top:0px; margin-bottom:1px;">
-            <div style="line-height:0.92; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
-              <span style="font-size:70px;">A Shaun the Sheep Movie: Farmageddon</span>
-              <span style="font-size:67px;">(2019)</span>
-            </div>
-
-            <div style="font-size:40px; color:#d4d4d4; font-family: 'Credits', 'Helvetica Neue', Helvetica, Arial, sans-serif; text-transform: uppercase; line-height:0.95;">
-              <span>Justin Fletcher, John Sparkes, Amalia Vitale, Kate Harbour, David Holt</span>
-              <div style="line-height:1;">
-                <span style="text-transform:none;">k</span> <span style="text-transform:uppercase;">Will Becher</span>  
-                <span style="text-transform:none;">  j</span> <span style="text-transform:uppercase;">StudioCanal</span> | 
-                🇬🇧 | 
-                <a href="https://www.themoviedb.org/movie/422803" target="_blank" class="tmdb-link" style="color:#00ccff; text-decoration:none;">TMDB</a>
-              </div>
-            </div>
-
-            <div id="info-description" style="margin-top:1.5px; font-size:20px; line-height:1; color:#dce4e8; font-family:'Bubble', sans-serif;">
-              When an alien with amazing powers crash-lands near Mossy 
-Bottom Farm, Shaun the Sheep goes on a mission to shepherd the 
-intergalactic visitor home before a sinister organization can capture 
-her.
-            </div>
-
-            <div id="info-meta" style="margin-top:1px; font-size:28px; color:#ffcc00; font-family:'DigitalDisplay', monospace; letter-spacing:1px;">
-              69% • 87 min • Animation • --
-            </div>
-          </div>
-        
-          
-        
-          
-        
-          
-        
-          
-        
         <div id="movie-type"></div>
         <div id="movie-runtime"></div>
       </div>
@@ -1194,7 +1150,7 @@ her.
           <div class="filter-item">
             <label>Presets:
               <select id="preset-select">
-                <option value="" selected="selected">Custom</option>
+                <option value="">Custom</option>
                 <option value="usa-80s">🇺🇸 USA 1980-1989</option>
                 <option value="usa-90s">🇺🇸 USA 1990-1999</option>
                 <option value="usa-80s-90s">🇺🇸 USA 1980-1999</option>
@@ -1212,14 +1168,14 @@ her.
 
           <div class="filter-item">
             <label>Genre: 
-              <select id="genre-select"><option value="all">All</option><option value="Sci-Fi">Sci-Fi</option><option value="Adventure">Adventure</option><option value="Comedy">Comedy</option><option value="Documentary">Documentary</option><option value="Animation" selected="selected">Animation</option><option value="Romance">Romance</option><option value="Crime">Crime</option><option value="Mystery">Mystery</option><option value="Action">Action</option><option value="Drama">Drama</option><option value="Thriller">Thriller</option><option value="Horror">Horror</option><option value="Fantasy">Fantasy</option><option value="War">War</option><option value="Western">Western</option><option value="Family">Family</option><option value="History">History</option><option value="Music">Music</option><option value="Sport">Sport</option></select>
+              <select id="genre-select"></select>
             </label>
           </div>
 
           <div class="filter-item">
             <label>Type: 
               <select id="type-select">
-                <option value="all" selected="selected">All</option>
+                <option value="all">All</option>
                 <option value="movie">Movie</option>
                 <option value="tv">TV</option>
               </select>
@@ -1229,7 +1185,7 @@ her.
           <div class="filter-item">
             <label>Country: 
               <select id="country-select">
-                <option value="" selected="selected">Any</option>
+                <option value="">Any</option>
                 <option value="US">🇺🇸</option>
                 <option value="GB">🇬🇧</option>
                 <option value="FR">🇫🇷</option>
@@ -1257,7 +1213,7 @@ her.
           <div class="filter-item">
             <label>Trailer: 
               <select id="trailer-select">
-                <option value="any" selected="selected">Any</option>
+                <option value="any">Any</option>
                 <option value="required">With Trailer Only</option>
               </select>
             </label>
@@ -1273,7 +1229,7 @@ her.
           <div class="filter-item">
             <label>Sort By: 
               <select id="sort-select">
-                <option value="popularity.desc" selected="selected">Popularity</option>
+                <option value="popularity.desc">Popularity</option>
                 <option value="vote_average.desc">Rating</option>
                 <option value="release_date.desc">Newest</option>
                 <option value="release_date.asc">Oldest</option>
@@ -1295,7 +1251,7 @@ her.
   <!-- Trailer Overlay -->
   <div id="trailer-overlay">
     <div class="player-wrapper">
-      <iframe id="player" frameborder="0" allowfullscreen="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" title="YouTube video player" width="640" height="390" src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/a.html"></iframe>
+      <div id="player"></div>
       <div id="popout-overlay-button" class="overlay-float">
         <button onclick="popoutTrailer()" class="overlay-btn">Pop Out</button>
       </div>
@@ -1303,26 +1259,27 @@ her.
     
     <div id="overlay-info">
       <div style="font-size:60px; line-height:0.9; color:#fff; font-family:'Credits', sans-serif; text-transform: uppercase;">
-        <span style="font-size:60px;"><span id="overlay-title">A Shaun the Sheep Movie: Farmageddon</span></span>
-        <span style="font-size:55px;">(<span id="overlay-year">2019</span>)</span>
+        <span style="font-size:60px;"><span id="overlay-title">TITLE</span></span>
+        <span style="font-size:55px;">(<span id="overlay-year">YEAR</span>)</span>
       </div>
 
       <div style="font-size:34px; color:#d4d4d4; font-family:'Credits', sans-serif; text-transform: uppercase; line-height:1;">
-        <div id="overlay-cast">JUSTIN FLETCHER, JOHN SPARKES, AMALIA VITALE, KATE HARBOUR, DAVID HOLT</div>
+        <div id="overlay-cast">CAST</div>
         <div>
-          <span style="text-transform:none;">k</span> <span id="overlay-director">WILL BECHER</span> |
-          <span style="text-transform:none;">j</span> <span id="overlay-studio">STUDIOCANAL</span> |
-          <span id="overlay-flag">🇬🇧</span> |
-          <a id="overlay-tmdb" href="https://www.themoviedb.org/movie/422803" target="_blank" class="tmdb-link">TMDB</a>
+          <span style="text-transform:none;">k</span> <span id="overlay-director">DIRECTOR</span> |
+          <span style="text-transform:none;">j</span> <span id="overlay-studio">STUDIO</span> |
+          <span id="overlay-flag">🌍</span> |
+          <a id="overlay-tmdb" href="#" target="_blank" class="tmdb-link">TMDB</a>
         </div>
       </div>
 
-      <div id="overlay-meta" style="font-size:26px; font-family:'DigitalDisplay', monospace; color:#ffcc00; letter-spacing:1px;">69% • 87 min • Animation • --</div>
+      <div id="overlay-meta" style="font-size:26px; font-family:'DigitalDisplay', monospace; color:#ffcc00; letter-spacing:1px;">
+        META
+      </div>
 
-      <div id="overlay-description" style="font-size:20px; color:#dce4e8; font-family:'Bubble', sans-serif; line-height:1.2; margin-top:4px;">When
- an alien with amazing powers crash-lands near Mossy Bottom Farm, Shaun 
-the Sheep goes on a mission to shepherd the intergalactic visitor home 
-before a sinister organization can capture her.</div>
+      <div id="overlay-description" style="font-size:20px; color:#dce4e8; font-family:'Bubble', sans-serif; line-height:1.2; margin-top:4px;">
+        DESCRIPTION
+      </div>
     </div>
     
     <div class="overlay-buttons">
@@ -1337,7 +1294,7 @@ before a sinister organization can capture her.</div>
   <!-- Error Messages -->
   <div id="error-message" class="error-message" style="display: none;"></div>
 
-  <script type="text/javascript" id="www-widgetapi-script" src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/www-widgetapi.js" async=""></script><script src="%F0%9F%93%BCVCR%F0%9F%93%BC%20%F0%9F%8E%AD_files/iframe_api.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script type="module">
     // Configuration - Move to environment variables in production
     const CONFIG = {
@@ -1459,11 +1416,7 @@ before a sinister organization can capture her.</div>
         }, duration);
       }
 
-      static showLoading(show = true) {
-        // Loading spinner completely disabled - using glowing line effect instead
-        // const loadingEl = document.getElementById('loading-spinner');
-        // loadingEl.style.display = 'none';
-      }
+
 
       static async handleApiError(error, context = '') {
         console.error(`API Error in ${context}:`, error);
@@ -1556,13 +1509,11 @@ before a sinister organization can capture her.</div>
 
       async getRandomTitle(requireTrailer = false, overrideType = null, overrideGenreId = null) {
         try {
-          ErrorHandler.showLoading(true);
-          
           const selectedGenreName = document.getElementById("genre-select")?.value;
           const selectedCountry = document.getElementById("country-select")?.value;
           const selectedType = document.getElementById("type-select")?.value || "movie";
           const selectedRating = parseFloat(document.getElementById("rating-range")?.value || 0);
-          const requireTrailer = document.getElementById("trailer-select")?.value === "required";
+          const trailerRequired = document.getElementById("trailer-select")?.value === "required";
           const selectedSort = document.getElementById("sort-select")?.value || "popularity.desc";
 
           const type = selectedType === "all" ? (Math.random() < 0.5 ? "movie" : "tv") : selectedType;
@@ -1664,7 +1615,7 @@ before a sinister organization can capture her.</div>
           const processedData = this.processMovieData(item, detailData, type);
           
           // If trailer is required but not found, skip this item
-          if (requireTrailer && !processedData.trailerUrl) {
+          if (trailerRequired && !processedData.trailerUrl) {
             console.log("🎬 Trailer required but not found - skipping");
             return this.getRandomTitle(requireTrailer, overrideType, overrideGenreId);
           }
@@ -1674,8 +1625,6 @@ before a sinister organization can capture her.</div>
         } catch (error) {
           await ErrorHandler.handleApiError(error, 'getRandomTitle');
           return false;
-        } finally {
-          ErrorHandler.showLoading(false);
         }
       }
 
@@ -2927,7 +2876,7 @@ before a sinister organization can capture her.</div>
       // First load
       console.log("🚀 Starting first fetch...");
       fetchWithCountdown(false, true).then(() => {
-        window.initialLoadComplete = true;
+
         appState.fetchTimer = setTimeout(startAutoFetch, 60000);
       });
     };
@@ -2943,6 +2892,5 @@ before a sinister organization can capture her.</div>
     window.onPlayerStateChange = onPlayerStateChange;
     window.failSafeTimeout = null;
   </script>
-
-
-</body></html>
+</body>
+</html>
