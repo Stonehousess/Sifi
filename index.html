@@ -1663,6 +1663,37 @@ body.vcr-mode .year-slider::-moz-range-thumb {
 
         const tmdbUrl = `https://www.themoviedb.org/${type}/${item.id}`;
 
+        // Save to Firebase
+        const docRef = doc(db, "films", String(item.id));
+        setDoc(docRef, {
+          id: item.id,
+          title,
+          overview,
+          year,
+          releaseDate,
+          runtime: runtime ?? "--",
+          episodeCount: episodeCount ?? "--",
+          rating,
+          popularity: item.popularity,
+          originCountry,
+          trailerUrl: currentTrailerUrl,
+          trailerKey: trailer ? trailer.key : null,
+          genre: appState.currentGenre.name,
+          type,
+          tmdbUrl,
+          director: director ?? "Unknown",
+          castList: castList ?? "Unknown",
+          studio: studio ?? "Unknown",
+          budget: budget ?? "--",
+          posterUrl: posterPath,
+          metaText,
+          timestamp: Date.now(),
+          timestampReadable: new Date().toISOString(),
+          cachedBy: "public"
+        }).catch(error => {
+          console.warn("Failed to save to Firebase:", error);
+        });
+
         return {
           id: item.id,
           title,
@@ -1756,6 +1787,53 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     window.tmdbService = tmdbService;
     window.getFlagEmoji = getFlagEmoji;
     window.extractYouTubeId = extractYouTubeId;
+
+    // Firebase Export Functions
+    function convertToCSV(data) {
+      if (!data || data.length === 0) return "";
+      
+      const headers = Object.keys(data[0]);
+      const csvRows = [headers.join(',')];
+      
+      for (const row of data) {
+        const values = headers.map(header => {
+          const value = row[header];
+          const escaped = String(value).replace(/"/g, '""');
+          return `"${escaped}"`;
+        });
+        csvRows.push(values.join(','));
+      }
+      
+      return csvRows.join('\n');
+    }
+
+    async function exportFirestoreAsCSV() {
+      try {
+        console.log("📊 Exporting Firebase data to CSV...");
+        const snapshot = await getDocs(collection(db, "films"));
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        const csv = convertToCSV(data);
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `firebase-saved-films-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        console.log(`✅ Exported ${data.length} records to CSV`);
+      } catch (error) {
+        console.error("❌ Export failed:", error);
+        ErrorHandler.showError("Export failed. Check console for details.");
+      }
+    }
 
     // Continue with the rest of your existing functions, but using the new structure...
     // (I'll continue with the key functions that need the most attention)
@@ -1962,10 +2040,8 @@ body.vcr-mode .year-slider::-moz-range-thumb {
       playerDiv.innerHTML = '';
       playerDiv.appendChild(iframe);
       
-      // Set up auto-advance for auto-trailer mode
-      if (isAutoTrailerMode) {
-        startAutoAdvanceTimer();
-      }
+      // Auto-advance is now handled by onPlayerStateChange event
+      // when the video actually ends
     }
 
     // Simple close trailer function
@@ -2457,19 +2533,14 @@ body.vcr-mode .year-slider::-moz-range-thumb {
         button.style.backgroundColor = "#ffcc00";
         button.style.color = "#000";
         
-        // Start auto-advance timer for current trailer
-        startAutoAdvanceTimer();
+        // Auto-advance is now handled by onPlayerStateChange event
       } else {
         console.log("🎬 Auto-trailer mode DISABLED");
         button.textContent = "Auto: OFF";
         button.style.backgroundColor = "";
         button.style.color = "";
         
-        // Clear auto-advance timer
-        if (window.autoAdvanceTimer) {
-          clearTimeout(window.autoAdvanceTimer);
-          window.autoAdvanceTimer = null;
-        }
+        // Auto-advance is now handled by onPlayerStateChange event
       }
     }
     
@@ -2481,20 +2552,9 @@ body.vcr-mode .year-slider::-moz-range-thumb {
       }
     }
     
-    // Auto-advance timer function
-    function startAutoAdvanceTimer() {
-      if (window.autoAdvanceTimer) {
-        clearTimeout(window.autoAdvanceTimer);
-      }
-      
-      console.log("🔁 Auto mode - will advance after trailer");
-      window.autoAdvanceTimer = setTimeout(() => {
-        if (isAutoTrailerMode) {
-          console.log("🔁 Auto mode - advancing to next trailer");
-          findTrailerAndPlay();
-        }
-      }, 15000); // 15 seconds for testing (change back to 60000 for production)
-    }
+    // Auto-advance timer function - REMOVED
+    // Trailer advancement now only happens when video actually ends
+    // via the onPlayerStateChange event handler
 
     // Button assignments
     console.log("🔧 Setting up button assignments...");
@@ -2526,16 +2586,29 @@ body.vcr-mode .year-slider::-moz-range-thumb {
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'n' || e.key === 'N') {
-        startAutoTrailerMode();
+      const key = e.key.toLowerCase();
+      
+      if (key === "e") exportFirestoreAsCSV?.();
+      if (key === "m") toggleMute?.();
+      if (key === "n" || key === "arrowright") document.getElementById("next-button")?.click();
+      if (key === "f") {
+        const iframe = document.querySelector("#player iframe");
+        const wrapper = document.getElementById("player");
+        if (!document.fullscreenElement) {
+          (iframe?.requestFullscreen?.() || wrapper?.requestFullscreen?.()).catch(err => {
+            console.warn("❌ Fullscreen failed:", err);
+          });
+        } else {
+          document.exitFullscreen?.();
+        }
       }
-      if (e.key === 'Escape') {
+      if (key === 'escape') {
         closeTrailer();
       }
-      if (e.key === 'a' || e.key === 'A') {
+      if (key === 'a') {
         toggleAutoTrailer();
       }
-      if (e.key === 'q' || e.key === 'Q') {
+      if (key === 'q') {
         quickAdvance();
       }
     });
@@ -2887,7 +2960,7 @@ body.vcr-mode .year-slider::-moz-range-thumb {
     window.toggleMute = toggleMute;
     window.popoutTrailer = popoutTrailer;
     window.onPlayerStateChange = onPlayerStateChange;
-
+    window.exportFirestoreAsCSV = exportFirestoreAsCSV;
   </script>
 </body>
 </html>
